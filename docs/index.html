@@ -3,92 +3,324 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flask-ADB-toolkit</title>
+    <title>Flask-ADB-toolkit | Premium Terminal Toolkit</title>
+    
+    <!-- Google Fonts: Inter & JetBrains Mono for a premium feel -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Inter', sans-serif; }
-        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .gradient-text { background: linear-gradient(to right, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        pre { background: #1e293b; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; border: 1px solid #334155; }
+        /* --- BASE & TYPOGRAPHY --- */
+        :root {
+            --font-sans: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+        body {
+            font-family: var(--font-sans);
+            background-color: #000;
+            color: #e2e8f0;
+            overflow-x: hidden;
+            cursor: none; /* Hide default cursor */
+        }
+        code, pre {
+            font-family: var(--font-mono);
+        }
+
+        /* --- CUSTOM CURSOR --- */
+        .cursor {
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            mix-blend-mode: difference;
+            transition: transform 0.1s ease;
+        }
+        .cursor-ring {
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(255,255,255,0.5);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9998;
+            transition: transform 0.15s ease-out;
+        }
+
+        /* --- MATRIX RAIN CANVAS --- */
+        #matrix-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.15; /* Subtle background effect */
+            pointer-events: none;
+        }
+
+        /* --- GLASSMORPHISM & PREMIUM CARDS --- */
+        .glass-panel {
+            background: rgba(10, 10, 10, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-panel:hover {
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -15px rgba(255, 255, 255, 0.05);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #ffffff 0%, #a0a0a0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* --- TERMINAL WINDOW --- */
+        .terminal-window {
+            background: #0a0a0a;
+            border: 1px solid #222;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.8);
+        }
+        .terminal-header {
+            background: #111;
+            padding: 8px 12px;
+            display: flex;
+            gap: 6px;
+        }
+        .terminal-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        .terminal-body {
+            padding: 20px;
+            font-size: 0.9rem;
+        }
+
+        /* --- SCROLL REVEAL ANIMATION --- */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- INTERACTIVE GLOW --- */
+        .glow-text {
+            text-shadow: 0 0 20px rgba(255,255,255,0.3);
+        }
+
+        /* Hide cursor on mobile for better UX */
+        @media (max-width: 768px) {
+            body { cursor: auto; }
+            .cursor, .cursor-ring { display: none; }
+        }
     </style>
 </head>
-<body class="antialiased">
+<body class="antialiased selection:bg-white selection:text-black">
 
-    <!-- Navbar -->
-    <nav class="glass sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
-        <div class="text-xl font-bold gradient-text">⚡ Flask-ADB-toolkit</div>
-        <div class="space-x-6 text-sm font-medium">
-            <a href="#features" class="hover:text-sky-400 transition">Features</a>
-            <a href="#setup" class="hover:text-sky-400 transition">Setup</a>
-            <a href="https://github.com/dedsec-1337/Flask-ADB-toolkit" target="_blank" class="bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded-lg transition">GitHub Repo</a>
+    <!-- Custom Cursor -->
+    <div class="cursor" id="cursor"></div>
+    <div class="cursor-ring" id="cursor-ring"></div>
+
+    <!-- Matrix Rain Background -->
+    <canvas id="matrix-canvas"></canvas>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass-panel !rounded-none !border-t-0 !border-l-0 !border-r-0 px-6 py-4 flex justify-between items-center">
+        <div class="text-xl font-bold tracking-tighter text-white">⚡ Flask-ADB-toolkit</div>
+        <div class="hidden md:flex space-x-8 text-sm font-medium text-gray-400">
+            <a href="#features" class="hover:text-white transition-colors duration-300">Features</a>
+            <a href="#quickstart" class="hover:text-white transition-colors duration-300">Quick Start</a>
+            <a href="https://github.com/dedsec-1337/Flask-ADB-toolkit" target="_blank" class="text-white bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg transition-all duration-300">GitHub</a>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <header class="max-w-5xl mx-auto px-6 py-24 text-center">
-        <h1 class="text-6xl font-extrabold tracking-tight mb-6">
-            <span class="gradient-text">Flask-ADB-toolkit</span>
-        </h1>
-        <p class="text-xl text-slate-400 max-w-2xl mx-auto mb-10">
-            One little flask 🧪 — every flashing tool you'll ever need. A powerful, web-based interface for Android Debug Bridge.
-        </p>
-        <div class="flex justify-center gap-4">
-            <a href="#setup" class="bg-sky-500 hover:bg-sky-600 text-white px-8 py-3 rounded-full font-semibold transition shadow-lg shadow-sky-500/30">Get Started</a>
-            <a href="https://github.com/dedsec-1337/Flask-ADB-toolkit" target="_blank" class="glass hover:bg-slate-700 text-white px-8 py-3 rounded-full font-semibold transition">View Source</a>
+    <header class="relative z-10 flex flex-col items-center justify-center min-h-screen text-center px-6 pt-20">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-6xl md:text-8xl font-extrabold tracking-tight mb-8 gradient-text glow-text">
+                Flask-ADB-toolkit
+            </h1>
+            <p class="text-xl md:text-2xl text-gray-400 max-w-2xl mx-auto mb-12 leading-relaxed font-light">
+                One little flask 🧪 — every flashing tool you'll ever need. A powerful, menu-driven terminal toolkit for Android Debug Bridge, built for people who want to tinker, not memorize commands.
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center gap-6">
+                <a href="#quickstart" class="glass-panel px-8 py-4 font-semibold text-white hover:!bg-white/10 transition-all duration-300">
+                    Get Started
+                </a>
+                <a href="https://github.com/dedsec-1337/Flask-ADB-toolkit" target="_blank" class="px-8 py-4 font-semibold text-gray-400 hover:text-white transition-all duration-300 flex items-center justify-center gap-2">
+                    View Source <span>→</span>
+                </a>
+            </div>
+        </div>
+        <!-- Scroll indicator -->
+        <div class="absolute bottom-10 animate-bounce text-gray-500">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
         </div>
     </header>
 
     <!-- Features Section -->
-    <section id="features" class="max-w-5xl mx-auto px-6 py-16">
-        <h2 class="text-3xl font-bold text-center mb-12">Key Features</h2>
+    <section id="features" class="relative z-10 max-w-6xl mx-auto px-6 py-32">
+        <div class="reveal">
+            <h2 class="text-4xl md:text-5xl font-bold text-center mb-4 gradient-text">Key Features</h2>
+            <p class="text-gray-500 text-center mb-16 max-w-xl mx-auto">Everything you need to manage your Android device, wrapped in a friendly terminal interface.</p>
+        </div>
+        
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="glass p-8 rounded-2xl hover:border-sky-500/50 transition">
-                <div class="text-3xl mb-4">🚀</div>
-                <h3 class="text-xl font-bold mb-2">Fast & Lightweight</h3>
-                <p class="text-slate-400">Built on Flask, providing a snappy and responsive web interface for all your ADB needs.</p>
+            <!-- Feature Card 1 -->
+            <div class="glass-panel p-8 reveal">
+                <div class="text-4xl mb-6 grayscale">🚀</div>
+                <h3 class="text-2xl font-bold mb-3 text-white">Fast & Lightweight</h3>
+                <p class="text-gray-400 leading-relaxed">A snappy terminal program that wraps all the scary <code class="text-xs bg-white/10 px-1 rounded">fastboot</code> and <code class="text-xs bg-white/10 px-1 rounded">adb</code> commands into friendly numbered options.</p>
             </div>
-            <div class="glass p-8 rounded-2xl hover:border-sky-500/50 transition">
-                <div class="text-3xl mb-4">📱</div>
-                <h3 class="text-xl font-bold mb-2">Full ADB Control</h3>
-                <p class="text-slate-400">Manage devices, install APKs, push/pull files, and execute shell commands directly from your browser.</p>
+            <!-- Feature Card 2 -->
+            <div class="glass-panel p-8 reveal" style="transition-delay: 100ms;">
+                <div class="text-4xl mb-6 grayscale">📱</div>
+                <h3 class="text-2xl font-bold mb-3 text-white">Full ADB Control</h3>
+                <p class="text-gray-400 leading-relaxed">Flash ROMs, restore stock, flash any partition on any device, deep-clean junk, run performance passes, take screenshots, and install APKs.</p>
             </div>
-            <div class="glass p-8 rounded-2xl hover:border-sky-500/50 transition">
-                <div class="text-3xl mb-4">🛠️</div>
-                <h3 class="text-xl font-bold mb-2">Easy to Use</h3>
-                <p class="text-slate-400">A clean and intuitive UI designed to make Android debugging accessible to everyone.</p>
+            <!-- Feature Card 3 -->
+            <div class="glass-panel p-8 reveal" style="transition-delay: 200ms;">
+                <div class="text-4xl mb-6 grayscale">🛠️</div>
+                <h3 class="text-2xl font-bold mb-3 text-white">Easy to Use</h3>
+                <p class="text-gray-400 leading-relaxed">Built for people who know nothing about custom ROMs but want to try. No memorizing commands, just plug in and pick from a menu.</p>
             </div>
         </div>
     </section>
 
-    <!-- Setup Section -->
-    <section id="setup" class="max-w-3xl mx-auto px-6 py-16">
-        <h2 class="text-3xl font-bold text-center mb-12">Quick Start</h2>
-        <div class="glass p-8 rounded-2xl">
-            <ol class="list-decimal list-inside space-y-6 text-slate-300">
-                <li>
-                    <strong class="text-white">Clone the repository:</strong>
-                    <pre class="mt-2 text-sm text-sky-300">git clone https://github.com/dedsec-1337/Flask-ADB-toolkit.git</pre>
-                </li>
-                <li>
-                    <strong class="text-white">Navigate to the directory:</strong>
-                    <pre class="mt-2 text-sm text-sky-300">cd Flask-ADB-toolkit</pre>
-                </li>
-                <li>
-                    <strong class="text-white">Install dependencies:</strong>
-                    <pre class="mt-2 text-sm text-sky-300">pip install -r requirements.txt</pre>
-                </li>
-                <li>
-                    <strong class="text-white">Run the application:</strong>
-                    <pre class="mt-2 text-sm text-sky-300">python app.py</pre>
-                </li>
-            </ol>
+    <!-- Quick Start Section -->
+    <section id="quickstart" class="relative z-10 max-w-4xl mx-auto px-6 py-32">
+        <div class="reveal">
+            <h2 class="text-4xl md:text-5xl font-bold text-center mb-4 gradient-text">Quick Start</h2>
+            <p class="text-gray-500 text-center mb-12">Get up and running in under 30 seconds.</p>
+        </div>
+
+        <div class="terminal-window reveal">
+            <div class="terminal-header">
+                <div class="terminal-dot bg-red-500"></div>
+                <div class="terminal-dot bg-yellow-500"></div>
+                <div class="terminal-dot bg-green-500"></div>
+                <span class="ml-auto text-xs text-gray-500 font-mono">bash</span>
+            </div>
+            <div class="terminal-body">
+                <div class="mb-6">
+                    <span class="text-gray-500"># 1. Save the script (paste the contents from the repo)</span>
+                    <pre class="text-white mt-1"><code>nano ~/flask-adb-toolkit.sh</code></pre>
+                </div>
+                <div class="mb-6">
+                    <span class="text-gray-500"># 2. Make it executable & run</span>
+                    <pre class="text-white mt-1"><code>chmod +x ~/flask-adb-toolkit.sh && ~/flask-adb-toolkit.sh</code></pre>
+                </div>
+                <div class="text-gray-500 text-sm mt-4">
+                    <p>💡 <strong>Windows (Git Bash):</strong> Double-click <code class="text-white">flask-adb-toolkit.bat</code></p>
+                    <p class="mt-1">💡 <strong>Windows (WSL):</strong> Follow the Linux steps above inside WSL.</p>
+                </div>
+            </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="border-t border-slate-800 mt-16 py-8 text-center text-slate-500 text-sm">
+    <footer class="relative z-10 border-t border-white/10 mt-20 py-12 text-center text-gray-600 text-sm">
         <p>Built with ❤️ by dedsec-1337. Hosted on GitHub Pages.</p>
+        <p class="mt-2 text-xs text-gray-700">Premium Matrix design for the Flask-ADB-toolkit.</p>
     </footer>
 
+    <script>
+        // --- CUSTOM CURSOR LOGIC ---
+        const cursor = document.getElementById('cursor');
+        const cursorRing = document.getElementById('cursor-ring');
+
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+            cursorRing.style.left = (e.clientX - 16) + 'px';
+            cursorRing.style.top = (e.clientY - 16) + 'px';
+        });
+
+        // Hover effect on interactive elements
+        document.querySelectorAll('a, button').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cursor.style.transform = 'scale(2)';
+                cursorRing.style.transform = 'scale(1.5)';
+            });
+            el.addEventListener('mouseleave', () => {
+                cursor.style.transform = 'scale(1)';
+                cursorRing.style.transform = 'scale(1)';
+            });
+        });
+
+        // --- MATRIX RAIN CANVAS LOGIC (Monochrome) ---
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let width, height, columns, yPositions;
+        const fontSize = 14;
+        const chars = 'アィウェオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF';
+
+        function setupCanvas() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            columns = Math.floor(width / fontSize);
+            yPositions = Array(columns).fill(1);
+        }
+
+        function drawMatrix() {
+            // Fade effect (black with low opacity)
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, width, height);
+
+            ctx.fillStyle = '#ffffff'; // White characters
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < yPositions.length; i++) {
+                const text = chars.charAt(Math.floor(Math.random() * chars.length));
+                const x = i * fontSize;
+                const y = yPositions[i] * fontSize;
+
+                // Add a subtle glow to the leading character
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = 'rgba(255,255,255,0.5)';
+                ctx.fillText(text, x, y);
+                ctx.shadowBlur = 0; // Reset for the next frame
+
+                // Reset to top when off-screen, with random offset
+                if (y > height && Math.random() > 0.975) {
+                    yPositions[i] = 0;
+                } else {
+                    yPositions[i]++;
+                }
+            }
+        }
+
+        setupCanvas();
+        window.addEventListener('resize', setupCanvas);
+        setInterval(drawMatrix, 50); // Smooth 20 FPS for a less "frantic" look
+
+        // --- SCROLL REVEAL ANIMATION ---
+        const revealElements = document.querySelectorAll('.reveal');
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, { threshold: 0.15 });
+
+        revealElements.forEach(el => revealObserver.observe(el));
+    </script>
 </body>
 </html>
