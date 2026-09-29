@@ -26,7 +26,7 @@ jobs:
           node-version: '20'
 
       - name: Generate static site
-        run: npx landing-page-generator from . --output ./site --theme dark
+        run: npx silentforge init dedsec-1337/Flask-ADB-toolkit -o ./site
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
