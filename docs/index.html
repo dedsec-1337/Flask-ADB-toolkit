@@ -101,7 +101,7 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
    ============================================ */
 #dedsec-canvas {
   position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-  z-index: 0; opacity: 0.2; pointer-events: none;
+  z-index: 0; opacity: 0.22; pointer-events: none;
 }
 
 /* ============================================
@@ -385,7 +385,7 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
 @media (max-width: 768px) {
   body { cursor: auto; }
   .cursor, .cursor-ring { display: none; }
-  #dedsec-canvas { opacity: 0.12; }
+  #dedsec-canvas { opacity: 0.14; }
   .terminal-body { font-size: 0.78rem; }
 }
 
@@ -641,7 +641,6 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
       cursor.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
     }, { passive: true });
 
-    // Smooth ring follow via rAF
     const followRing = () => {
       ringX += (mouseX - ringX - 16) * 0.18;
       ringY += (mouseY - ringY - 16) * 0.18;
@@ -650,7 +649,6 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
     };
     requestAnimationFrame(followRing);
 
-    // Hover scale
     const interactives = document.querySelectorAll('a, button');
     interactives.forEach(el => {
       el.addEventListener('mouseenter', () => {
@@ -665,7 +663,7 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
   }
 
   // ============================================
-  // DEDSEC MATRIX RAIN — Optimized with rAF
+  // DEDSEC MATRIX RAIN — white stream, blood-red accent
   // ============================================
   if (!prefersReducedMotion) {
     const ctx = canvas.getContext('2d', { alpha: true });
@@ -675,8 +673,13 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
     const FRAME_INTERVAL = 50; // ~20 FPS
     let visible = true;
 
-    const CHARS = 'アィウェオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF';
+    const CHARS = 'アィウェオカキクケコサシスセソタチツタトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF';
     const DEDSEC_WORDS = ['DEDSEC', 'HACK', 'CTOS', '0101', 'WATCH_DOGS'];
+
+    // Color palette for the rain
+    const COLOR_WHITE = '#ffffff';
+    const COLOR_BLOOD = '#b91c1c';   // deep blood red — the revolt
+    const COLOR_GLITCH = '#ff0000';  // brighter spike on rare glitch frames
 
     function setupCanvas() {
       fontSize = isMobile ? 12 : 14;
@@ -694,9 +697,9 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
       ctx.fillStyle = 'rgba(0, 0, 0, 0.06)';
       ctx.fillRect(0, 0, width, height);
 
-      // Occasional red glitch flash
-      if (Math.random() > 0.99) {
-        ctx.fillStyle = 'rgba(255, 0, 0, 0.04)';
+      // Rare full-screen red pulse (a moment of unrest)
+      if (Math.random() > 0.995) {
+        ctx.fillStyle = 'rgba(185, 28, 28, 0.05)';
         ctx.fillRect(0, 0, width, height);
       }
 
@@ -711,9 +714,22 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
         const x = i * fontSize;
         const y = yPositions[i] * fontSize;
 
-        const isGlitch = Math.random() > 0.98;
-        ctx.fillStyle = isGlitch ? '#ff0000' : '#ffffff';
-        ctx.shadowColor = isGlitch ? 'rgba(255,0,0,0.8)' : 'rgba(255,255,255,0.5)';
+        // Priority: rare bright glitch > blood red > white
+        let color, glow;
+        const roll = Math.random();
+        if (roll > 0.985) {
+          color = COLOR_GLITCH;
+          glow = 'rgba(255, 0, 0, 0.9)';
+        } else if (roll > 0.82) {
+          color = COLOR_BLOOD;
+          glow = 'rgba(185, 28, 28, 0.55)';
+        } else {
+          color = COLOR_WHITE;
+          glow = 'rgba(255, 255, 255, 0.5)';
+        }
+
+        ctx.fillStyle = color;
+        ctx.shadowColor = glow;
         ctx.shadowBlur = 6;
         ctx.fillText(text, x, y);
         ctx.shadowBlur = 0;
@@ -725,14 +741,12 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
       requestAnimationFrame(draw);
     }
 
-    // Debounced resize
     let resizeTimer;
     window.addEventListener('resize', () => {
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(setupCanvas, 150);
     }, { passive: true });
 
-    // Pause when tab hidden (saves CPU + battery)
     document.addEventListener('visibilitychange', () => {
       visible = !document.hidden;
     });
@@ -760,7 +774,7 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
   }
 
   // ============================================
-  // OS TABS + COMMAND COPY
+  // OS TABS
   // ============================================
   const OS_COMMANDS = {
     debian: 'sudo apt update && sudo apt install android-tools-adb android-tools-fastboot',
@@ -805,7 +819,6 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
       if (navigator.clipboard && window.isSecureContext) {
         await navigator.clipboard.writeText(text);
       } else {
-        // Fallback for older browsers
         const ta = document.createElement('textarea');
         ta.value = text;
         ta.style.position = 'fixed';
@@ -821,7 +834,6 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
     }
   };
 
-  // Delegate all copy button clicks
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('[data-copy]');
     if (!btn) return;
@@ -844,20 +856,13 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
       return res.text();
     })
     .then(text => {
-      // Use textContent for the actual script to avoid XSS
       scriptContent.textContent = text;
-      // Store for copying
       scriptContent.dataset.raw = text;
     })
     .catch(() => {
       scriptContent.innerHTML = '<code style="color:#f87171">Error loading script. Please view it directly on <a href="https://github.com/dedsec-1337/Flask-ADB-toolkit" target="_blank" rel="noopener" style="text-decoration:underline">GitHub</a>.</code>';
     });
 
-  // Use data-raw when copying script for safety
-  const originalCopyText = copyText;
-  window.copyText = originalCopyText;
-
-  // Download button
   $('download-btn').addEventListener('click', () => {
     const content = scriptContent.dataset.raw || scriptContent.innerText;
     const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
