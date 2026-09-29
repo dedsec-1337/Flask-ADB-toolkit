@@ -23,7 +23,7 @@
             cursor: none; 
         }
         code, pre { font-family: var(--font-mono); }
-        pre { margin: 0; } /* Critical for tight terminal boxes */
+        pre { margin: 0; }
 
         /* --- CUSTOM CURSOR --- */
         .cursor {
@@ -37,15 +37,15 @@
             transition: transform 0.15s ease-out;
         }
 
-        /* --- MATRIX RAIN --- */
+        /* --- MATRIX RAIN (DedSec Edition) --- */
         #matrix-canvas {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 0; opacity: 0.15; pointer-events: none;
+            z-index: 0; opacity: 0.2; pointer-events: none;
         }
 
-        /* --- GLASSMORPHISM (Tightened Padding) --- */
+        /* --- GLASSMORPHISM --- */
         .glass-panel {
-            background: rgba(10, 10, 10, 0.4); backdrop-filter: blur(12px);
+            background: rgba(10, 10, 10, 0.5); backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 1rem; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -58,7 +58,7 @@
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
 
-        /* --- TERMINAL WINDOW (Tight & Premium) --- */
+        /* --- TERMINAL WINDOW --- */
         .terminal-window {
             background: #050505; border: 1px solid #1a1a1a; border-radius: 8px;
             overflow: hidden; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.9);
@@ -73,13 +73,9 @@
             padding: 12px 16px; font-size: 0.85rem; overflow-x: auto; 
             scroll-behavior: smooth; white-space: pre; line-height: 1.5;
         }
-
-        /* Custom Horizontal Scrollbar */
         .terminal-body::-webkit-scrollbar { height: 6px; }
         .terminal-body::-webkit-scrollbar-track { background: #050505; }
-        .terminal-body::-webkit-scrollbar-thumb { 
-            background: #333; border-radius: 3px; 
-        }
+        .terminal-body::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
         .terminal-body::-webkit-scrollbar-thumb:hover { background: #555; }
 
         /* --- COPY BUTTON --- */
@@ -92,7 +88,7 @@
         .copy-btn:hover { color: #ffffff; }
         .copy-btn.copied { color: #4ade80; }
 
-        /* --- OS TABS (Compact) --- */
+        /* --- OS TABS --- */
         .os-tab {
             padding: 0.4rem 0.8rem; border-radius: 0.4rem; cursor: pointer;
             transition: all 0.2s; font-size: 0.8rem; font-weight: 500;
@@ -115,6 +111,7 @@
         @media (max-width: 768px) {
             body { cursor: auto; }
             .cursor, .cursor-ring { display: none; }
+            #matrix-canvas { opacity: 0.1; }
         }
     </style>
 </head>
@@ -306,38 +303,69 @@
             });
         });
 
-        // --- MATRIX RAIN ---
+        // --- DEDSEC MATRIX RAIN ---
         const canvas = document.getElementById('matrix-canvas');
         const ctx = canvas.getContext('2d');
         let width, height, columns, yPositions;
-        const fontSize = 14;
-        const chars = 'アィウェオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF';
+        const fontSize = 16;
+        // DedSec characters: skulls, glitch symbols, and binary
+        const chars = '💀☠️⚡◈▣█▓▒░01010101DEDSEC';
+        const dedsecMessages = ['DEDSEC', 'HACK', 'CTOS', '0101', '⚠', '█'];
+
         function setupCanvas() {
             width = canvas.width = window.innerWidth;
             height = canvas.height = window.innerHeight;
             columns = Math.floor(width / fontSize);
             yPositions = Array(columns).fill(1);
         }
+
+        let frameCount = 0;
         function drawMatrix() {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            frameCount++;
+            // Fade effect
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.06)';
             ctx.fillRect(0, 0, width, height);
-            ctx.fillStyle = '#ffffff';
+
+            // DedSec glitch: occasional red flicker
+            if (frameCount % 120 === 0) {
+                ctx.fillStyle = 'rgba(255, 0, 0, 0.02)';
+                ctx.fillRect(0, 0, width, height);
+            }
+
             ctx.font = fontSize + 'px monospace';
+
             for (let i = 0; i < yPositions.length; i++) {
-                const text = chars.charAt(Math.floor(Math.random() * chars.length));
+                // Mix of DedSec symbols and random characters
+                let text;
+                if (Math.random() > 0.92) {
+                    text = dedsecMessages[Math.floor(Math.random() * dedsecMessages.length)];
+                } else {
+                    text = chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+
                 const x = i * fontSize;
                 const y = yPositions[i] * fontSize;
-                ctx.shadowBlur = 8;
-                ctx.shadowColor = 'rgba(255,255,255,0.5)';
+
+                // White with subtle glow
+                ctx.fillStyle = '#ffffff';
+                ctx.shadowBlur = 6;
+                ctx.shadowColor = 'rgba(255,255,255,0.4)';
                 ctx.fillText(text, x, y);
                 ctx.shadowBlur = 0;
-                if (y > height && Math.random() > 0.975) yPositions[i] = 0;
-                else yPositions[i]++;
+
+                // Reset logic with random speed variation
+                if (y > height && Math.random() > 0.97) {
+                    yPositions[i] = 0;
+                } else {
+                    // Random speed: some columns fall faster
+                    yPositions[i] += Math.random() > 0.8 ? 2 : 1;
+                }
             }
         }
+
         setupCanvas();
         window.addEventListener('resize', setupCanvas);
-        setInterval(drawMatrix, 50);
+        setInterval(drawMatrix, 45);
 
         // --- SCROLL REVEAL ---
         const revealElements = document.querySelectorAll('.reveal');
