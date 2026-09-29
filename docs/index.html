@@ -37,10 +37,10 @@
             transition: transform 0.15s ease-out;
         }
 
-        /* --- DEDSEC SKULL CANVAS --- */
-        #dedsec-canvas {
+        /* --- MATRIX RAIN --- */
+        #matrix-canvas {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 0; opacity: 0.25; pointer-events: none;
+            z-index: 0; opacity: 0.2; pointer-events: none;
         }
 
         /* --- GLASSMORPHISM --- */
@@ -108,10 +108,11 @@
         }
         .reveal.active { opacity: 1; transform: translateY(0); }
 
+        /* --- MOBILE OPTIMIZATIONS --- */
         @media (max-width: 768px) {
             body { cursor: auto; }
             .cursor, .cursor-ring { display: none; }
-            #dedsec-canvas { opacity: 0.15; }
+            #matrix-canvas { opacity: 0.1; }
         }
     </style>
 </head>
@@ -119,28 +120,42 @@
 
     <div class="cursor" id="cursor"></div>
     <div class="cursor-ring" id="cursor-ring"></div>
-    <canvas id="dedsec-canvas"></canvas>
+    <canvas id="matrix-canvas"></canvas>
 
-    <!-- Navigation -->
-    <nav class="fixed top-0 w-full z-50 glass-panel !rounded-none !border-t-0 !border-l-0 !border-r-0 px-6 py-4 flex justify-between items-center">
-        <div class="text-xl font-bold tracking-tighter text-white">⚡ Flask-ADB-toolkit</div>
+    <!-- Navigation (Mobile Optimized) -->
+    <nav class="fixed top-0 w-full z-50 glass-panel !rounded-none !border-t-0 !border-l-0 !border-r-0 px-4 md:px-6 py-4 flex justify-between items-center">
+        <div class="text-lg md:text-xl font-bold tracking-tighter text-white">⚡ Flask-ADB-toolkit</div>
+        
+        <!-- Desktop Links -->
         <div class="hidden md:flex space-x-8 text-sm font-medium text-gray-400">
             <a href="#features" class="hover:text-white transition-colors duration-300">Features</a>
             <a href="#quickstart" class="hover:text-white transition-colors duration-300">Quick Start</a>
             <a href="https://github.com/dedsec-1337/Flask-ADB-toolkit" target="_blank" class="text-white bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg transition-all duration-300">GitHub</a>
         </div>
+
+        <!-- Mobile Menu Button -->
+        <button id="mobile-menu-btn" class="md:hidden text-white focus:outline-none">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+        </button>
     </nav>
 
+    <!-- Mobile Menu Dropdown -->
+    <div id="mobile-menu" class="fixed top-[68px] left-0 w-full glass-panel z-40 hidden flex-col p-4 space-y-4 md:hidden border-t-0 border-l-0 border-r-0">
+        <a href="#features" class="text-gray-300 hover:text-white transition-colors">Features</a>
+        <a href="#quickstart" class="text-gray-300 hover:text-white transition-colors">Quick Start</a>
+        <a href="https://github.com/dedsec-1337/Flask-ADB-toolkit" target="_blank" class="text-white bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg text-center transition-all">GitHub</a>
+    </div>
+
     <!-- Hero -->
-    <header class="relative z-10 flex flex-col items-center justify-center min-h-screen text-center px-6 pt-20">
+    <header class="relative z-10 flex flex-col items-center justify-center min-h-screen text-center px-4 sm:px-6 pt-24 md:pt-32">
         <div class="max-w-4xl mx-auto">
-            <h1 class="text-6xl md:text-8xl font-extrabold tracking-tight mb-8 gradient-text glow-text">
+            <h1 class="text-5xl sm:text-6xl md:text-8xl font-extrabold tracking-tight mb-6 md:mb-8 gradient-text glow-text">
                 Flask-ADB-toolkit
             </h1>
-            <p class="text-xl md:text-2xl text-gray-400 max-w-2xl mx-auto mb-12 leading-relaxed font-light">
+            <p class="text-lg sm:text-xl md:text-2xl text-gray-400 max-w-2xl mx-auto mb-10 md:mb-12 leading-relaxed font-light">
                 One little flask 🧪 — every flashing tool you'll ever need. A powerful, menu-driven terminal toolkit for Android Debug Bridge.
             </p>
-            <div class="flex flex-col sm:flex-row justify-center gap-6">
+            <div class="flex flex-col sm:flex-row justify-center gap-4 md:gap-6">
                 <a href="#quickstart" class="glass-panel px-8 py-4 font-semibold text-white hover:!bg-white/10 transition-all duration-300">
                     Get Started
                 </a>
@@ -152,41 +167,41 @@
     </header>
 
     <!-- Features -->
-    <section id="features" class="relative z-10 max-w-6xl mx-auto px-6 py-32">
+    <section id="features" class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-20 md:py-32">
         <div class="reveal">
-            <h2 class="text-4xl md:text-5xl font-bold text-center mb-4 gradient-text">Key Features</h2>
-            <p class="text-gray-500 text-center mb-16 max-w-xl mx-auto">Everything you need to manage your Android device, wrapped in a friendly terminal interface.</p>
+            <h2 class="text-3xl md:text-5xl font-bold text-center mb-4 gradient-text">Key Features</h2>
+            <p class="text-gray-500 text-center mb-12 md:mb-16 max-w-xl mx-auto text-sm md:text-base">Everything you need to manage your Android device, wrapped in a friendly terminal interface.</p>
         </div>
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="glass-panel p-6 reveal">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+            <div class="glass-panel p-5 md:p-6 reveal">
                 <div class="text-4xl mb-4 grayscale">🚀</div>
-                <h3 class="text-2xl font-bold mb-3 text-white">Fast & Lightweight</h3>
+                <h3 class="text-xl md:text-2xl font-bold mb-3 text-white">Fast & Lightweight</h3>
                 <p class="text-gray-400 leading-relaxed text-sm">A snappy terminal program that wraps all the scary <code class="text-xs bg-white/10 px-1 rounded">fastboot</code> and <code class="text-xs bg-white/10 px-1 rounded">adb</code> commands into friendly numbered options.</p>
             </div>
-            <div class="glass-panel p-6 reveal" style="transition-delay: 100ms;">
+            <div class="glass-panel p-5 md:p-6 reveal" style="transition-delay: 100ms;">
                 <div class="text-4xl mb-4 grayscale">📱</div>
-                <h3 class="text-2xl font-bold mb-3 text-white">Full ADB Control</h3>
+                <h3 class="text-xl md:text-2xl font-bold mb-3 text-white">Full ADB Control</h3>
                 <p class="text-gray-400 leading-relaxed text-sm">Flash ROMs, restore stock, flash any partition, deep-clean junk, run performance passes, take screenshots, and install APKs.</p>
             </div>
-            <div class="glass-panel p-6 reveal" style="transition-delay: 200ms;">
+            <div class="glass-panel p-5 md:p-6 reveal" style="transition-delay: 200ms;">
                 <div class="text-4xl mb-4 grayscale">🛠️</div>
-                <h3 class="text-2xl font-bold mb-3 text-white">Easy to Use</h3>
+                <h3 class="text-xl md:text-2xl font-bold mb-3 text-white">Easy to Use</h3>
                 <p class="text-gray-400 leading-relaxed text-sm">Built for people who know nothing about custom ROMs but want to try. No memorizing commands, just plug in and pick from a menu.</p>
             </div>
         </div>
     </section>
 
     <!-- Quick Start -->
-    <section id="quickstart" class="relative z-10 max-w-4xl mx-auto px-6 py-32">
+    <section id="quickstart" class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 py-20 md:py-32">
         <div class="reveal">
-            <h2 class="text-4xl md:text-5xl font-bold text-center mb-4 gradient-text">Quick Start</h2>
-            <p class="text-gray-500 text-center mb-12">Get up and running in under a minute.</p>
+            <h2 class="text-3xl md:text-5xl font-bold text-center mb-4 gradient-text">Quick Start</h2>
+            <p class="text-gray-500 text-center mb-10 md:mb-12 text-sm md:text-base">Get up and running in under a minute.</p>
         </div>
 
         <!-- Step 1 -->
-        <div class="glass-panel p-6 mb-6 reveal">
-            <h3 class="text-xl font-bold mb-3 text-white">1. Install Android Tools</h3>
+        <div class="glass-panel p-5 md:p-6 mb-6 reveal">
+            <h3 class="text-lg md:text-xl font-bold mb-3 text-white">1. Install Android Tools</h3>
             <p class="text-gray-400 text-sm mb-4">You need <code class="text-xs bg-white/10 px-1 rounded">adb</code> and <code class="text-xs bg-white/10 px-1 rounded">fastboot</code> installed on your system.</p>
             
             <div class="flex flex-wrap gap-2 mb-3" id="os-tabs">
@@ -214,16 +229,16 @@
         </div>
 
         <!-- Step 2 -->
-        <div class="glass-panel p-6 mb-6 reveal">
-            <h3 class="text-xl font-bold mb-3 text-white">2. Save the Toolkit Script</h3>
+        <div class="glass-panel p-5 md:p-6 mb-6 reveal">
+            <h3 class="text-lg md:text-xl font-bold mb-3 text-white">2. Save the Toolkit Script</h3>
             
             <p class="text-gray-300 font-semibold text-sm mb-1">Option A: Create the file manually</p>
             <p class="text-gray-400 text-sm mb-3">Run this command to open a new file in the <code class="text-xs bg-white/10 px-1 rounded">nano</code> editor:</p>
-            <pre class="text-white mb-2 bg-[#050505] p-3 rounded-lg border border-[#1a1a1a] text-sm"><span class="text-gray-500">❯</span> nano ~/flask-adb-toolkit.sh</pre>
+            <pre class="text-white mb-2 bg-[#050505] p-3 rounded-lg border border-[#1a1a1a] text-xs sm:text-sm"><span class="text-gray-500">❯</span> nano ~/flask-adb-toolkit.sh</pre>
             <p class="text-gray-500 text-xs mb-5">(Paste the script below, then press <code class="bg-white/10 px-1 rounded text-gray-300">Ctrl+O</code>, <code class="bg-white/10 px-1 rounded text-gray-300">Enter</code>, and <code class="bg-white/10 px-1 rounded text-gray-300">Ctrl+X</code> to save and exit)</p>
 
             <p class="text-gray-300 font-semibold text-sm mb-2">Option B: Use the buttons below</p>
-            <div class="flex gap-3 mb-5">
+            <div class="flex flex-col sm:flex-row gap-3 mb-5">
                 <button onclick="copyScript(this)" class="bg-white/10 hover:bg-white/20 text-white px-5 py-2.5 rounded-lg font-semibold transition-all duration-300 flex-1 flex items-center justify-center gap-2 text-xs">
                     📋 Copy Full Script
                 </button>
@@ -250,8 +265,8 @@
         </div>
 
         <!-- Step 3 -->
-        <div class="glass-panel p-6 reveal">
-            <h3 class="text-xl font-bold mb-3 text-white">3. Run the Toolkit</h3>
+        <div class="glass-panel p-5 md:p-6 reveal">
+            <h3 class="text-lg md:text-xl font-bold mb-3 text-white">3. Run the Toolkit</h3>
             <p class="text-gray-400 text-sm mb-4">Make the script executable and launch it.</p>
             
             <div class="terminal-window">
@@ -283,122 +298,75 @@
     </footer>
 
     <script>
-        // --- CUSTOM CURSOR ---
-        const cursor = document.getElementById('cursor');
-        const cursorRing = document.getElementById('cursor-ring');
-        document.addEventListener('mousemove', (e) => {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-            cursorRing.style.left = (e.clientX - 16) + 'px';
-            cursorRing.style.top = (e.clientY - 16) + 'px';
-        });
-        document.querySelectorAll('a, button').forEach(el => {
-            el.addEventListener('mouseenter', () => {
-                cursor.style.transform = 'scale(2)';
-                cursorRing.style.transform = 'scale(1.5)';
-            });
-            el.addEventListener('mouseleave', () => {
-                cursor.style.transform = 'scale(1)';
-                cursorRing.style.transform = 'scale(1)';
-            });
+        // --- MOBILE MENU TOGGLE ---
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
         });
 
-        // --- DEDSEC SKULL ANIMATION ---
-        const canvas = document.getElementById('dedsec-canvas');
-        const ctx = canvas.getContext('2d');
-        let width, height;
-        let frame = 0;
-
-        // Pixel art skull (16x16 grid)
-        const skullPixels = [
-            [0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0],
-            [0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0],
-            [0,0,1,1,0,0,1,1,0,0,1,1,0,0,0,0],
-            [0,0,1,1,0,0,1,1,0,0,1,1,0,0,0,0],
-            [0,0,1,1,1,1,1,1,1,1,1,1,0,0,0,0],
-            [0,0,1,1,1,1,1,1,1,1,1,1,0,0,0,0],
-            [0,0,1,0,1,1,1,1,1,1,0,1,0,0,0,0],
-            [0,0,1,0,1,0,1,1,0,1,0,1,0,0,0,0],
-            [0,0,1,0,1,0,1,1,0,1,0,1,0,0,0,0],
-            [0,0,1,1,1,1,1,1,1,1,1,1,0,0,0,0],
-            [0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0],
-            [0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0],
-            [0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0],
-            [0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-        ];
-
-        const pixelSize = 12; // Size of each pixel on screen
-        const skullWidth = skullPixels[0].length * pixelSize;
-        const skullHeight = skullPixels.length * pixelSize;
-
-        function setupCanvas() {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
+        // --- CUSTOM CURSOR (Only on Desktop) ---
+        if (window.matchMedia("(pointer: fine)").matches) {
+            const cursor = document.getElementById('cursor');
+            const cursorRing = document.getElementById('cursor-ring');
+            document.addEventListener('mousemove', (e) => {
+                cursor.style.left = e.clientX + 'px';
+                cursor.style.top = e.clientY + 'px';
+                cursorRing.style.left = (e.clientX - 16) + 'px';
+                cursorRing.style.top = (e.clientY - 16) + 'px';
+            });
+            document.querySelectorAll('a, button').forEach(el => {
+                el.addEventListener('mouseenter', () => {
+                    cursor.style.transform = 'scale(2)';
+                    cursorRing.style.transform = 'scale(1.5)';
+                });
+                el.addEventListener('mouseleave', () => {
+                    cursor.style.transform = 'scale(1)';
+                    cursorRing.style.transform = 'scale(1)';
+                });
+            });
         }
 
-        function drawSkull() {
-            frame++;
-            
-            // Clear with a trailing effect
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
+        // --- MATRIX RAIN (Responsive) ---
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height, columns, yPositions;
+        let fontSize = window.innerWidth < 768 ? 12 : 14; // Smaller font on mobile
+
+        const chars = 'アィウェオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF';
+
+        function setupCanvas() {
+            fontSize = window.innerWidth < 768 ? 12 : 14;
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            columns = Math.floor(width / fontSize);
+            yPositions = Array(columns).fill(1);
+        }
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
             ctx.fillRect(0, 0, width, height);
+            ctx.fillStyle = '#ffffff';
+            ctx.font = fontSize + 'px monospace';
 
-            // Center the skull
-            const offsetX = (width - skullWidth) / 2;
-            const offsetY = (height - skullHeight) / 2;
+            for (let i = 0; i < yPositions.length; i++) {
+                const text = chars.charAt(Math.floor(Math.random() * chars.length));
+                const x = i * fontSize;
+                const y = yPositions[i] * fontSize;
 
-            // Glitch offset (randomly shifts the skull)
-            const glitchX = (Math.random() > 0.9) ? (Math.random() - 0.5) * 8 : 0;
-            const glitchY = (Math.random() > 0.9) ? (Math.random() - 0.5) * 8 : 0;
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = 'rgba(255,255,255,0.5)';
+                ctx.fillText(text, x, y);
+                ctx.shadowBlur = 0;
 
-            // Draw the skull
-            for (let y = 0; y < skullPixels.length; y++) {
-                for (let x = 0; x < skullPixels[y].length; x++) {
-                    if (skullPixels[y][x] === 1) {
-                        // Randomly make some pixels "glitch" (flicker or change color)
-                        const isGlitch = Math.random() > 0.95;
-                        const isRed = Math.random() > 0.98; // Rare red flicker
-
-                        if (isGlitch) {
-                            ctx.fillStyle = isRed ? '#ff0000' : 'rgba(255, 255, 255, 0.3)';
-                        } else {
-                            ctx.fillStyle = '#ffffff';
-                        }
-
-                        // Add a glow
-                        ctx.shadowBlur = 6;
-                        ctx.shadowColor = 'rgba(255, 255, 255, 0.5)';
-
-                        ctx.fillRect(
-                            offsetX + x * pixelSize + glitchX,
-                            offsetY + y * pixelSize + glitchY,
-                            pixelSize - 1, // Slight gap for pixel art look
-                            pixelSize - 1
-                        );
-
-                        ctx.shadowBlur = 0;
-                    }
-                }
-            }
-
-            // Occasional scanline effect
-            if (frame % 4 === 0) {
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
-                ctx.fillRect(0, (frame * 5) % height, width, 2);
-            }
-
-            // Occasional full-screen red glitch flash
-            if (Math.random() > 0.995) {
-                ctx.fillStyle = 'rgba(255, 0, 0, 0.05)';
-                ctx.fillRect(0, 0, width, height);
+                if (y > height && Math.random() > 0.975) yPositions[i] = 0;
+                else yPositions[i] += Math.random() > 0.8 ? 2 : 1; // Random speed variation
             }
         }
 
         setupCanvas();
         window.addEventListener('resize', setupCanvas);
-        setInterval(drawSkull, 50); // 20 FPS for a retro feel
+        setInterval(drawMatrix, 50);
 
         // --- SCROLL REVEAL ---
         const revealElements = document.querySelectorAll('.reveal');
