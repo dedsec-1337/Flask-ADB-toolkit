@@ -11,7 +11,7 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://dedsec-1337.github.io/Flask-ADB-toolkit/">
 <meta name="twitter:card" content="summary_large_image">
-<title>Flask-ADB-toolkit | Premium Terminal Toolkit</title>
+<title>Flask-ADB-toolkit</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -161,10 +161,7 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
   font-size: clamp(3rem, 10vw, 6rem);
   font-weight: 800; letter-spacing: -0.05em;
   line-height: 1.05; margin-bottom: 1.5rem;
-  background: linear-gradient(135deg, #fff 0%, #a0a0a0 100%);
-  -webkit-background-clip: text; background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-shadow: 0 0 20px rgba(255,255,255,0.15);
+  color: var(--text-white);
 }
 .hero-desc {
   font-size: clamp(1.0625rem, 2.2vw, 1.5rem);
@@ -191,8 +188,6 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
 .btn-primary:hover { background: var(--white-10); }
 .btn-ghost { color: var(--text-muted); }
 .btn-ghost:hover { color: var(--text-white); }
-.btn-ghost .arrow { transition: transform 0.3s; }
-.btn-ghost:hover .arrow { transform: translateX(4px); }
 
 /* ============================================
    SECTIONS & CARDS
@@ -208,9 +203,7 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
   font-size: clamp(1.875rem, 5vw, 3rem);
   font-weight: 700; letter-spacing: -0.03em;
   margin-bottom: 1rem;
-  background: linear-gradient(135deg, #fff 0%, #a0a0a0 100%);
-  -webkit-background-clip: text; background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--text-white);
 }
 .section-desc {
   color: var(--text-dim); max-width: 36rem;
@@ -221,7 +214,7 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
   display: grid; grid-template-columns: 1fr; gap: 1.5rem;
 }
 .feature-card {
-  padding: 1.5rem;
+  padding: 1.75rem 1.5rem;
   background: var(--glass-bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -233,7 +226,6 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
   border-color: var(--white-20);
   box-shadow: 0 20px 40px -15px rgba(255,255,255,0.05);
 }
-.feature-icon { font-size: 2.25rem; margin-bottom: 1rem; filter: grayscale(1); }
 .feature-title { font-size: 1.5rem; font-weight: 700; color: var(--text-white); margin-bottom: 0.75rem; }
 .feature-desc { color: var(--text-muted); font-size: 0.875rem; line-height: 1.7; }
 
@@ -381,8 +373,7 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
   .section-desc { font-size: 1rem; }
 
   .feature-grid { grid-template-columns: repeat(3, 1fr); gap: 2rem; }
-  .feature-card { padding: 1.5rem; }
-  .feature-title { font-size: 1.5rem; }
+  .feature-card { padding: 2rem 1.5rem; }
 
   .step { padding: 1.5rem; }
   .step-title { font-size: 1.25rem; }
@@ -456,9 +447,7 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
     </p>
     <div class="hero-actions">
       <a href="#quickstart" class="btn btn-primary">Get Started</a>
-      <a href="https://github.com/dedsec-1337/Flask-ADB-toolkit" target="_blank" rel="noopener" class="btn btn-ghost">
-        View Source <span class="arrow">→</span>
-      </a>
+      <a href="https://github.com/dedsec-1337/Flask-ADB-toolkit" target="_blank" rel="noopener" class="btn btn-ghost">View Source</a>
     </div>
   </div>
 </header>
@@ -472,19 +461,16 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
 
   <div class="feature-grid">
     <article class="feature-card reveal">
-      <div class="feature-icon" aria-hidden="true">🚀</div>
       <h3 class="feature-title">Fast &amp; Lightweight</h3>
       <p class="feature-desc">A snappy terminal program that wraps all the scary <code>fastboot</code> and <code>adb</code> commands into friendly numbered options.</p>
     </article>
 
     <article class="feature-card reveal" style="transition-delay:100ms">
-      <div class="feature-icon" aria-hidden="true">📱</div>
       <h3 class="feature-title">Full ADB Control</h3>
       <p class="feature-desc">Flash ROMs, restore stock, flash any partition, deep-clean junk, run performance passes, take screenshots, and install APKs.</p>
     </article>
 
     <article class="feature-card reveal" style="transition-delay:200ms">
-      <div class="feature-icon" aria-hidden="true">🛠️</div>
       <h3 class="feature-title">Easy to Use</h3>
       <p class="feature-desc">Built for people who know nothing about custom ROMs but want to try. No memorizing commands, just plug in and pick from a menu.</p>
     </article>
@@ -552,8 +538,8 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
 
     <p class="step-subtitle">Option B: Use the buttons below</p>
     <div class="script-actions">
-      <button class="script-btn" data-copy="script">📋 Copy Full Script</button>
-      <button class="script-btn" id="download-btn">⬇️ Download .sh</button>
+      <button class="script-btn" data-copy="script">Copy Full Script</button>
+      <button class="script-btn" id="download-btn">Download .sh</button>
     </div>
 
     <div class="terminal">
@@ -596,8 +582,8 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
     </div>
 
     <p class="step-hint" style="margin-top:1rem;padding-top:0.75rem;border-top:1px solid var(--white-10)">
-      💡 <strong>Windows (Git Bash):</strong> Download and double-click <code>flask-adb-toolkit.bat</code> from the repository.<br>
-      💡 <strong>Windows (WSL):</strong> Follow the Linux steps above inside WSL.
+      <strong>Windows (Git Bash):</strong> Download and double-click <code>flask-adb-toolkit.bat</code> from the repository.<br>
+      <strong>Windows (WSL):</strong> Follow the Linux steps above inside WSL.
     </p>
   </div>
 </section>
@@ -605,7 +591,7 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
 </main>
 
 <footer class="footer">
-  <p>Built with ❤️ by dedsec-1337. Hosted on GitHub Pages.</p>
+  <p>Built by dedsec-1337. Hosted on GitHub Pages.</p>
 </footer>
 
 <script>
