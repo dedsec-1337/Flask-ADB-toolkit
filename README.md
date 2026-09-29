@@ -2,24 +2,10 @@
 
 > **One little flask 🧪 — every flashing tool you'll ever need.**
 
-
-
 ![Bash](https://img.shields.io/badge/language-bash-4EAA25?style=for-the-badge&logo=gnubash&logoColor=white)
-
-
-
-
 ![Platform](https://img.shields.io/badge/platform-Linux%20%C2%B7%20macOS%20%C2%B7%20Windows%20%28WSL%2FGit--Bash%29-0078D6?style=for-the-badge)
-
-
 ![License](https://img.shields.io/badge/license-MIT-yellow?style=for-the-badge)
-
-
-
-
 ![Vibes](https://img.shields.io/badge/vibes-100%25%20fun-ff69b4?style=for-the-badge)
-
-
 
 🌐 **Live site:** [dedsec-1337.github.io/Flask-ADB-toolkit](https://dedsec-1337.github.io/Flask-ADB-toolkit/) — features, quick start, and a one-click copy/download of the script.
 
@@ -59,6 +45,7 @@ but want to try anyway.
 ## ✨ Features
 
 ### 🔧 Bootloader / Fastboot mode
+
 | Option | What it does |
 |---|---|
 | 🔓 Unlock bootloader | Guided unlock (with warnings!) |
@@ -71,6 +58,7 @@ but want to try anyway.
 | ⏮ Restore stock | Newest (B4.1) or older (V3.2) build, both slots |
 
 ### 📱 Booted-phone (ADB) mode
+
 | Option | What it does |
 |---|---|
 | ⚡ Performance pass | Trims caches + speed-compiles every app — **skips un-compilable system packages and auto-resumes if interrupted** |
@@ -93,20 +81,23 @@ and a menu that **adapts to whatever state your phone is in**.
 
 ## 🚀 Quick start (Linux / macOS)
 
-```bash
-# 1. Install adb & fastboot — pick your OS
-sudo apt update && sudo apt install android-tools-adb android-tools-fastboot   # Ubuntu / Debian
-sudo pacman -S android-tools                                                   # Arch / CachyOS
-sudo dnf install android-tools                                                 # Fedora
-brew install android-platform-tools                                           # macOS
+Install `adb` & `fastboot` — pick your OS:
 
-# 2. Save the script
-nano ~/flask-adb-toolkit.sh      # paste the script, Ctrl+O, Enter, Ctrl+X
+- Ubuntu / Debian: `sudo apt update && sudo apt install android-tools-adb android-tools-fastboot`
+- Arch / CachyOS: `sudo pacman -S android-tools`
+- Fedora: `sudo dnf install android-tools`
+- macOS: `brew install android-platform-tools`
 
-# 3. Make it executable & run
-chmod +x ~/flask-adb-toolkit.sh
-~/flask-adb-toolkit.sh
-```
+Save the script:
+
+    nano ~/flask-adb-toolkit.sh
+
+Paste the script, then `Ctrl+O`, `Enter`, `Ctrl+X` to save and exit.
+
+Make it executable and run it:
+
+    chmod +x ~/flask-adb-toolkit.sh
+    ~/flask-adb-toolkit.sh
 
 Rather paste than type? The [live site](https://dedsec-1337.github.io/Flask-ADB-toolkit/) has a **Copy Full Script** and **Download .sh** button that pulls the current version straight off GitHub. Same script, fewer keystrokes.
 
