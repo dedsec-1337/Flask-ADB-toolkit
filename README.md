@@ -108,3 +108,50 @@ nano ~/flask-adb-toolkit.sh      # paste the script, Ctrl+O, Enter, Ctrl+X
 # 3. Make it executable & run
 chmod +x ~/flask-adb-toolkit.sh
 ~/flask-adb-toolkit.sh
+```
+
+Rather paste than type? The [live site](https://dedsec-1337.github.io/Flask-ADB-toolkit/) has a **Copy Full Script** and **Download .sh** button that pulls the current version straight off GitHub. Same script, fewer keystrokes.
+
+Then just follow the colorful menus. 🎨
+
+> **CMF Phone 2 Pro owners:** drop your ROM/stock folders into `~/Desktop/cmf`
+> (each folder needs its `.zip` / `.img` files), and options 7–9 in the bootloader menu light up.
+
+## 🪟 Windows?
+
+Yes! Two ways — pick your comfort level:
+
+- **🟢 Easiest:** [Git for Windows](https://git-scm.com/download/win) (gives you Git Bash) + Google's [platform-tools](https://developer.android.com/tools/releases/platform-tools) on your `PATH` → then double-click **`flask-adb-toolkit.bat`** 🎉
+- **🟣 Classic:** Ubuntu inside Windows via **WSL** (`wsl --install`) — it's basically Linux, then follow the Linux steps above.
+
+## ⚠️ Disclaimer
+
+Flashing partitions **erases data** and can, if misused, brick your device.
+This tool asks for confirmation (`type YES`) before anything dangerous —
+but **you** are still the one pressing the buttons. 🔘
+
+- Not responsible for lost data, bricked phones, or voided warranties
+- Always back up first 📦
+- Everything here is provided **as-is**, made for fun & learning
+
+## 🗺️ Roadmap
+
+- [ ] More device-specific profiles (open an issue with your device!)
+- [ ] macOS one-liner installer
+- [ ] Undo-last-flash safety snapshot (if feasible)
+- [ ] Even more colors 🌈
+
+## 🤝 Contributing
+
+Found a bug? Got a device profile to add? PRs and issues are welcome!
+Keep it friendly — this is a fun project. 🍪
+
+## 📜 License
+
+[MIT](LICENSE) — do whatever you want, just don't blame the flask if it spills. 🧪
+
+---
+
+<p align="center">
+  <i>Made with 💚, one frustrated evening, and an unhealthy love of terminal colors.</i>
+</p>
