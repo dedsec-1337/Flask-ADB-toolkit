@@ -37,10 +37,10 @@
             transition: transform 0.15s ease-out;
         }
 
-        /* --- MATRIX RAIN (DedSec Edition) --- */
-        #matrix-canvas {
+        /* --- DEDSEC SKULL CANVAS --- */
+        #dedsec-canvas {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 0; opacity: 0.2; pointer-events: none;
+            z-index: 0; opacity: 0.25; pointer-events: none;
         }
 
         /* --- GLASSMORPHISM --- */
@@ -111,7 +111,7 @@
         @media (max-width: 768px) {
             body { cursor: auto; }
             .cursor, .cursor-ring { display: none; }
-            #matrix-canvas { opacity: 0.1; }
+            #dedsec-canvas { opacity: 0.15; }
         }
     </style>
 </head>
@@ -119,7 +119,7 @@
 
     <div class="cursor" id="cursor"></div>
     <div class="cursor-ring" id="cursor-ring"></div>
-    <canvas id="matrix-canvas"></canvas>
+    <canvas id="dedsec-canvas"></canvas>
 
     <!-- Navigation -->
     <nav class="fixed top-0 w-full z-50 glass-panel !rounded-none !border-t-0 !border-l-0 !border-r-0 px-6 py-4 flex justify-between items-center">
@@ -303,69 +303,102 @@
             });
         });
 
-        // --- DEDSEC MATRIX RAIN ---
-        const canvas = document.getElementById('matrix-canvas');
+        // --- DEDSEC SKULL ANIMATION ---
+        const canvas = document.getElementById('dedsec-canvas');
         const ctx = canvas.getContext('2d');
-        let width, height, columns, yPositions;
-        const fontSize = 16;
-        // DedSec characters: skulls, glitch symbols, and binary
-        const chars = '💀☠️⚡◈▣█▓▒░01010101DEDSEC';
-        const dedsecMessages = ['DEDSEC', 'HACK', 'CTOS', '0101', '⚠', '█'];
+        let width, height;
+        let frame = 0;
+
+        // Pixel art skull (16x16 grid)
+        const skullPixels = [
+            [0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0],
+            [0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0],
+            [0,0,1,1,0,0,1,1,0,0,1,1,0,0,0,0],
+            [0,0,1,1,0,0,1,1,0,0,1,1,0,0,0,0],
+            [0,0,1,1,1,1,1,1,1,1,1,1,0,0,0,0],
+            [0,0,1,1,1,1,1,1,1,1,1,1,0,0,0,0],
+            [0,0,1,0,1,1,1,1,1,1,0,1,0,0,0,0],
+            [0,0,1,0,1,0,1,1,0,1,0,1,0,0,0,0],
+            [0,0,1,0,1,0,1,1,0,1,0,1,0,0,0,0],
+            [0,0,1,1,1,1,1,1,1,1,1,1,0,0,0,0],
+            [0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0],
+            [0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0],
+            [0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0],
+            [0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+        ];
+
+        const pixelSize = 12; // Size of each pixel on screen
+        const skullWidth = skullPixels[0].length * pixelSize;
+        const skullHeight = skullPixels.length * pixelSize;
 
         function setupCanvas() {
             width = canvas.width = window.innerWidth;
             height = canvas.height = window.innerHeight;
-            columns = Math.floor(width / fontSize);
-            yPositions = Array(columns).fill(1);
         }
 
-        let frameCount = 0;
-        function drawMatrix() {
-            frameCount++;
-            // Fade effect
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.06)';
+        function drawSkull() {
+            frame++;
+            
+            // Clear with a trailing effect
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
             ctx.fillRect(0, 0, width, height);
 
-            // DedSec glitch: occasional red flicker
-            if (frameCount % 120 === 0) {
-                ctx.fillStyle = 'rgba(255, 0, 0, 0.02)';
-                ctx.fillRect(0, 0, width, height);
+            // Center the skull
+            const offsetX = (width - skullWidth) / 2;
+            const offsetY = (height - skullHeight) / 2;
+
+            // Glitch offset (randomly shifts the skull)
+            const glitchX = (Math.random() > 0.9) ? (Math.random() - 0.5) * 8 : 0;
+            const glitchY = (Math.random() > 0.9) ? (Math.random() - 0.5) * 8 : 0;
+
+            // Draw the skull
+            for (let y = 0; y < skullPixels.length; y++) {
+                for (let x = 0; x < skullPixels[y].length; x++) {
+                    if (skullPixels[y][x] === 1) {
+                        // Randomly make some pixels "glitch" (flicker or change color)
+                        const isGlitch = Math.random() > 0.95;
+                        const isRed = Math.random() > 0.98; // Rare red flicker
+
+                        if (isGlitch) {
+                            ctx.fillStyle = isRed ? '#ff0000' : 'rgba(255, 255, 255, 0.3)';
+                        } else {
+                            ctx.fillStyle = '#ffffff';
+                        }
+
+                        // Add a glow
+                        ctx.shadowBlur = 6;
+                        ctx.shadowColor = 'rgba(255, 255, 255, 0.5)';
+
+                        ctx.fillRect(
+                            offsetX + x * pixelSize + glitchX,
+                            offsetY + y * pixelSize + glitchY,
+                            pixelSize - 1, // Slight gap for pixel art look
+                            pixelSize - 1
+                        );
+
+                        ctx.shadowBlur = 0;
+                    }
+                }
             }
 
-            ctx.font = fontSize + 'px monospace';
+            // Occasional scanline effect
+            if (frame % 4 === 0) {
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
+                ctx.fillRect(0, (frame * 5) % height, width, 2);
+            }
 
-            for (let i = 0; i < yPositions.length; i++) {
-                // Mix of DedSec symbols and random characters
-                let text;
-                if (Math.random() > 0.92) {
-                    text = dedsecMessages[Math.floor(Math.random() * dedsecMessages.length)];
-                } else {
-                    text = chars.charAt(Math.floor(Math.random() * chars.length));
-                }
-
-                const x = i * fontSize;
-                const y = yPositions[i] * fontSize;
-
-                // White with subtle glow
-                ctx.fillStyle = '#ffffff';
-                ctx.shadowBlur = 6;
-                ctx.shadowColor = 'rgba(255,255,255,0.4)';
-                ctx.fillText(text, x, y);
-                ctx.shadowBlur = 0;
-
-                // Reset logic with random speed variation
-                if (y > height && Math.random() > 0.97) {
-                    yPositions[i] = 0;
-                } else {
-                    // Random speed: some columns fall faster
-                    yPositions[i] += Math.random() > 0.8 ? 2 : 1;
-                }
+            // Occasional full-screen red glitch flash
+            if (Math.random() > 0.995) {
+                ctx.fillStyle = 'rgba(255, 0, 0, 0.05)';
+                ctx.fillRect(0, 0, width, height);
             }
         }
 
         setupCanvas();
         window.addEventListener('resize', setupCanvas);
-        setInterval(drawMatrix, 45);
+        setInterval(drawSkull, 50); // 20 FPS for a retro feel
 
         // --- SCROLL REVEAL ---
         const revealElements = document.querySelectorAll('.reveal');
