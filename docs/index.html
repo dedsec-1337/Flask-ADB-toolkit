@@ -1,485 +1,891 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flask-ADB-toolkit | Premium Terminal Toolkit</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#000000">
+<meta name="description" content="Flask-ADB-toolkit — A powerful, menu-driven terminal toolkit for Android Debug Bridge. Flash ROMs, manage devices, and more without memorizing commands.">
+<meta name="keywords" content="adb, fastboot, android, flask, terminal, toolkit, rom flasher">
+<meta property="og:title" content="Flask-ADB-toolkit">
+<meta property="og:description" content="One little flask — every flashing tool you'll ever need.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://dedsec-1337.github.io/Flask-ADB-toolkit/">
+<meta name="twitter:card" content="summary_large_image">
+<title>Flask-ADB-toolkit | Premium Terminal Toolkit</title>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        :root {
-            --font-sans: 'Inter', sans-serif;
-            --font-mono: 'JetBrains Mono', monospace;
-        }
-        body {
-            font-family: var(--font-sans);
-            background-color: #000;
-            color: #e2e8f0;
-            overflow-x: hidden;
-            cursor: none; 
-        }
-        code, pre { font-family: var(--font-mono); }
-        pre { margin: 0; }
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 
-        /* --- CUSTOM CURSOR --- */
-        .cursor {
-            width: 8px; height: 8px; background: white; border-radius: 50%;
-            position: fixed; pointer-events: none; z-index: 9999;
-            mix-blend-mode: difference; transition: transform 0.1s ease;
-        }
-        .cursor-ring {
-            width: 40px; height: 40px; border: 1px solid rgba(255,255,255,0.5);
-            border-radius: 50%; position: fixed; pointer-events: none; z-index: 9998;
-            transition: transform 0.15s ease-out;
-        }
+<style>
+/* ============================================
+   RESET & VARIABLES
+   ============================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        /* --- DEDSEC MATRIX RAIN CANVAS --- */
-        #dedsec-canvas {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 0; opacity: 0.2; pointer-events: none;
-        }
+:root {
+  --bg: #000;
+  --text: #e2e8f0;
+  --text-muted: #9ca3af;
+  --text-dim: #6b7280;
+  --text-fade: #4b5563;
+  --text-white: #ffffff;
+  --glass-bg: rgba(10, 10, 10, 0.5);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --white-05: rgba(255, 255, 255, 0.05);
+  --white-10: rgba(255, 255, 255, 0.1);
+  --white-20: rgba(255, 255, 255, 0.2);
+  --terminal-bg: #050505;
+  --terminal-border: #1a1a1a;
+  --terminal-header: #0a0a0a;
+  --accent-red: #ff0000;
+  --accent-green: #4ade80;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+  --radius: 1rem;
+  --radius-sm: 0.5rem;
+  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
-        /* --- GLASSMORPHISM --- */
-        .glass-panel {
-            background: rgba(10, 10, 10, 0.5); backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 1rem; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .glass-panel:hover {
-            border-color: rgba(255, 255, 255, 0.2);
-            box-shadow: 0 20px 40px -15px rgba(255, 255, 255, 0.05);
-        }
-        .gradient-text {
-            background: linear-gradient(135deg, #ffffff 0%, #a0a0a0 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
+html { scroll-behavior: smooth; }
 
-        /* --- TERMINAL WINDOW --- */
-        .terminal-window {
-            background: #050505; border: 1px solid #1a1a1a; border-radius: 8px;
-            overflow: hidden; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.9);
-            position: relative;
-        }
-        .terminal-header {
-            background: #0a0a0a; padding: 8px 14px; display: flex;
-            align-items: center; border-bottom: 1px solid #1a1a1a;
-        }
-        .terminal-dot { width: 10px; height: 10px; border-radius: 50%; }
-        .terminal-body {
-            padding: 12px 16px; font-size: 0.85rem; overflow-x: auto; 
-            scroll-behavior: smooth; white-space: pre; line-height: 1.5;
-        }
-        .terminal-body::-webkit-scrollbar { height: 6px; }
-        .terminal-body::-webkit-scrollbar-track { background: #050505; }
-        .terminal-body::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
-        .terminal-body::-webkit-scrollbar-thumb:hover { background: #555; }
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  overflow-x: hidden;
+  cursor: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
-        /* --- COPY BUTTON --- */
-        .copy-btn {
-            background: transparent; border: none; color: #6b7280;
-            cursor: pointer; font-size: 0.75rem; font-family: var(--font-sans);
-            font-weight: 500; transition: all 0.2s ease; display: flex;
-            align-items: center; gap: 4px;
-        }
-        .copy-btn:hover { color: #ffffff; }
-        .copy-btn.copied { color: #4ade80; }
+::selection { background: #fff; color: #000; }
 
-        /* --- OS TABS --- */
-        .os-tab {
-            padding: 0.4rem 0.8rem; border-radius: 0.4rem; cursor: pointer;
-            transition: all 0.2s; font-size: 0.8rem; font-weight: 500;
-            border: 1px solid transparent; background: transparent;
-        }
-        .os-tab.active {
-            background: rgba(255, 255, 255, 0.08); color: white;
-            border-color: rgba(255, 255, 255, 0.2);
-        }
-        .os-tab:not(.active) { color: #9ca3af; }
-        .os-tab:not(.active):hover { color: white; background: rgba(255, 255, 255, 0.05); }
+code, pre { font-family: var(--font-mono); }
+pre { margin: 0; white-space: pre; }
+code { font-size: 0.75rem; background: var(--white-10); padding: 0 0.25rem; border-radius: 0.25rem; }
 
-        /* --- SCROLL REVEAL --- */
-        .reveal {
-            opacity: 0; transform: translateY(30px);
-            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .reveal.active { opacity: 1; transform: translateY(0); }
+img, svg { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; background: none; border: none; color: inherit; cursor: pointer; }
 
-        /* --- MOBILE OPTIMIZATIONS --- */
-        @media (max-width: 768px) {
-            body { cursor: auto; }
-            .cursor, .cursor-ring { display: none; }
-            #dedsec-canvas { opacity: 0.12; }
-        }
-    </style>
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+.skip-link {
+  position: fixed; top: -100px; left: 1rem;
+  background: #fff; color: #000; padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm); z-index: 10000; transition: top 0.2s;
+}
+.skip-link:focus { top: 1rem; }
+
+/* ============================================
+   CUSTOM CURSOR (Desktop only)
+   ============================================ */
+.cursor {
+  width: 8px; height: 8px; background: #fff; border-radius: 50%;
+  position: fixed; top: 0; left: 0; pointer-events: none;
+  z-index: 9999; mix-blend-mode: difference;
+  transition: transform 0.1s ease; will-change: transform;
+}
+.cursor-ring {
+  width: 40px; height: 40px; border: 1px solid rgba(255,255,255,0.5);
+  border-radius: 50%; position: fixed; top: 0; left: 0;
+  pointer-events: none; z-index: 9998;
+  transition: transform 0.15s ease-out; will-change: transform;
+}
+
+/* ============================================
+   CANVAS BACKGROUND
+   ============================================ */
+#dedsec-canvas {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 0; opacity: 0.2; pointer-events: none;
+}
+
+/* ============================================
+   NAVIGATION
+   ============================================ */
+.nav {
+  position: fixed; top: 0; left: 0; width: 100%; z-index: 50;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 1rem 1rem;
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--glass-border);
+}
+.nav-logo { font-size: 1.125rem; font-weight: 700; letter-spacing: -0.05em; color: var(--text-white); }
+.nav-links { display: none; gap: 2rem; font-size: 0.875rem; font-weight: 500; color: var(--text-muted); }
+.nav-links a { transition: color 0.3s; }
+.nav-links a:hover { color: var(--text-white); }
+.nav-links .nav-cta {
+  color: var(--text-white); background: var(--white-10);
+  padding: 0.5rem 1rem; border-radius: var(--radius-sm);
+  transition: background 0.3s;
+}
+.nav-links .nav-cta:hover { background: var(--white-20); }
+.nav-mobile-btn { color: var(--text-white); padding: 0.25rem; }
+
+.nav-mobile-menu {
+  position: fixed; top: 68px; left: 0; width: 100%; z-index: 40;
+  display: flex; flex-direction: column; gap: 1rem; padding: 1rem;
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--glass-border);
+  transform: translateY(-120%); opacity: 0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  pointer-events: none;
+}
+.nav-mobile-menu.open { transform: translateY(0); opacity: 1; pointer-events: auto; }
+.nav-mobile-menu a { color: #d1d5db; transition: color 0.2s; }
+.nav-mobile-menu a:hover { color: var(--text-white); }
+.nav-mobile-menu .nav-cta {
+  color: var(--text-white); background: var(--white-10);
+  padding: 0.5rem 1rem; border-radius: var(--radius-sm); text-align: center;
+}
+
+/* ============================================
+   HERO
+   ============================================ */
+.hero {
+  position: relative; z-index: 10;
+  min-height: 100vh; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; padding: 6rem 1rem 2rem;
+}
+.hero-content { max-width: 56rem; width: 100%; }
+.hero-title {
+  font-size: clamp(3rem, 10vw, 6rem);
+  font-weight: 800; letter-spacing: -0.05em;
+  line-height: 1.05; margin-bottom: 1.5rem;
+  background: linear-gradient(135deg, #fff 0%, #a0a0a0 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 20px rgba(255,255,255,0.15);
+}
+.hero-desc {
+  font-size: clamp(1.0625rem, 2.2vw, 1.5rem);
+  color: var(--text-muted); font-weight: 300;
+  max-width: 42rem; margin: 0 auto 3rem; line-height: 1.6;
+}
+.hero-actions { display: flex; flex-direction: column; gap: 1rem; justify-content: center; align-items: center; }
+.hero-actions .btn { width: 100%; max-width: 260px; justify-content: center; }
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+.btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 1rem 2rem; font-weight: 600;
+  border-radius: var(--radius); transition: all var(--transition);
+}
+.btn-primary {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  color: var(--text-white);
+}
+.btn-primary:hover { background: var(--white-10); }
+.btn-ghost { color: var(--text-muted); }
+.btn-ghost:hover { color: var(--text-white); }
+.btn-ghost .arrow { transition: transform 0.3s; }
+.btn-ghost:hover .arrow { transform: translateX(4px); }
+
+/* ============================================
+   SECTIONS & CARDS
+   ============================================ */
+.section {
+  position: relative; z-index: 10;
+  max-width: 72rem; margin: 0 auto;
+  padding: 5rem 1rem;
+}
+.section-narrow { max-width: 56rem; }
+.section-header { text-align: center; margin-bottom: 4rem; }
+.section-title {
+  font-size: clamp(1.875rem, 5vw, 3rem);
+  font-weight: 700; letter-spacing: -0.03em;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #fff 0%, #a0a0a0 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.section-desc {
+  color: var(--text-dim); max-width: 36rem;
+  margin: 0 auto; font-size: 0.9375rem;
+}
+
+.feature-grid {
+  display: grid; grid-template-columns: 1fr; gap: 1.5rem;
+}
+.feature-card {
+  padding: 1.5rem;
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  transition: all var(--transition);
+}
+.feature-card:hover {
+  border-color: var(--white-20);
+  box-shadow: 0 20px 40px -15px rgba(255,255,255,0.05);
+}
+.feature-icon { font-size: 2.25rem; margin-bottom: 1rem; filter: grayscale(1); }
+.feature-title { font-size: 1.5rem; font-weight: 700; color: var(--text-white); margin-bottom: 0.75rem; }
+.feature-desc { color: var(--text-muted); font-size: 0.875rem; line-height: 1.7; }
+
+/* ============================================
+   QUICK START STEPS
+   ============================================ */
+.step {
+  padding: 1.5rem;
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  margin-bottom: 1.5rem;
+  transition: border-color var(--transition);
+}
+.step:hover { border-color: var(--white-20); }
+.step-title {
+  font-size: 1.25rem; font-weight: 700;
+  color: var(--text-white); margin-bottom: 0.75rem;
+}
+.step-desc { color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1rem; }
+.step-subtitle { color: #d1d5db; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem; }
+.step-hint { color: var(--text-dim); font-size: 0.75rem; margin-bottom: 1.25rem; }
+
+/* ============================================
+   TERMINAL WINDOW
+   ============================================ */
+.terminal {
+  background: var(--terminal-bg);
+  border: 1px solid var(--terminal-border);
+  border-radius: 0.5rem; overflow: hidden;
+  box-shadow: 0 10px 30px -10px rgba(0,0,0,0.9);
+}
+.terminal-header {
+  display: flex; align-items: center;
+  padding: 0.5rem 0.875rem;
+  background: var(--terminal-header);
+  border-bottom: 1px solid var(--terminal-border);
+}
+.terminal-dots { display: flex; gap: 6px; }
+.terminal-dot { width: 10px; height: 10px; border-radius: 50%; }
+.dot-red { background: #ef4444; }
+.dot-yellow { background: #eab308; }
+.dot-green { background: #22c55e; }
+.terminal-label { margin-left: auto; font-size: 0.75rem; color: var(--text-dim); font-family: var(--font-mono); }
+
+.terminal-body {
+  padding: 0.75rem 1rem;
+  font-size: 0.85rem; line-height: 1.5;
+  overflow-x: auto; white-space: pre;
+  color: var(--text-white);
+  scroll-behavior: smooth;
+}
+.terminal-body.max-h { max-height: 12rem; overflow-y: auto; }
+.terminal-body::-webkit-scrollbar { height: 6px; width: 6px; }
+.terminal-body::-webkit-scrollbar-track { background: var(--terminal-bg); }
+.terminal-body::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+.terminal-body::-webkit-scrollbar-thumb:hover { background: #555; }
+
+.prompt { color: var(--text-dim); user-select: none; }
+
+.copy-btn {
+  display: inline-flex; align-items: center; gap: 4px;
+  margin-left: 0.75rem; padding: 0.125rem 0.25rem;
+  color: var(--text-dim); font-size: 0.75rem; font-weight: 500;
+  transition: color 0.2s;
+}
+.copy-btn:hover { color: var(--text-white); }
+.copy-btn.copied { color: var(--accent-green); }
+.copy-btn svg { width: 14px; height: 14px; }
+
+/* ============================================
+   OS TABS
+   ============================================ */
+.os-tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem; }
+.os-tab {
+  padding: 0.4rem 0.8rem; font-size: 0.8rem; font-weight: 500;
+  border-radius: 0.4rem; border: 1px solid transparent;
+  color: var(--text-muted);
+  transition: all 0.2s;
+}
+.os-tab:hover { color: var(--text-white); background: var(--white-05); }
+.os-tab.active {
+  color: var(--text-white); background: var(--white-10);
+  border-color: var(--white-20);
+}
+
+/* ============================================
+   SCRIPT ACTIONS
+   ============================================ */
+.script-actions {
+  display: flex; flex-direction: column; gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+.script-btn {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  font-size: 0.75rem; font-weight: 600; color: var(--text-white);
+  background: var(--white-10); border-radius: var(--radius-sm);
+  transition: background var(--transition);
+}
+.script-btn:hover { background: var(--white-20); }
+
+/* ============================================
+   FOOTER
+   ============================================ */
+.footer {
+  position: relative; z-index: 10;
+  margin-top: 5rem; padding: 2rem 1rem;
+  text-align: center; font-size: 0.75rem;
+  color: var(--text-fade);
+  border-top: 1px solid var(--white-10);
+}
+
+/* ============================================
+   SCROLL REVEAL
+   ============================================ */
+.reveal {
+  opacity: 0; transform: translateY(30px);
+  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: opacity, transform;
+}
+.reveal.active { opacity: 1; transform: translateY(0); }
+
+/* ============================================
+   RESPONSIVE — TABLET & DESKTOP
+   ============================================ */
+@media (min-width: 640px) {
+  .hero-actions { flex-direction: row; }
+  .hero-actions .btn { width: auto; }
+  .script-actions { flex-direction: row; }
+}
+
+@media (min-width: 768px) {
+  .nav { padding: 1rem 1.5rem; }
+  .nav-logo { font-size: 1.25rem; }
+  .nav-links { display: flex; }
+  .nav-mobile-btn { display: none; }
+  .nav-mobile-menu { display: none; }
+
+  .section { padding: 8rem 1.5rem; }
+  .section-header { margin-bottom: 4rem; }
+  .section-desc { font-size: 1rem; }
+
+  .feature-grid { grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+  .feature-card { padding: 1.5rem; }
+  .feature-title { font-size: 1.5rem; }
+
+  .step { padding: 1.5rem; }
+  .step-title { font-size: 1.25rem; }
+}
+
+/* ============================================
+   MOBILE OPTIMIZATIONS
+   ============================================ */
+@media (max-width: 768px) {
+  body { cursor: auto; }
+  .cursor, .cursor-ring { display: none; }
+  #dedsec-canvas { opacity: 0.12; }
+  .terminal-body { font-size: 0.78rem; }
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal { opacity: 1; transform: none; }
+}
+</style>
 </head>
-<body class="antialiased selection:bg-white selection:text-black">
+<body>
 
-    <div class="cursor" id="cursor"></div>
-    <div class="cursor-ring" id="cursor-ring"></div>
-    <canvas id="dedsec-canvas"></canvas>
+<a href="#main" class="skip-link">Skip to content</a>
 
-    <!-- Navigation (Mobile Optimized) -->
-    <nav class="fixed top-0 w-full z-50 glass-panel !rounded-none !border-t-0 !border-l-0 !border-r-0 px-4 md:px-6 py-4 flex justify-between items-center">
-        <div class="text-lg md:text-xl font-bold tracking-tighter text-white">⚡ Flask-ADB-toolkit</div>
-        
-        <!-- Desktop Links -->
-        <div class="hidden md:flex space-x-8 text-sm font-medium text-gray-400">
-            <a href="#features" class="hover:text-white transition-colors duration-300">Features</a>
-            <a href="#quickstart" class="hover:text-white transition-colors duration-300">Quick Start</a>
-            <a href="https://github.com/dedsec-1337/Flask-ADB-toolkit" target="_blank" class="text-white bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg transition-all duration-300">GitHub</a>
-        </div>
+<!-- Custom Cursor (desktop only) -->
+<div class="cursor" id="cursor" aria-hidden="true"></div>
+<div class="cursor-ring" id="cursor-ring" aria-hidden="true"></div>
 
-        <!-- Mobile Menu Button -->
-        <button id="mobile-menu-btn" class="md:hidden text-white focus:outline-none">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-        </button>
-    </nav>
+<!-- Animated Background -->
+<canvas id="dedsec-canvas" aria-hidden="true"></canvas>
 
-    <!-- Mobile Menu Dropdown -->
-    <div id="mobile-menu" class="fixed top-[68px] left-0 w-full glass-panel z-40 hidden flex-col p-4 space-y-4 md:hidden border-t-0 border-l-0 border-r-0">
-        <a href="#features" class="text-gray-300 hover:text-white transition-colors">Features</a>
-        <a href="#quickstart" class="text-gray-300 hover:text-white transition-colors">Quick Start</a>
-        <a href="https://github.com/dedsec-1337/Flask-ADB-toolkit" target="_blank" class="text-white bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg text-center transition-all">GitHub</a>
+<!-- Navigation -->
+<nav class="nav" role="navigation" aria-label="Main navigation">
+  <div class="nav-logo">⚡ Flask-ADB-toolkit</div>
+
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#quickstart">Quick Start</a>
+    <a href="https://github.com/dedsec-1337/Flask-ADB-toolkit" target="_blank" rel="noopener" class="nav-cta">GitHub</a>
+  </div>
+
+  <button class="nav-mobile-btn" id="mobile-menu-btn" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="mobile-menu">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 6h16M4 12h16M4 18h16"/>
+    </svg>
+  </button>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="nav-mobile-menu" id="mobile-menu">
+  <a href="#features">Features</a>
+  <a href="#quickstart">Quick Start</a>
+  <a href="https://github.com/dedsec-1337/Flask-ADB-toolkit" target="_blank" rel="noopener" class="nav-cta">GitHub</a>
+</div>
+
+<main id="main">
+
+<!-- Hero -->
+<header class="hero">
+  <div class="hero-content">
+    <h1 class="hero-title">Flask-ADB-toolkit</h1>
+    <p class="hero-desc">
+      One little flask 🧪 — every flashing tool you'll ever need. A powerful, menu-driven terminal toolkit for Android Debug Bridge.
+    </p>
+    <div class="hero-actions">
+      <a href="#quickstart" class="btn btn-primary">Get Started</a>
+      <a href="https://github.com/dedsec-1337/Flask-ADB-toolkit" target="_blank" rel="noopener" class="btn btn-ghost">
+        View Source <span class="arrow">→</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- Features -->
+<section id="features" class="section" aria-labelledby="features-title">
+  <div class="section-header reveal">
+    <h2 id="features-title" class="section-title">Key Features</h2>
+    <p class="section-desc">Everything you need to manage your Android device, wrapped in a friendly terminal interface.</p>
+  </div>
+
+  <div class="feature-grid">
+    <article class="feature-card reveal">
+      <div class="feature-icon" aria-hidden="true">🚀</div>
+      <h3 class="feature-title">Fast &amp; Lightweight</h3>
+      <p class="feature-desc">A snappy terminal program that wraps all the scary <code>fastboot</code> and <code>adb</code> commands into friendly numbered options.</p>
+    </article>
+
+    <article class="feature-card reveal" style="transition-delay:100ms">
+      <div class="feature-icon" aria-hidden="true">📱</div>
+      <h3 class="feature-title">Full ADB Control</h3>
+      <p class="feature-desc">Flash ROMs, restore stock, flash any partition, deep-clean junk, run performance passes, take screenshots, and install APKs.</p>
+    </article>
+
+    <article class="feature-card reveal" style="transition-delay:200ms">
+      <div class="feature-icon" aria-hidden="true">🛠️</div>
+      <h3 class="feature-title">Easy to Use</h3>
+      <p class="feature-desc">Built for people who know nothing about custom ROMs but want to try. No memorizing commands, just plug in and pick from a menu.</p>
+    </article>
+  </div>
+</section>
+
+<!-- Quick Start -->
+<section id="quickstart" class="section section-narrow" aria-labelledby="quickstart-title">
+  <div class="section-header reveal">
+    <h2 id="quickstart-title" class="section-title">Quick Start</h2>
+    <p class="section-desc">Get up and running in under a minute.</p>
+  </div>
+
+  <!-- Step 1 -->
+  <div class="step reveal">
+    <h3 class="step-title">1. Install Android Tools</h3>
+    <p class="step-desc">You need <code>adb</code> and <code>fastboot</code> installed on your system.</p>
+
+    <div class="os-tabs" id="os-tabs" role="tablist" aria-label="Operating system">
+      <button class="os-tab active" data-os="debian" role="tab" aria-selected="true">Ubuntu / Debian</button>
+      <button class="os-tab" data-os="arch" role="tab" aria-selected="false">Arch Linux</button>
+      <button class="os-tab" data-os="fedora" role="tab" aria-selected="false">Fedora</button>
+      <button class="os-tab" data-os="mac" role="tab" aria-selected="false">macOS</button>
     </div>
 
-    <!-- Hero -->
-    <header class="relative z-10 flex flex-col items-center justify-center min-h-screen text-center px-4 sm:px-6 pt-24 md:pt-32">
-        <div class="max-w-4xl mx-auto">
-            <h1 class="text-5xl sm:text-6xl md:text-8xl font-extrabold tracking-tight mb-6 md:mb-8 gradient-text glow-text">
-                Flask-ADB-toolkit
-            </h1>
-            <p class="text-lg sm:text-xl md:text-2xl text-gray-400 max-w-2xl mx-auto mb-10 md:mb-12 leading-relaxed font-light">
-                One little flask 🧪 — every flashing tool you'll ever need. A powerful, menu-driven terminal toolkit for Android Debug Bridge.
-            </p>
-            <div class="flex flex-col sm:flex-row justify-center gap-4 md:gap-6">
-                <a href="#quickstart" class="glass-panel px-8 py-4 font-semibold text-white hover:!bg-white/10 transition-all duration-300">
-                    Get Started
-                </a>
-                <a href="https://github.com/dedsec-1337/Flask-ADB-toolkit" target="_blank" class="px-8 py-4 font-semibold text-gray-400 hover:text-white transition-all duration-300 flex items-center justify-center gap-2">
-                    View Source <span>→</span>
-                </a>
-            </div>
+    <div class="terminal">
+      <div class="terminal-header">
+        <div class="terminal-dots" aria-hidden="true">
+          <div class="terminal-dot dot-red"></div>
+          <div class="terminal-dot dot-yellow"></div>
+          <div class="terminal-dot dot-green"></div>
         </div>
-    </header>
+        <span class="terminal-label" id="os-label">Ubuntu / Debian</span>
+        <button class="copy-btn" data-copy="command" aria-label="Copy command">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span>Copy</span>
+        </button>
+      </div>
+      <div class="terminal-body" id="os-command"><span class="prompt">❯</span> sudo apt update && sudo apt install android-tools-adb android-tools-fastboot</div>
+    </div>
+  </div>
 
-    <!-- Features -->
-    <section id="features" class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-20 md:py-32">
-        <div class="reveal">
-            <h2 class="text-3xl md:text-5xl font-bold text-center mb-4 gradient-text">Key Features</h2>
-            <p class="text-gray-500 text-center mb-12 md:mb-16 max-w-xl mx-auto text-sm md:text-base">Everything you need to manage your Android device, wrapped in a friendly terminal interface.</p>
+  <!-- Step 2 -->
+  <div class="step reveal">
+    <h3 class="step-title">2. Save the Toolkit Script</h3>
+
+    <p class="step-subtitle">Option A: Create the file manually</p>
+    <p class="step-desc">Run this command to open a new file in the <code>nano</code> editor:</p>
+    <div class="terminal" style="margin-bottom:0.5rem">
+      <div class="terminal-header">
+        <div class="terminal-dots" aria-hidden="true">
+          <div class="terminal-dot dot-red"></div>
+          <div class="terminal-dot dot-yellow"></div>
+          <div class="terminal-dot dot-green"></div>
         </div>
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-            <div class="glass-panel p-5 md:p-6 reveal">
-                <div class="text-4xl mb-4 grayscale">🚀</div>
-                <h3 class="text-xl md:text-2xl font-bold mb-3 text-white">Fast & Lightweight</h3>
-                <p class="text-gray-400 leading-relaxed text-sm">A snappy terminal program that wraps all the scary <code class="text-xs bg-white/10 px-1 rounded">fastboot</code> and <code class="text-xs bg-white/10 px-1 rounded">adb</code> commands into friendly numbered options.</p>
-            </div>
-            <div class="glass-panel p-5 md:p-6 reveal" style="transition-delay: 100ms;">
-                <div class="text-4xl mb-4 grayscale">📱</div>
-                <h3 class="text-xl md:text-2xl font-bold mb-3 text-white">Full ADB Control</h3>
-                <p class="text-gray-400 leading-relaxed text-sm">Flash ROMs, restore stock, flash any partition, deep-clean junk, run performance passes, take screenshots, and install APKs.</p>
-            </div>
-            <div class="glass-panel p-5 md:p-6 reveal" style="transition-delay: 200ms;">
-                <div class="text-4xl mb-4 grayscale">🛠️</div>
-                <h3 class="text-xl md:text-2xl font-bold mb-3 text-white">Easy to Use</h3>
-                <p class="text-gray-400 leading-relaxed text-sm">Built for people who know nothing about custom ROMs but want to try. No memorizing commands, just plug in and pick from a menu.</p>
-            </div>
+        <span class="terminal-label">bash</span>
+        <button class="copy-btn" data-copy="nano" aria-label="Copy nano command">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span>Copy</span>
+        </button>
+      </div>
+      <div class="terminal-body"><span class="prompt">❯</span> nano ~/flask-adb-toolkit.sh</div>
+    </div>
+    <p class="step-hint">(Paste the script below, then press <code>Ctrl+O</code>, <code>Enter</code>, and <code>Ctrl+X</code> to save and exit)</p>
+
+    <p class="step-subtitle">Option B: Use the buttons below</p>
+    <div class="script-actions">
+      <button class="script-btn" data-copy="script">📋 Copy Full Script</button>
+      <button class="script-btn" id="download-btn">⬇️ Download .sh</button>
+    </div>
+
+    <div class="terminal">
+      <div class="terminal-header">
+        <div class="terminal-dots" aria-hidden="true">
+          <div class="terminal-dot dot-red"></div>
+          <div class="terminal-dot dot-yellow"></div>
+          <div class="terminal-dot dot-green"></div>
         </div>
-    </section>
+        <span class="terminal-label">flask-adb-toolkit.sh</span>
+        <button class="copy-btn" data-copy="script" aria-label="Copy full script">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span>Copy</span>
+        </button>
+      </div>
+      <div class="terminal-body max-h" id="script-content"><code>Loading script from GitHub...</code></div>
+    </div>
+  </div>
 
-    <!-- Quick Start -->
-    <section id="quickstart" class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 py-20 md:py-32">
-        <div class="reveal">
-            <h2 class="text-3xl md:text-5xl font-bold text-center mb-4 gradient-text">Quick Start</h2>
-            <p class="text-gray-500 text-center mb-10 md:mb-12 text-sm md:text-base">Get up and running in under a minute.</p>
+  <!-- Step 3 -->
+  <div class="step reveal">
+    <h3 class="step-title">3. Run the Toolkit</h3>
+    <p class="step-desc">Make the script executable and launch it.</p>
+
+    <div class="terminal">
+      <div class="terminal-header">
+        <div class="terminal-dots" aria-hidden="true">
+          <div class="terminal-dot dot-red"></div>
+          <div class="terminal-dot dot-yellow"></div>
+          <div class="terminal-dot dot-green"></div>
         </div>
+        <span class="terminal-label">bash</span>
+        <button class="copy-btn" data-copy="run" aria-label="Copy run commands">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span>Copy</span>
+        </button>
+      </div>
+      <div class="terminal-body"><span class="prompt">❯</span> chmod +x ~/flask-adb-toolkit.sh
+<span class="prompt">❯</span> ~/flask-adb-toolkit.sh</div>
+    </div>
 
-        <!-- Step 1 -->
-        <div class="glass-panel p-5 md:p-6 mb-6 reveal">
-            <h3 class="text-lg md:text-xl font-bold mb-3 text-white">1. Install Android Tools</h3>
-            <p class="text-gray-400 text-sm mb-4">You need <code class="text-xs bg-white/10 px-1 rounded">adb</code> and <code class="text-xs bg-white/10 px-1 rounded">fastboot</code> installed on your system.</p>
-            
-            <div class="flex flex-wrap gap-2 mb-3" id="os-tabs">
-                <button class="os-tab active" data-os="debian">Ubuntu / Debian</button>
-                <button class="os-tab" data-os="arch">Arch Linux</button>
-                <button class="os-tab" data-os="fedora">Fedora</button>
-                <button class="os-tab" data-os="mac">macOS</button>
-            </div>
+    <p class="step-hint" style="margin-top:1rem;padding-top:0.75rem;border-top:1px solid var(--white-10)">
+      💡 <strong>Windows (Git Bash):</strong> Download and double-click <code>flask-adb-toolkit.bat</code> from the repository.<br>
+      💡 <strong>Windows (WSL):</strong> Follow the Linux steps above inside WSL.
+    </p>
+  </div>
+</section>
 
-            <div class="terminal-window">
-                <div class="terminal-header">
-                    <div class="terminal-dot bg-red-500"></div>
-                    <div class="terminal-dot bg-yellow-500"></div>
-                    <div class="terminal-dot bg-green-500"></div>
-                    <span class="ml-auto text-xs text-gray-500 font-mono" id="os-label">Ubuntu / Debian</span>
-                    <button class="copy-btn ml-4" onclick="copyCommand(this)">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                        Copy
-                    </button>
-                </div>
-                <div class="terminal-body">
-                    <pre class="text-white" id="os-command"><span class="text-gray-500">❯</span> sudo apt update && sudo apt install android-tools-adb android-tools-fastboot</pre>
-                </div>
-            </div>
-        </div>
+</main>
 
-        <!-- Step 2 -->
-        <div class="glass-panel p-5 md:p-6 mb-6 reveal">
-            <h3 class="text-lg md:text-xl font-bold mb-3 text-white">2. Save the Toolkit Script</h3>
-            
-            <p class="text-gray-300 font-semibold text-sm mb-1">Option A: Create the file manually</p>
-            <p class="text-gray-400 text-sm mb-3">Run this command to open a new file in the <code class="text-xs bg-white/10 px-1 rounded">nano</code> editor:</p>
-            <pre class="text-white mb-2 bg-[#050505] p-3 rounded-lg border border-[#1a1a1a] text-xs sm:text-sm"><span class="text-gray-500">❯</span> nano ~/flask-adb-toolkit.sh</pre>
-            <p class="text-gray-500 text-xs mb-5">(Paste the script below, then press <code class="bg-white/10 px-1 rounded text-gray-300">Ctrl+O</code>, <code class="bg-white/10 px-1 rounded text-gray-300">Enter</code>, and <code class="bg-white/10 px-1 rounded text-gray-300">Ctrl+X</code> to save and exit)</p>
+<footer class="footer">
+  <p>Built with ❤️ by dedsec-1337. Hosted on GitHub Pages.</p>
+</footer>
 
-            <p class="text-gray-300 font-semibold text-sm mb-2">Option B: Use the buttons below</p>
-            <div class="flex flex-col sm:flex-row gap-3 mb-5">
-                <button onclick="copyScript(this)" class="bg-white/10 hover:bg-white/20 text-white px-5 py-2.5 rounded-lg font-semibold transition-all duration-300 flex-1 flex items-center justify-center gap-2 text-xs">
-                    📋 Copy Full Script
-                </button>
-                <button onclick="downloadScript()" class="bg-white/10 hover:bg-white/20 text-white px-5 py-2.5 rounded-lg font-semibold transition-all duration-300 flex-1 flex items-center justify-center gap-2 text-xs">
-                    ⬇️ Download .sh
-                </button>
-            </div>
+<script>
+(() => {
+  'use strict';
 
-            <div class="terminal-window">
-                <div class="terminal-header">
-                    <div class="terminal-dot bg-red-500"></div>
-                    <div class="terminal-dot bg-yellow-500"></div>
-                    <div class="terminal-dot bg-green-500"></div>
-                    <span class="ml-auto text-xs text-gray-500 font-mono">flask-adb-toolkit.sh</span>
-                    <button class="copy-btn ml-4" onclick="copyScript(this)">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                        Copy
-                    </button>
-                </div>
-                <div class="terminal-body max-h-48 overflow-y-auto">
-                    <pre class="text-gray-300 text-xs" id="script-content"><code>Loading script from GitHub...</code></pre>
-                </div>
-            </div>
-        </div>
+  // ============================================
+  // CACHED DOM REFERENCES
+  // ============================================
+  const $ = (id) => document.getElementById(id);
+  const canvas = $('dedsec-canvas');
+  const mobileMenu = $('mobile-menu');
+  const mobileMenuBtn = $('mobile-menu-btn');
+  const osLabel = $('os-label');
+  const osCommand = $('os-command');
+  const scriptContent = $('script-content');
 
-        <!-- Step 3 -->
-        <div class="glass-panel p-5 md:p-6 reveal">
-            <h3 class="text-lg md:text-xl font-bold mb-3 text-white">3. Run the Toolkit</h3>
-            <p class="text-gray-400 text-sm mb-4">Make the script executable and launch it.</p>
-            
-            <div class="terminal-window">
-                <div class="terminal-header">
-                    <div class="terminal-dot bg-red-500"></div>
-                    <div class="terminal-dot bg-yellow-500"></div>
-                    <div class="terminal-dot bg-green-500"></div>
-                    <span class="ml-auto text-xs text-gray-500 font-mono">bash</span>
-                    <button class="copy-btn ml-4" onclick="copyExecution(this)">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                        Copy
-                    </button>
-                </div>
-                <div class="terminal-body">
-                    <pre class="text-white"><span class="text-gray-500">❯</span> chmod +x ~/flask-adb-toolkit.sh
-<span class="text-gray-500">❯</span> ~/flask-adb-toolkit.sh</pre>
-                </div>
-            </div>
-            
-            <div class="text-gray-500 text-xs mt-4 border-t border-white/10 pt-3">
-                <p>💡 <strong>Windows (Git Bash):</strong> Download and double-click <code class="text-white">flask-adb-toolkit.bat</code> from the repository.</p>
-                <p class="mt-1">💡 <strong>Windows (WSL):</strong> Follow the Linux steps above inside WSL.</p>
-            </div>
-        </div>
-    </section>
+  const isDesktop = window.matchMedia('(pointer: fine)').matches;
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
 
-    <footer class="relative z-10 border-t border-white/10 mt-20 py-8 text-center text-gray-600 text-xs">
-        <p>Built with ❤️ by dedsec-1337. Hosted on GitHub Pages.</p>
-    </footer>
+  // ============================================
+  // MOBILE MENU
+  // ============================================
+  mobileMenuBtn.addEventListener('click', () => {
+    const isOpen = mobileMenu.classList.toggle('open');
+    mobileMenuBtn.setAttribute('aria-expanded', isOpen);
+  });
+  mobileMenu.querySelectorAll('a').forEach(a =>
+    a.addEventListener('click', () => {
+      mobileMenu.classList.remove('open');
+      mobileMenuBtn.setAttribute('aria-expanded', 'false');
+    })
+  );
 
-    <script>
-        // --- MOBILE MENU TOGGLE ---
-        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-        const mobileMenu = document.getElementById('mobile-menu');
-        mobileMenuBtn.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
-        });
-        // Close mobile menu when a link is clicked
-        mobileMenu.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => mobileMenu.classList.add('hidden'));
-        });
+  // ============================================
+  // CUSTOM CURSOR (Desktop only)
+  // ============================================
+  if (isDesktop && !prefersReducedMotion) {
+    const cursor = $('cursor');
+    const cursorRing = $('cursor-ring');
+    let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
 
-        // --- CUSTOM CURSOR (Only on Desktop) ---
-        if (window.matchMedia("(pointer: fine)").matches) {
-            const cursor = document.getElementById('cursor');
-            const cursorRing = document.getElementById('cursor-ring');
-            document.addEventListener('mousemove', (e) => {
-                cursor.style.left = e.clientX + 'px';
-                cursor.style.top = e.clientY + 'px';
-                cursorRing.style.left = (e.clientX - 16) + 'px';
-                cursorRing.style.top = (e.clientY - 16) + 'px';
-            });
-            document.querySelectorAll('a, button').forEach(el => {
-                el.addEventListener('mouseenter', () => {
-                    cursor.style.transform = 'scale(2)';
-                    cursorRing.style.transform = 'scale(1.5)';
-                });
-                el.addEventListener('mouseleave', () => {
-                    cursor.style.transform = 'scale(1)';
-                    cursorRing.style.transform = 'scale(1)';
-                });
-            });
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      cursor.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
+    }, { passive: true });
+
+    // Smooth ring follow via rAF
+    const followRing = () => {
+      ringX += (mouseX - ringX - 16) * 0.18;
+      ringY += (mouseY - ringY - 16) * 0.18;
+      cursorRing.style.transform = `translate3d(${ringX}px, ${ringY}px, 0)`;
+      requestAnimationFrame(followRing);
+    };
+    requestAnimationFrame(followRing);
+
+    // Hover scale
+    const interactives = document.querySelectorAll('a, button');
+    interactives.forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        cursor.style.transform += ' scale(2)';
+        cursorRing.style.transform += ' scale(1.4)';
+      });
+      el.addEventListener('mouseleave', () => {
+        cursor.style.transform = cursor.style.transform.replace(' scale(2)', '');
+        cursorRing.style.transform = cursorRing.style.transform.replace(' scale(1.4)', '');
+      });
+    });
+  }
+
+  // ============================================
+  // DEDSEC MATRIX RAIN — Optimized with rAF
+  // ============================================
+  if (!prefersReducedMotion) {
+    const ctx = canvas.getContext('2d', { alpha: true });
+    let width, height, columns, yPositions;
+    let fontSize = isMobile ? 12 : 14;
+    let lastFrame = 0;
+    const FRAME_INTERVAL = 50; // ~20 FPS
+    let visible = true;
+
+    const CHARS = 'アィウェオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF';
+    const DEDSEC_WORDS = ['DEDSEC', 'HACK', 'CTOS', '0101', 'WATCH_DOGS'];
+
+    function setupCanvas() {
+      fontSize = isMobile ? 12 : 14;
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+      columns = Math.floor(width / fontSize);
+      yPositions = new Array(columns).fill(1);
+    }
+
+    function draw(ts) {
+      if (!visible) { requestAnimationFrame(draw); return; }
+      if (ts - lastFrame < FRAME_INTERVAL) { requestAnimationFrame(draw); return; }
+      lastFrame = ts;
+
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.06)';
+      ctx.fillRect(0, 0, width, height);
+
+      // Occasional red glitch flash
+      if (Math.random() > 0.99) {
+        ctx.fillStyle = 'rgba(255, 0, 0, 0.04)';
+        ctx.fillRect(0, 0, width, height);
+      }
+
+      ctx.font = fontSize + 'px monospace';
+
+      for (let i = 0; i < yPositions.length; i++) {
+        const useWord = Math.random() > 0.95;
+        const text = useWord
+          ? DEDSEC_WORDS[(Math.random() * DEDSEC_WORDS.length) | 0]
+          : CHARS[(Math.random() * CHARS.length) | 0];
+
+        const x = i * fontSize;
+        const y = yPositions[i] * fontSize;
+
+        const isGlitch = Math.random() > 0.98;
+        ctx.fillStyle = isGlitch ? '#ff0000' : '#ffffff';
+        ctx.shadowColor = isGlitch ? 'rgba(255,0,0,0.8)' : 'rgba(255,255,255,0.5)';
+        ctx.shadowBlur = 6;
+        ctx.fillText(text, x, y);
+        ctx.shadowBlur = 0;
+
+        if (y > height && Math.random() > 0.975) yPositions[i] = 0;
+        else yPositions[i] += Math.random() > 0.8 ? 2 : 1;
+      }
+
+      requestAnimationFrame(draw);
+    }
+
+    // Debounced resize
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(setupCanvas, 150);
+    }, { passive: true });
+
+    // Pause when tab hidden (saves CPU + battery)
+    document.addEventListener('visibilitychange', () => {
+      visible = !document.hidden;
+    });
+
+    setupCanvas();
+    requestAnimationFrame(draw);
+  }
+
+  // ============================================
+  // SCROLL REVEAL
+  // ============================================
+  if ('IntersectionObserver' in window && !prefersReducedMotion) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('active');
+          observer.unobserve(entry.target);
         }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
 
-        // --- DEDSEC MATRIX RAIN (No Skull) ---
-        const canvas = document.getElementById('dedsec-canvas');
-        const ctx = canvas.getContext('2d');
-        let width, height, columns, yPositions;
-        let fontSize = window.innerWidth < 768 ? 12 : 14;
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  } else {
+    document.querySelectorAll('.reveal').forEach(el => el.classList.add('active'));
+  }
 
-        const chars = 'アィウェオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF';
-        const dedsecWords = ['DEDSEC', 'HACK', 'CTOS', '0101', 'WATCH_DOGS'];
+  // ============================================
+  // OS TABS + COMMAND COPY
+  // ============================================
+  const OS_COMMANDS = {
+    debian: 'sudo apt update && sudo apt install android-tools-adb android-tools-fastboot',
+    arch: 'sudo pacman -S android-tools',
+    fedora: 'sudo dnf install android-tools',
+    mac: 'brew install android-platform-tools'
+  };
+  let currentOsCommand = OS_COMMANDS.debian;
 
-        function setupCanvas() {
-            fontSize = window.innerWidth < 768 ? 12 : 14;
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-            columns = Math.floor(width / fontSize);
-            yPositions = Array(columns).fill(1);
-        }
+  document.querySelectorAll('.os-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.os-tab').forEach(t => {
+        t.classList.remove('active');
+        t.setAttribute('aria-selected', 'false');
+      });
+      tab.classList.add('active');
+      tab.setAttribute('aria-selected', 'true');
 
-        function drawMatrix() {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.06)';
-            ctx.fillRect(0, 0, width, height);
+      const os = tab.dataset.os;
+      currentOsCommand = OS_COMMANDS[os];
+      osLabel.textContent = tab.textContent.trim();
+      osCommand.innerHTML = `<span class="prompt">❯</span> ${currentOsCommand}`;
+    });
+  });
 
-            // Occasional red glitch flash
-            if (Math.random() > 0.99) {
-                ctx.fillStyle = 'rgba(255, 0, 0, 0.04)';
-                ctx.fillRect(0, 0, width, height);
-            }
+  // ============================================
+  // UNIVERSAL COPY
+  // ============================================
+  const copyFeedback = (btn) => {
+    const label = btn.querySelector('span') || btn;
+    const original = label.textContent;
+    label.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      label.textContent = original;
+      btn.classList.remove('copied');
+    }, 2000);
+  };
 
-            ctx.font = fontSize + 'px monospace';
+  const copyText = async (text, btn) => {
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        // Fallback for older browsers
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      copyFeedback(btn);
+    } catch (err) {
+      console.error('Copy failed:', err);
+    }
+  };
 
-            for (let i = 0; i < yPositions.length; i++) {
-                let text;
-                // Chance to drop a DedSec word
-                if (Math.random() > 0.95) {
-                    text = dedsecWords[Math.floor(Math.random() * dedsecWords.length)];
-                } else {
-                    text = chars.charAt(Math.floor(Math.random() * chars.length));
-                }
+  // Delegate all copy button clicks
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-copy]');
+    if (!btn) return;
+    const type = btn.dataset.copy;
 
-                const x = i * fontSize;
-                const y = yPositions[i] * fontSize;
+    if (type === 'command') copyText(currentOsCommand, btn);
+    else if (type === 'script') copyText(scriptContent.innerText, btn);
+    else if (type === 'nano') copyText('nano ~/flask-adb-toolkit.sh', btn);
+    else if (type === 'run') copyText('chmod +x ~/flask-adb-toolkit.sh\n~/flask-adb-toolkit.sh', btn);
+  });
 
-                // Random red or white glitch
-                if (Math.random() > 0.98) {
-                    ctx.fillStyle = '#ff0000';
-                    ctx.shadowColor = 'rgba(255,0,0,0.8)';
-                } else {
-                    ctx.fillStyle = '#ffffff';
-                    ctx.shadowColor = 'rgba(255,255,255,0.5)';
-                }
+  // ============================================
+  // SCRIPT FETCH + DOWNLOAD
+  // ============================================
+  const SCRIPT_URL = 'https://raw.githubusercontent.com/dedsec-1337/Flask-ADB-toolkit/main/flask-adb-toolkit.sh';
 
-                ctx.shadowBlur = 6;
-                ctx.fillText(text, x, y);
-                ctx.shadowBlur = 0;
+  fetch(SCRIPT_URL)
+    .then(res => {
+      if (!res.ok) throw new Error('Failed to fetch script');
+      return res.text();
+    })
+    .then(text => {
+      // Use textContent for the actual script to avoid XSS
+      scriptContent.textContent = text;
+      // Store for copying
+      scriptContent.dataset.raw = text;
+    })
+    .catch(() => {
+      scriptContent.innerHTML = '<code style="color:#f87171">Error loading script. Please view it directly on <a href="https://github.com/dedsec-1337/Flask-ADB-toolkit" target="_blank" rel="noopener" style="text-decoration:underline">GitHub</a>.</code>';
+    });
 
-                if (y > height && Math.random() > 0.975) yPositions[i] = 0;
-                else yPositions[i] += Math.random() > 0.8 ? 2 : 1;
-            }
-        }
+  // Use data-raw when copying script for safety
+  const originalCopyText = copyText;
+  window.copyText = originalCopyText;
 
-        setupCanvas();
-        window.addEventListener('resize', setupCanvas);
-        setInterval(drawMatrix, 50);
+  // Download button
+  $('download-btn').addEventListener('click', () => {
+    const content = scriptContent.dataset.raw || scriptContent.innerText;
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'flask-adb-toolkit.sh';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
 
-        // --- SCROLL REVEAL ---
-        const revealElements = document.querySelectorAll('.reveal');
-        const revealObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) entry.target.classList.add('active');
-            });
-        }, { threshold: 0.15 });
-        revealElements.forEach(el => revealObserver.observe(el));
-
-        // --- OS TABS & COPY ---
-        const osCommands = {
-            debian: 'sudo apt update && sudo apt install android-tools-adb android-tools-fastboot',
-            arch: 'sudo pacman -S android-tools',
-            fedora: 'sudo dnf install android-tools',
-            mac: 'brew install android-platform-tools'
-        };
-        let currentOsCommand = osCommands['debian'];
-
-        document.querySelectorAll('.os-tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                document.querySelectorAll('.os-tab').forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                const os = tab.getAttribute('data-os');
-                currentOsCommand = osCommands[os];
-                document.getElementById('os-label').innerText = tab.innerText;
-                document.getElementById('os-command').innerHTML = `<span class="text-gray-500">❯</span> ${currentOsCommand}`;
-            });
-        });
-
-        function copyCommand(btn) {
-            copyText(currentOsCommand, btn);
-        }
-
-        // --- FETCH SCRIPT ---
-        async function fetchScript() {
-            const rawUrl = 'https://raw.githubusercontent.com/dedsec-1337/Flask-ADB-toolkit/main/flask-adb-toolkit.sh';
-            try {
-                const response = await fetch(rawUrl);
-                if (!response.ok) throw new Error('Failed to fetch script');
-                const text = await response.text();
-                document.getElementById('script-content').innerHTML = `<code>${text.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code>`;
-            } catch (error) {
-                document.getElementById('script-content').innerHTML = `<code class="text-red-400">Error loading script. Please view it directly on <a href="https://github.com/dedsec-1337/Flask-ADB-toolkit" target="_blank" class="underline">GitHub</a>.</code>`;
-            }
-        }
-        fetchScript();
-
-        // --- COPY SCRIPT ---
-        function copyScript(btn) {
-            const content = document.getElementById('script-content').innerText;
-            copyText(content, btn);
-        }
-
-        function downloadScript() {
-            const content = document.getElementById('script-content').innerText;
-            const blob = new Blob([content], { type: 'text/plain' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'flask-adb-toolkit.sh';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
-        }
-
-        // --- COPY EXECUTION COMMANDS ---
-        function copyExecution(btn) {
-            const cmd = 'chmod +x ~/flask-adb-toolkit.sh\n~/flask-adb-toolkit.sh';
-            copyText(cmd, btn);
-        }
-
-        // --- UNIVERSAL COPY FUNCTION ---
-        function copyText(text, btnElement) {
-            navigator.clipboard.writeText(text).then(() => {
-                const originalText = btnElement.innerHTML;
-                btnElement.innerHTML = '<span class="text-green-400 font-bold">Copied!</span>';
-                btnElement.classList.add('copied');
-                setTimeout(() => {
-                    btnElement.innerHTML = originalText;
-                    btnElement.classList.remove('copied');
-                }, 2000);
-            }).catch(err => {
-                console.error('Failed to copy: ', err);
-            });
-        }
-    </script>
+})();
+</script>
 </body>
 </html>
