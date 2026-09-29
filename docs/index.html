@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flask-ADB-toolkit | Premium Terminal Toolkit</title>
     
-    <!-- Google Fonts: Inter & JetBrains Mono for a premium feel -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -22,7 +21,7 @@
             background-color: #000;
             color: #e2e8f0;
             overflow-x: hidden;
-            cursor: none; /* Hide default cursor */
+            cursor: none; 
         }
         code, pre {
             font-family: var(--font-mono);
@@ -59,7 +58,7 @@
             width: 100%;
             height: 100%;
             z-index: 0;
-            opacity: 0.15; /* Subtle background effect */
+            opacity: 0.15;
             pointer-events: none;
         }
 
@@ -107,6 +106,29 @@
             font-size: 0.9rem;
         }
 
+        /* --- OS TABS --- */
+        .os-tab {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .os-tab.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .os-tab:not(.active) {
+            color: #9ca3af;
+            border: 1px solid transparent;
+        }
+        .os-tab:not(.active):hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
         /* --- SCROLL REVEAL ANIMATION --- */
         .reveal {
             opacity: 0;
@@ -118,12 +140,6 @@
             transform: translateY(0);
         }
 
-        /* --- INTERACTIVE GLOW --- */
-        .glow-text {
-            text-shadow: 0 0 20px rgba(255,255,255,0.3);
-        }
-
-        /* Hide cursor on mobile for better UX */
         @media (max-width: 768px) {
             body { cursor: auto; }
             .cursor, .cursor-ring { display: none; }
@@ -132,11 +148,8 @@
 </head>
 <body class="antialiased selection:bg-white selection:text-black">
 
-    <!-- Custom Cursor -->
     <div class="cursor" id="cursor"></div>
     <div class="cursor-ring" id="cursor-ring"></div>
-
-    <!-- Matrix Rain Background -->
     <canvas id="matrix-canvas"></canvas>
 
     <!-- Navigation -->
@@ -156,7 +169,7 @@
                 Flask-ADB-toolkit
             </h1>
             <p class="text-xl md:text-2xl text-gray-400 max-w-2xl mx-auto mb-12 leading-relaxed font-light">
-                One little flask 🧪 — every flashing tool you'll ever need. A powerful, menu-driven terminal toolkit for Android Debug Bridge, built for people who want to tinker, not memorize commands.
+                One little flask 🧪 — every flashing tool you'll ever need. A powerful, menu-driven terminal toolkit for Android Debug Bridge.
             </p>
             <div class="flex flex-col sm:flex-row justify-center gap-6">
                 <a href="#quickstart" class="glass-panel px-8 py-4 font-semibold text-white hover:!bg-white/10 transition-all duration-300">
@@ -166,10 +179,6 @@
                     View Source <span>→</span>
                 </a>
             </div>
-        </div>
-        <!-- Scroll indicator -->
-        <div class="absolute bottom-10 animate-bounce text-gray-500">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
         </div>
     </header>
 
@@ -181,19 +190,16 @@
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <!-- Feature Card 1 -->
             <div class="glass-panel p-8 reveal">
                 <div class="text-4xl mb-6 grayscale">🚀</div>
                 <h3 class="text-2xl font-bold mb-3 text-white">Fast & Lightweight</h3>
                 <p class="text-gray-400 leading-relaxed">A snappy terminal program that wraps all the scary <code class="text-xs bg-white/10 px-1 rounded">fastboot</code> and <code class="text-xs bg-white/10 px-1 rounded">adb</code> commands into friendly numbered options.</p>
             </div>
-            <!-- Feature Card 2 -->
             <div class="glass-panel p-8 reveal" style="transition-delay: 100ms;">
                 <div class="text-4xl mb-6 grayscale">📱</div>
                 <h3 class="text-2xl font-bold mb-3 text-white">Full ADB Control</h3>
-                <p class="text-gray-400 leading-relaxed">Flash ROMs, restore stock, flash any partition on any device, deep-clean junk, run performance passes, take screenshots, and install APKs.</p>
+                <p class="text-gray-400 leading-relaxed">Flash ROMs, restore stock, flash any partition, deep-clean junk, run performance passes, take screenshots, and install APKs.</p>
             </div>
-            <!-- Feature Card 3 -->
             <div class="glass-panel p-8 reveal" style="transition-delay: 200ms;">
                 <div class="text-4xl mb-6 grayscale">🛠️</div>
                 <h3 class="text-2xl font-bold mb-3 text-white">Easy to Use</h3>
@@ -206,29 +212,80 @@
     <section id="quickstart" class="relative z-10 max-w-4xl mx-auto px-6 py-32">
         <div class="reveal">
             <h2 class="text-4xl md:text-5xl font-bold text-center mb-4 gradient-text">Quick Start</h2>
-            <p class="text-gray-500 text-center mb-12">Get up and running in under 30 seconds.</p>
+            <p class="text-gray-500 text-center mb-12">Get up and running in under a minute.</p>
         </div>
 
-        <div class="terminal-window reveal">
-            <div class="terminal-header">
-                <div class="terminal-dot bg-red-500"></div>
-                <div class="terminal-dot bg-yellow-500"></div>
-                <div class="terminal-dot bg-green-500"></div>
-                <span class="ml-auto text-xs text-gray-500 font-mono">bash</span>
+        <!-- Step 1: Install Prerequisites -->
+        <div class="glass-panel p-8 mb-8 reveal">
+            <h3 class="text-2xl font-bold mb-4 text-white">1. Install Android Tools</h3>
+            <p class="text-gray-400 mb-6">You need <code class="text-xs bg-white/10 px-1 rounded">adb</code> and <code class="text-xs bg-white/10 px-1 rounded">fastboot</code> installed on your system.</p>
+            
+            <div class="flex flex-wrap gap-2 mb-4" id="os-tabs">
+                <button class="os-tab active" data-os="debian">Ubuntu / Debian</button>
+                <button class="os-tab" data-os="arch">Arch Linux</button>
+                <button class="os-tab" data-os="fedora">Fedora</button>
+                <button class="os-tab" data-os="mac">macOS</button>
             </div>
-            <div class="terminal-body">
-                <div class="mb-6">
-                    <span class="text-gray-500"># 1. Save the script (paste the contents from the repo)</span>
-                    <pre class="text-white mt-1"><code>nano ~/flask-adb-toolkit.sh</code></pre>
+
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <div class="terminal-dot bg-red-500"></div>
+                    <div class="terminal-dot bg-yellow-500"></div>
+                    <div class="terminal-dot bg-green-500"></div>
                 </div>
-                <div class="mb-6">
-                    <span class="text-gray-500"># 2. Make it executable & run</span>
-                    <pre class="text-white mt-1"><code>chmod +x ~/flask-adb-toolkit.sh && ~/flask-adb-toolkit.sh</code></pre>
+                <div class="terminal-body">
+                    <pre class="text-white" id="os-command"><code>sudo apt update && sudo apt install android-tools-adb android-tools-fastboot</code></pre>
                 </div>
-                <div class="text-gray-500 text-sm mt-4">
-                    <p>💡 <strong>Windows (Git Bash):</strong> Double-click <code class="text-white">flask-adb-toolkit.bat</code></p>
-                    <p class="mt-1">💡 <strong>Windows (WSL):</strong> Follow the Linux steps above inside WSL.</p>
+            </div>
+        </div>
+
+        <!-- Step 2: The Script -->
+        <div class="glass-panel p-8 mb-8 reveal">
+            <h3 class="text-2xl font-bold mb-4 text-white">2. Save the Toolkit Script</h3>
+            <p class="text-gray-400 mb-6">This script is fetched live from the GitHub repository. You can copy it or download it directly.</p>
+            
+            <div class="flex gap-4 mb-4">
+                <button onclick="copyScript()" class="bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 flex-1 flex items-center justify-center gap-2">
+                    📋 Copy Script
+                </button>
+                <button onclick="downloadScript()" class="bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 flex-1 flex items-center justify-center gap-2">
+                    ⬇️ Download .sh
+                </button>
+            </div>
+
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <div class="terminal-dot bg-red-500"></div>
+                    <div class="terminal-dot bg-yellow-500"></div>
+                    <div class="terminal-dot bg-green-500"></div>
+                    <span class="ml-auto text-xs text-gray-500 font-mono">flask-adb-toolkit.sh</span>
                 </div>
+                <div class="terminal-body max-h-64 overflow-y-auto">
+                    <pre class="text-gray-300 text-xs" id="script-content"><code>Loading script from GitHub...</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Run it -->
+        <div class="glass-panel p-8 reveal">
+            <h3 class="text-2xl font-bold mb-4 text-white">3. Run the Toolkit</h3>
+            <p class="text-gray-400 mb-6">Make the script executable and launch it.</p>
+            
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <div class="terminal-dot bg-red-500"></div>
+                    <div class="terminal-dot bg-yellow-500"></div>
+                    <div class="terminal-dot bg-green-500"></div>
+                </div>
+                <div class="terminal-body">
+                    <pre class="text-white"><code>chmod +x flask-adb-toolkit.sh
+./flask-adb-toolkit.sh</code></pre>
+                </div>
+            </div>
+            
+            <div class="text-gray-500 text-sm mt-6 border-t border-white/10 pt-4">
+                <p>💡 <strong>Windows (Git Bash):</strong> Download and double-click <code class="text-white">flask-adb-toolkit.bat</code> from the repository.</p>
+                <p class="mt-1">💡 <strong>Windows (WSL):</strong> Follow the Linux steps above inside WSL.</p>
             </div>
         </div>
     </section>
@@ -236,22 +293,18 @@
     <!-- Footer -->
     <footer class="relative z-10 border-t border-white/10 mt-20 py-12 text-center text-gray-600 text-sm">
         <p>Built with ❤️ by dedsec-1337. Hosted on GitHub Pages.</p>
-        <p class="mt-2 text-xs text-gray-700">Premium Matrix design for the Flask-ADB-toolkit.</p>
     </footer>
 
     <script>
-        // --- CUSTOM CURSOR LOGIC ---
+        // --- CUSTOM CURSOR ---
         const cursor = document.getElementById('cursor');
         const cursorRing = document.getElementById('cursor-ring');
-
         document.addEventListener('mousemove', (e) => {
             cursor.style.left = e.clientX + 'px';
             cursor.style.top = e.clientY + 'px';
             cursorRing.style.left = (e.clientX - 16) + 'px';
             cursorRing.style.top = (e.clientY - 16) + 'px';
         });
-
-        // Hover effect on interactive elements
         document.querySelectorAll('a, button').forEach(el => {
             el.addEventListener('mouseenter', () => {
                 cursor.style.transform = 'scale(2)';
@@ -263,64 +316,103 @@
             });
         });
 
-        // --- MATRIX RAIN CANVAS LOGIC (Monochrome) ---
+        // --- MATRIX RAIN ---
         const canvas = document.getElementById('matrix-canvas');
         const ctx = canvas.getContext('2d');
-
         let width, height, columns, yPositions;
         const fontSize = 14;
         const chars = 'アィウェオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF';
-
         function setupCanvas() {
             width = canvas.width = window.innerWidth;
             height = canvas.height = window.innerHeight;
             columns = Math.floor(width / fontSize);
             yPositions = Array(columns).fill(1);
         }
-
         function drawMatrix() {
-            // Fade effect (black with low opacity)
             ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
             ctx.fillRect(0, 0, width, height);
-
-            ctx.fillStyle = '#ffffff'; // White characters
+            ctx.fillStyle = '#ffffff';
             ctx.font = fontSize + 'px monospace';
-
             for (let i = 0; i < yPositions.length; i++) {
                 const text = chars.charAt(Math.floor(Math.random() * chars.length));
                 const x = i * fontSize;
                 const y = yPositions[i] * fontSize;
-
-                // Add a subtle glow to the leading character
                 ctx.shadowBlur = 8;
                 ctx.shadowColor = 'rgba(255,255,255,0.5)';
                 ctx.fillText(text, x, y);
-                ctx.shadowBlur = 0; // Reset for the next frame
-
-                // Reset to top when off-screen, with random offset
-                if (y > height && Math.random() > 0.975) {
-                    yPositions[i] = 0;
-                } else {
-                    yPositions[i]++;
-                }
+                ctx.shadowBlur = 0;
+                if (y > height && Math.random() > 0.975) yPositions[i] = 0;
+                else yPositions[i]++;
             }
         }
-
         setupCanvas();
         window.addEventListener('resize', setupCanvas);
-        setInterval(drawMatrix, 50); // Smooth 20 FPS for a less "frantic" look
+        setInterval(drawMatrix, 50);
 
-        // --- SCROLL REVEAL ANIMATION ---
+        // --- SCROLL REVEAL ---
         const revealElements = document.querySelectorAll('.reveal');
         const revealObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('active');
-                }
+                if (entry.isIntersecting) entry.target.classList.add('active');
             });
         }, { threshold: 0.15 });
-
         revealElements.forEach(el => revealObserver.observe(el));
+
+        // --- OS TABS LOGIC ---
+        const osCommands = {
+            debian: 'sudo apt update && sudo apt install android-tools-adb android-tools-fastboot',
+            arch: 'sudo pacman -S android-tools',
+            fedora: 'sudo dnf install android-tools',
+            mac: 'brew install android-platform-tools'
+        };
+
+        document.querySelectorAll('.os-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.os-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                const os = tab.getAttribute('data-os');
+                document.getElementById('os-command').innerHTML = `<code>${osCommands[os]}</code>`;
+            });
+        });
+
+        // --- FETCH SCRIPT FROM GITHUB ---
+        async function fetchScript() {
+            const rawUrl = 'https://raw.githubusercontent.com/dedsec-1337/Flask-ADB-toolkit/main/flask-adb-toolkit.sh';
+            try {
+                const response = await fetch(rawUrl);
+                if (!response.ok) throw new Error('Failed to fetch script');
+                const text = await response.text();
+                document.getElementById('script-content').innerHTML = `<code>${text.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code>`;
+            } catch (error) {
+                document.getElementById('script-content').innerHTML = `<code class="text-red-400">Error loading script. Please view it directly on <a href="https://github.com/dedsec-1337/Flask-ADB-toolkit" target="_blank" class="underline">GitHub</a>.</code>`;
+            }
+        }
+        fetchScript();
+
+        // --- COPY SCRIPT ---
+        function copyScript() {
+            const content = document.getElementById('script-content').innerText;
+            navigator.clipboard.writeText(content).then(() => {
+                const btn = event.target;
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '✅ Copied!';
+                setTimeout(() => btn.innerHTML = originalText, 2000);
+            });
+        }
+
+        // --- DOWNLOAD SCRIPT ---
+        function downloadScript() {
+            const content = document.getElementById('script-content').innerText;
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'flask-adb-toolkit.sh';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
     </script>
 </body>
 </html>
