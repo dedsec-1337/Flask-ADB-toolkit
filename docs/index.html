@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask-ADB-toolkit</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Inter', sans-serif; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .gradient-text { background: linear-gradient(to right, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        pre { background: #1e293b; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; border: 1px solid #334155; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Navbar -->
+    <nav class="glass sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
+        <div class="text-xl font-bold gradient-text">⚡ Flask-ADB-toolkit</div>
+        <div class="space-x-6 text-sm font-medium">
+            <a href="#features" class="hover:text-sky-400 transition">Features</a>
+            <a href="#setup" class="hover:text-sky-400 transition">Setup</a>
+            <a href="https://github.com/dedsec-1337/Flask-ADB-toolkit" target="_blank" class="bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded-lg transition">GitHub Repo</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="max-w-5xl mx-auto px-6 py-24 text-center">
+        <h1 class="text-6xl font-extrabold tracking-tight mb-6">
+            <span class="gradient-text">Flask-ADB-toolkit</span>
+        </h1>
+        <p class="text-xl text-slate-400 max-w-2xl mx-auto mb-10">
+            One little flask 🧪 — every flashing tool you'll ever need. A powerful, web-based interface for Android Debug Bridge.
+        </p>
+        <div class="flex justify-center gap-4">
+            <a href="#setup" class="bg-sky-500 hover:bg-sky-600 text-white px-8 py-3 rounded-full font-semibold transition shadow-lg shadow-sky-500/30">Get Started</a>
+            <a href="https://github.com/dedsec-1337/Flask-ADB-toolkit" target="_blank" class="glass hover:bg-slate-700 text-white px-8 py-3 rounded-full font-semibold transition">View Source</a>
+        </div>
+    </header>
+
+    <!-- Features Section -->
+    <section id="features" class="max-w-5xl mx-auto px-6 py-16">
+        <h2 class="text-3xl font-bold text-center mb-12">Key Features</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="glass p-8 rounded-2xl hover:border-sky-500/50 transition">
+                <div class="text-3xl mb-4">🚀</div>
+                <h3 class="text-xl font-bold mb-2">Fast & Lightweight</h3>
+                <p class="text-slate-400">Built on Flask, providing a snappy and responsive web interface for all your ADB needs.</p>
+            </div>
+            <div class="glass p-8 rounded-2xl hover:border-sky-500/50 transition">
+                <div class="text-3xl mb-4">📱</div>
+                <h3 class="text-xl font-bold mb-2">Full ADB Control</h3>
+                <p class="text-slate-400">Manage devices, install APKs, push/pull files, and execute shell commands directly from your browser.</p>
+            </div>
+            <div class="glass p-8 rounded-2xl hover:border-sky-500/50 transition">
+                <div class="text-3xl mb-4">🛠️</div>
+                <h3 class="text-xl font-bold mb-2">Easy to Use</h3>
+                <p class="text-slate-400">A clean and intuitive UI designed to make Android debugging accessible to everyone.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Setup Section -->
+    <section id="setup" class="max-w-3xl mx-auto px-6 py-16">
+        <h2 class="text-3xl font-bold text-center mb-12">Quick Start</h2>
+        <div class="glass p-8 rounded-2xl">
+            <ol class="list-decimal list-inside space-y-6 text-slate-300">
+                <li>
+                    <strong class="text-white">Clone the repository:</strong>
+                    <pre class="mt-2 text-sm text-sky-300">git clone https://github.com/dedsec-1337/Flask-ADB-toolkit.git</pre>
+                </li>
+                <li>
+                    <strong class="text-white">Navigate to the directory:</strong>
+                    <pre class="mt-2 text-sm text-sky-300">cd Flask-ADB-toolkit</pre>
+                </li>
+                <li>
+                    <strong class="text-white">Install dependencies:</strong>
+                    <pre class="mt-2 text-sm text-sky-300">pip install -r requirements.txt</pre>
+                </li>
+                <li>
+                    <strong class="text-white">Run the application:</strong>
+                    <pre class="mt-2 text-sm text-sky-300">python app.py</pre>
+                </li>
+            </ol>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 mt-16 py-8 text-center text-slate-500 text-sm">
+        <p>Built with ❤️ by dedsec-1337. Hosted on GitHub Pages.</p>
+    </footer>
+
+</body>
+</html>
