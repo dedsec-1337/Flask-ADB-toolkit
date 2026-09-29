@@ -11,7 +11,6 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* --- BASE & TYPOGRAPHY --- */
         :root {
             --font-sans: 'Inter', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
@@ -23,122 +22,59 @@
             overflow-x: hidden;
             cursor: none; 
         }
-        code, pre {
-            font-family: var(--font-mono);
-        }
+        code, pre { font-family: var(--font-mono); }
 
-        /* --- CUSTOM CURSOR --- */
         .cursor {
-            width: 8px;
-            height: 8px;
-            background: white;
-            border-radius: 50%;
-            position: fixed;
-            pointer-events: none;
-            z-index: 9999;
-            mix-blend-mode: difference;
-            transition: transform 0.1s ease;
+            width: 8px; height: 8px; background: white; border-radius: 50%;
+            position: fixed; pointer-events: none; z-index: 9999;
+            mix-blend-mode: difference; transition: transform 0.1s ease;
         }
         .cursor-ring {
-            width: 40px;
-            height: 40px;
-            border: 1px solid rgba(255,255,255,0.5);
-            border-radius: 50%;
-            position: fixed;
-            pointer-events: none;
-            z-index: 9998;
+            width: 40px; height: 40px; border: 1px solid rgba(255,255,255,0.5);
+            border-radius: 50%; position: fixed; pointer-events: none; z-index: 9998;
             transition: transform 0.15s ease-out;
         }
-
-        /* --- MATRIX RAIN CANVAS --- */
         #matrix-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            opacity: 0.15;
-            pointer-events: none;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0; opacity: 0.15; pointer-events: none;
         }
-
-        /* --- GLASSMORPHISM & PREMIUM CARDS --- */
         .glass-panel {
-            background: rgba(10, 10, 10, 0.4);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 1rem;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(10, 10, 10, 0.4); backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 1rem; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .glass-panel:hover {
-            border-color: rgba(255, 255, 255, 0.3);
-            transform: translateY(-4px);
+            border-color: rgba(255, 255, 255, 0.3); transform: translateY(-4px);
             box-shadow: 0 20px 40px -15px rgba(255, 255, 255, 0.05);
         }
         .gradient-text {
             background: linear-gradient(135deg, #ffffff 0%, #a0a0a0 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
-
-        /* --- TERMINAL WINDOW --- */
         .terminal-window {
-            background: #0a0a0a;
-            border: 1px solid #222;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.8);
+            background: #0a0a0a; border: 1px solid #222; border-radius: 8px;
+            overflow: hidden; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.8);
         }
-        .terminal-header {
-            background: #111;
-            padding: 8px 12px;
-            display: flex;
-            gap: 6px;
-        }
-        .terminal-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-        }
-        .terminal-body {
-            padding: 20px;
-            font-size: 0.9rem;
-        }
+        .terminal-header { background: #111; padding: 8px 12px; display: flex; gap: 6px; }
+        .terminal-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .terminal-body { padding: 20px; font-size: 0.9rem; }
 
-        /* --- OS TABS --- */
         .os-tab {
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.875rem;
-            font-weight: 500;
+            padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer;
+            transition: all 0.2s; font-size: 0.875rem; font-weight: 500;
         }
         .os-tab.active {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
+            background: rgba(255, 255, 255, 0.1); color: white;
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        .os-tab:not(.active) {
-            color: #9ca3af;
-            border: 1px solid transparent;
-        }
-        .os-tab:not(.active):hover {
-            color: white;
-            background: rgba(255, 255, 255, 0.05);
-        }
+        .os-tab:not(.active) { color: #9ca3af; border: 1px solid transparent; }
+        .os-tab:not(.active):hover { color: white; background: rgba(255, 255, 255, 0.05); }
 
-        /* --- SCROLL REVEAL ANIMATION --- */
         .reveal {
-            opacity: 0;
-            transform: translateY(30px);
+            opacity: 0; transform: translateY(30px);
             transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .reveal.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        .reveal.active { opacity: 1; transform: translateY(0); }
 
         @media (max-width: 768px) {
             body { cursor: auto; }
@@ -152,7 +88,6 @@
     <div class="cursor-ring" id="cursor-ring"></div>
     <canvas id="matrix-canvas"></canvas>
 
-    <!-- Navigation -->
     <nav class="fixed top-0 w-full z-50 glass-panel !rounded-none !border-t-0 !border-l-0 !border-r-0 px-6 py-4 flex justify-between items-center">
         <div class="text-xl font-bold tracking-tighter text-white">⚡ Flask-ADB-toolkit</div>
         <div class="hidden md:flex space-x-8 text-sm font-medium text-gray-400">
@@ -162,7 +97,6 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
     <header class="relative z-10 flex flex-col items-center justify-center min-h-screen text-center px-6 pt-20">
         <div class="max-w-4xl mx-auto">
             <h1 class="text-6xl md:text-8xl font-extrabold tracking-tight mb-8 gradient-text glow-text">
@@ -182,7 +116,6 @@
         </div>
     </header>
 
-    <!-- Features Section -->
     <section id="features" class="relative z-10 max-w-6xl mx-auto px-6 py-32">
         <div class="reveal">
             <h2 class="text-4xl md:text-5xl font-bold text-center mb-4 gradient-text">Key Features</h2>
@@ -208,14 +141,13 @@
         </div>
     </section>
 
-    <!-- Quick Start Section -->
     <section id="quickstart" class="relative z-10 max-w-4xl mx-auto px-6 py-32">
         <div class="reveal">
             <h2 class="text-4xl md:text-5xl font-bold text-center mb-4 gradient-text">Quick Start</h2>
             <p class="text-gray-500 text-center mb-12">Get up and running in under a minute.</p>
         </div>
 
-        <!-- Step 1: Install Prerequisites -->
+        <!-- Step 1 -->
         <div class="glass-panel p-8 mb-8 reveal">
             <h3 class="text-2xl font-bold mb-4 text-white">1. Install Android Tools</h3>
             <p class="text-gray-400 mb-6">You need <code class="text-xs bg-white/10 px-1 rounded">adb</code> and <code class="text-xs bg-white/10 px-1 rounded">fastboot</code> installed on your system.</p>
@@ -239,12 +171,17 @@
             </div>
         </div>
 
-        <!-- Step 2: The Script -->
+        <!-- Step 2 -->
         <div class="glass-panel p-8 mb-8 reveal">
             <h3 class="text-2xl font-bold mb-4 text-white">2. Save the Toolkit Script</h3>
-            <p class="text-gray-400 mb-6">This script is fetched live from the GitHub repository. You can copy it or download it directly.</p>
             
-            <div class="flex gap-4 mb-4">
+            <p class="text-gray-300 font-semibold mb-2">Option A: Create the file manually in your terminal</p>
+            <p class="text-gray-400 mb-4">Run the following command to open a new file in the <code class="text-xs bg-white/10 px-1 rounded">nano</code> editor:</p>
+            <pre class="text-white mb-2 bg-[#0a0a0a] p-3 rounded-lg border border-[#222]"><code>nano ~/flask-adb-toolkit.sh</code></pre>
+            <p class="text-gray-500 text-xs mb-6">(Paste the script below, then press <code class="bg-white/10 px-1 rounded text-gray-300">Ctrl+O</code>, <code class="bg-white/10 px-1 rounded text-gray-300">Enter</code>, and <code class="bg-white/10 px-1 rounded text-gray-300">Ctrl+X</code> to save and exit)</p>
+
+            <p class="text-gray-300 font-semibold mb-2">Option B: Use the buttons below to quickly copy or download the script</p>
+            <div class="flex gap-4 mb-6">
                 <button onclick="copyScript()" class="bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 flex-1 flex items-center justify-center gap-2">
                     📋 Copy Script
                 </button>
@@ -266,7 +203,7 @@
             </div>
         </div>
 
-        <!-- Step 3: Run it -->
+        <!-- Step 3 -->
         <div class="glass-panel p-8 reveal">
             <h3 class="text-2xl font-bold mb-4 text-white">3. Run the Toolkit</h3>
             <p class="text-gray-400 mb-6">Make the script executable and launch it.</p>
@@ -278,8 +215,8 @@
                     <div class="terminal-dot bg-green-500"></div>
                 </div>
                 <div class="terminal-body">
-                    <pre class="text-white"><code>chmod +x flask-adb-toolkit.sh
-./flask-adb-toolkit.sh</code></pre>
+                    <pre class="text-white"><code>chmod +x ~/flask-adb-toolkit.sh
+~/flask-adb-toolkit.sh</code></pre>
                 </div>
             </div>
             
@@ -290,13 +227,11 @@
         </div>
     </section>
 
-    <!-- Footer -->
     <footer class="relative z-10 border-t border-white/10 mt-20 py-12 text-center text-gray-600 text-sm">
         <p>Built with ❤️ by dedsec-1337. Hosted on GitHub Pages.</p>
     </footer>
 
     <script>
-        // --- CUSTOM CURSOR ---
         const cursor = document.getElementById('cursor');
         const cursorRing = document.getElementById('cursor-ring');
         document.addEventListener('mousemove', (e) => {
@@ -316,7 +251,6 @@
             });
         });
 
-        // --- MATRIX RAIN ---
         const canvas = document.getElementById('matrix-canvas');
         const ctx = canvas.getContext('2d');
         let width, height, columns, yPositions;
@@ -349,7 +283,6 @@
         window.addEventListener('resize', setupCanvas);
         setInterval(drawMatrix, 50);
 
-        // --- SCROLL REVEAL ---
         const revealElements = document.querySelectorAll('.reveal');
         const revealObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -358,7 +291,6 @@
         }, { threshold: 0.15 });
         revealElements.forEach(el => revealObserver.observe(el));
 
-        // --- OS TABS LOGIC ---
         const osCommands = {
             debian: 'sudo apt update && sudo apt install android-tools-adb android-tools-fastboot',
             arch: 'sudo pacman -S android-tools',
@@ -375,7 +307,6 @@
             });
         });
 
-        // --- FETCH SCRIPT FROM GITHUB ---
         async function fetchScript() {
             const rawUrl = 'https://raw.githubusercontent.com/dedsec-1337/Flask-ADB-toolkit/main/flask-adb-toolkit.sh';
             try {
@@ -389,7 +320,6 @@
         }
         fetchScript();
 
-        // --- COPY SCRIPT ---
         function copyScript() {
             const content = document.getElementById('script-content').innerText;
             navigator.clipboard.writeText(content).then(() => {
@@ -400,7 +330,6 @@
             });
         }
 
-        // --- DOWNLOAD SCRIPT ---
         function downloadScript() {
             const content = document.getElementById('script-content').innerText;
             const blob = new Blob([content], { type: 'text/plain' });
