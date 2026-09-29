@@ -23,6 +23,7 @@
             cursor: none; 
         }
         code, pre { font-family: var(--font-mono); }
+        pre { margin: 0; } /* Critical for tight terminal boxes */
 
         /* --- CUSTOM CURSOR --- */
         .cursor {
@@ -42,7 +43,7 @@
             z-index: 0; opacity: 0.15; pointer-events: none;
         }
 
-        /* --- GLASSMORPHISM --- */
+        /* --- GLASSMORPHISM (Tightened Padding) --- */
         .glass-panel {
             background: rgba(10, 10, 10, 0.4); backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08);
@@ -57,20 +58,20 @@
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
 
-        /* --- TERMINAL WINDOW (Premium Code Blocks) --- */
+        /* --- TERMINAL WINDOW (Tight & Premium) --- */
         .terminal-window {
-            background: #050505; border: 1px solid #1a1a1a; border-radius: 10px;
+            background: #050505; border: 1px solid #1a1a1a; border-radius: 8px;
             overflow: hidden; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.9);
             position: relative;
         }
         .terminal-header {
-            background: #0a0a0a; padding: 10px 16px; display: flex;
+            background: #0a0a0a; padding: 8px 14px; display: flex;
             align-items: center; border-bottom: 1px solid #1a1a1a;
         }
         .terminal-dot { width: 10px; height: 10px; border-radius: 50%; }
         .terminal-body {
-            padding: 20px; font-size: 0.9rem; overflow-x: auto; 
-            scroll-behavior: smooth; white-space: pre;
+            padding: 12px 16px; font-size: 0.85rem; overflow-x: auto; 
+            scroll-behavior: smooth; white-space: pre; line-height: 1.5;
         }
 
         /* Custom Horizontal Scrollbar */
@@ -91,10 +92,10 @@
         .copy-btn:hover { color: #ffffff; }
         .copy-btn.copied { color: #4ade80; }
 
-        /* --- OS TABS --- */
+        /* --- OS TABS (Compact) --- */
         .os-tab {
-            padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer;
-            transition: all 0.2s; font-size: 0.875rem; font-weight: 500;
+            padding: 0.4rem 0.8rem; border-radius: 0.4rem; cursor: pointer;
+            transition: all 0.2s; font-size: 0.8rem; font-weight: 500;
             border: 1px solid transparent; background: transparent;
         }
         .os-tab.active {
@@ -111,7 +112,6 @@
         }
         .reveal.active { opacity: 1; transform: translateY(0); }
 
-        /* Hide cursor on mobile */
         @media (max-width: 768px) {
             body { cursor: auto; }
             .cursor, .cursor-ring { display: none; }
@@ -162,20 +162,20 @@
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="glass-panel p-8 reveal">
-                <div class="text-4xl mb-6 grayscale">🚀</div>
+            <div class="glass-panel p-6 reveal">
+                <div class="text-4xl mb-4 grayscale">🚀</div>
                 <h3 class="text-2xl font-bold mb-3 text-white">Fast & Lightweight</h3>
-                <p class="text-gray-400 leading-relaxed">A snappy terminal program that wraps all the scary <code class="text-xs bg-white/10 px-1 rounded">fastboot</code> and <code class="text-xs bg-white/10 px-1 rounded">adb</code> commands into friendly numbered options.</p>
+                <p class="text-gray-400 leading-relaxed text-sm">A snappy terminal program that wraps all the scary <code class="text-xs bg-white/10 px-1 rounded">fastboot</code> and <code class="text-xs bg-white/10 px-1 rounded">adb</code> commands into friendly numbered options.</p>
             </div>
-            <div class="glass-panel p-8 reveal" style="transition-delay: 100ms;">
-                <div class="text-4xl mb-6 grayscale">📱</div>
+            <div class="glass-panel p-6 reveal" style="transition-delay: 100ms;">
+                <div class="text-4xl mb-4 grayscale">📱</div>
                 <h3 class="text-2xl font-bold mb-3 text-white">Full ADB Control</h3>
-                <p class="text-gray-400 leading-relaxed">Flash ROMs, restore stock, flash any partition, deep-clean junk, run performance passes, take screenshots, and install APKs.</p>
+                <p class="text-gray-400 leading-relaxed text-sm">Flash ROMs, restore stock, flash any partition, deep-clean junk, run performance passes, take screenshots, and install APKs.</p>
             </div>
-            <div class="glass-panel p-8 reveal" style="transition-delay: 200ms;">
-                <div class="text-4xl mb-6 grayscale">🛠️</div>
+            <div class="glass-panel p-6 reveal" style="transition-delay: 200ms;">
+                <div class="text-4xl mb-4 grayscale">🛠️</div>
                 <h3 class="text-2xl font-bold mb-3 text-white">Easy to Use</h3>
-                <p class="text-gray-400 leading-relaxed">Built for people who know nothing about custom ROMs but want to try. No memorizing commands, just plug in and pick from a menu.</p>
+                <p class="text-gray-400 leading-relaxed text-sm">Built for people who know nothing about custom ROMs but want to try. No memorizing commands, just plug in and pick from a menu.</p>
             </div>
         </div>
     </section>
@@ -188,11 +188,11 @@
         </div>
 
         <!-- Step 1 -->
-        <div class="glass-panel p-8 mb-8 reveal">
-            <h3 class="text-2xl font-bold mb-4 text-white">1. Install Android Tools</h3>
-            <p class="text-gray-400 mb-6">You need <code class="text-xs bg-white/10 px-1 rounded">adb</code> and <code class="text-xs bg-white/10 px-1 rounded">fastboot</code> installed on your system.</p>
+        <div class="glass-panel p-6 mb-6 reveal">
+            <h3 class="text-xl font-bold mb-3 text-white">1. Install Android Tools</h3>
+            <p class="text-gray-400 text-sm mb-4">You need <code class="text-xs bg-white/10 px-1 rounded">adb</code> and <code class="text-xs bg-white/10 px-1 rounded">fastboot</code> installed on your system.</p>
             
-            <div class="flex flex-wrap gap-2 mb-4" id="os-tabs">
+            <div class="flex flex-wrap gap-2 mb-3" id="os-tabs">
                 <button class="os-tab active" data-os="debian">Ubuntu / Debian</button>
                 <button class="os-tab" data-os="arch">Arch Linux</button>
                 <button class="os-tab" data-os="fedora">Fedora</button>
@@ -217,20 +217,20 @@
         </div>
 
         <!-- Step 2 -->
-        <div class="glass-panel p-8 mb-8 reveal">
-            <h3 class="text-2xl font-bold mb-4 text-white">2. Save the Toolkit Script</h3>
+        <div class="glass-panel p-6 mb-6 reveal">
+            <h3 class="text-xl font-bold mb-3 text-white">2. Save the Toolkit Script</h3>
             
-            <p class="text-gray-300 font-semibold mb-2">Option A: Create the file manually</p>
-            <p class="text-gray-400 mb-4">Run this command to open a new file in the <code class="text-xs bg-white/10 px-1 rounded">nano</code> editor:</p>
-            <pre class="text-white mb-2 bg-[#050505] p-4 rounded-lg border border-[#1a1a1a] text-sm"><span class="text-gray-500">❯</span> nano ~/flask-adb-toolkit.sh</pre>
-            <p class="text-gray-500 text-xs mb-6">(Paste the script below, then press <code class="bg-white/10 px-1 rounded text-gray-300">Ctrl+O</code>, <code class="bg-white/10 px-1 rounded text-gray-300">Enter</code>, and <code class="bg-white/10 px-1 rounded text-gray-300">Ctrl+X</code> to save and exit)</p>
+            <p class="text-gray-300 font-semibold text-sm mb-1">Option A: Create the file manually</p>
+            <p class="text-gray-400 text-sm mb-3">Run this command to open a new file in the <code class="text-xs bg-white/10 px-1 rounded">nano</code> editor:</p>
+            <pre class="text-white mb-2 bg-[#050505] p-3 rounded-lg border border-[#1a1a1a] text-sm"><span class="text-gray-500">❯</span> nano ~/flask-adb-toolkit.sh</pre>
+            <p class="text-gray-500 text-xs mb-5">(Paste the script below, then press <code class="bg-white/10 px-1 rounded text-gray-300">Ctrl+O</code>, <code class="bg-white/10 px-1 rounded text-gray-300">Enter</code>, and <code class="bg-white/10 px-1 rounded text-gray-300">Ctrl+X</code> to save and exit)</p>
 
-            <p class="text-gray-300 font-semibold mb-2">Option B: Use the buttons below</p>
-            <div class="flex gap-4 mb-6">
-                <button onclick="copyScript(this)" class="bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 flex-1 flex items-center justify-center gap-2 text-sm">
+            <p class="text-gray-300 font-semibold text-sm mb-2">Option B: Use the buttons below</p>
+            <div class="flex gap-3 mb-5">
+                <button onclick="copyScript(this)" class="bg-white/10 hover:bg-white/20 text-white px-5 py-2.5 rounded-lg font-semibold transition-all duration-300 flex-1 flex items-center justify-center gap-2 text-xs">
                     📋 Copy Full Script
                 </button>
-                <button onclick="downloadScript()" class="bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 flex-1 flex items-center justify-center gap-2 text-sm">
+                <button onclick="downloadScript()" class="bg-white/10 hover:bg-white/20 text-white px-5 py-2.5 rounded-lg font-semibold transition-all duration-300 flex-1 flex items-center justify-center gap-2 text-xs">
                     ⬇️ Download .sh
                 </button>
             </div>
@@ -246,16 +246,16 @@
                         Copy
                     </button>
                 </div>
-                <div class="terminal-body max-h-64 overflow-y-auto">
+                <div class="terminal-body max-h-48 overflow-y-auto">
                     <pre class="text-gray-300 text-xs" id="script-content"><code>Loading script from GitHub...</code></pre>
                 </div>
             </div>
         </div>
 
         <!-- Step 3 -->
-        <div class="glass-panel p-8 reveal">
-            <h3 class="text-2xl font-bold mb-4 text-white">3. Run the Toolkit</h3>
-            <p class="text-gray-400 mb-6">Make the script executable and launch it.</p>
+        <div class="glass-panel p-6 reveal">
+            <h3 class="text-xl font-bold mb-3 text-white">3. Run the Toolkit</h3>
+            <p class="text-gray-400 text-sm mb-4">Make the script executable and launch it.</p>
             
             <div class="terminal-window">
                 <div class="terminal-header">
@@ -274,14 +274,14 @@
                 </div>
             </div>
             
-            <div class="text-gray-500 text-sm mt-6 border-t border-white/10 pt-4">
+            <div class="text-gray-500 text-xs mt-4 border-t border-white/10 pt-3">
                 <p>💡 <strong>Windows (Git Bash):</strong> Download and double-click <code class="text-white">flask-adb-toolkit.bat</code> from the repository.</p>
                 <p class="mt-1">💡 <strong>Windows (WSL):</strong> Follow the Linux steps above inside WSL.</p>
             </div>
         </div>
     </section>
 
-    <footer class="relative z-10 border-t border-white/10 mt-20 py-12 text-center text-gray-600 text-sm">
+    <footer class="relative z-10 border-t border-white/10 mt-20 py-8 text-center text-gray-600 text-xs">
         <p>Built with ❤️ by dedsec-1337. Hosted on GitHub Pages.</p>
     </footer>
 
