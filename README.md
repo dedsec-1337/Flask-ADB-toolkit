@@ -9,9 +9,7 @@
 
 
 
-![Platform](https://img.shields.io/badge/platform-Linux%20%C2%B7%20macOS%20%C2%B7%20Windows%20(WSL%2FGit--Bash)
-
--0078D6?style=for-the-badge)
+![Platform](https://img.shields.io/badge/platform-Linux%20%C2%B7%20macOS%20%C2%B7%20Windows%20%28WSL%2FGit--Bash%29-0078D6?style=for-the-badge)
 
 
 ![License](https://img.shields.io/badge/license-MIT-yellow?style=for-the-badge)
