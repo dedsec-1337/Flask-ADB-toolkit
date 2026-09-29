@@ -37,8 +37,8 @@
             transition: transform 0.15s ease-out;
         }
 
-        /* --- MATRIX RAIN --- */
-        #matrix-canvas {
+        /* --- DEDSEC MATRIX RAIN CANVAS --- */
+        #dedsec-canvas {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 0; opacity: 0.2; pointer-events: none;
         }
@@ -112,7 +112,7 @@
         @media (max-width: 768px) {
             body { cursor: auto; }
             .cursor, .cursor-ring { display: none; }
-            #matrix-canvas { opacity: 0.1; }
+            #dedsec-canvas { opacity: 0.12; }
         }
     </style>
 </head>
@@ -120,7 +120,7 @@
 
     <div class="cursor" id="cursor"></div>
     <div class="cursor-ring" id="cursor-ring"></div>
-    <canvas id="matrix-canvas"></canvas>
+    <canvas id="dedsec-canvas"></canvas>
 
     <!-- Navigation (Mobile Optimized) -->
     <nav class="fixed top-0 w-full z-50 glass-panel !rounded-none !border-t-0 !border-l-0 !border-r-0 px-4 md:px-6 py-4 flex justify-between items-center">
@@ -304,6 +304,10 @@
         mobileMenuBtn.addEventListener('click', () => {
             mobileMenu.classList.toggle('hidden');
         });
+        // Close mobile menu when a link is clicked
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => mobileMenu.classList.add('hidden'));
+        });
 
         // --- CUSTOM CURSOR (Only on Desktop) ---
         if (window.matchMedia("(pointer: fine)").matches) {
@@ -327,13 +331,14 @@
             });
         }
 
-        // --- MATRIX RAIN (Responsive) ---
-        const canvas = document.getElementById('matrix-canvas');
+        // --- DEDSEC MATRIX RAIN (No Skull) ---
+        const canvas = document.getElementById('dedsec-canvas');
         const ctx = canvas.getContext('2d');
         let width, height, columns, yPositions;
-        let fontSize = window.innerWidth < 768 ? 12 : 14; // Smaller font on mobile
+        let fontSize = window.innerWidth < 768 ? 12 : 14;
 
         const chars = 'アィウェオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF';
+        const dedsecWords = ['DEDSEC', 'HACK', 'CTOS', '0101', 'WATCH_DOGS'];
 
         function setupCanvas() {
             fontSize = window.innerWidth < 768 ? 12 : 14;
@@ -344,23 +349,44 @@
         }
 
         function drawMatrix() {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.06)';
             ctx.fillRect(0, 0, width, height);
-            ctx.fillStyle = '#ffffff';
+
+            // Occasional red glitch flash
+            if (Math.random() > 0.99) {
+                ctx.fillStyle = 'rgba(255, 0, 0, 0.04)';
+                ctx.fillRect(0, 0, width, height);
+            }
+
             ctx.font = fontSize + 'px monospace';
 
             for (let i = 0; i < yPositions.length; i++) {
-                const text = chars.charAt(Math.floor(Math.random() * chars.length));
+                let text;
+                // Chance to drop a DedSec word
+                if (Math.random() > 0.95) {
+                    text = dedsecWords[Math.floor(Math.random() * dedsecWords.length)];
+                } else {
+                    text = chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+
                 const x = i * fontSize;
                 const y = yPositions[i] * fontSize;
 
-                ctx.shadowBlur = 8;
-                ctx.shadowColor = 'rgba(255,255,255,0.5)';
+                // Random red or white glitch
+                if (Math.random() > 0.98) {
+                    ctx.fillStyle = '#ff0000';
+                    ctx.shadowColor = 'rgba(255,0,0,0.8)';
+                } else {
+                    ctx.fillStyle = '#ffffff';
+                    ctx.shadowColor = 'rgba(255,255,255,0.5)';
+                }
+
+                ctx.shadowBlur = 6;
                 ctx.fillText(text, x, y);
                 ctx.shadowBlur = 0;
 
                 if (y > height && Math.random() > 0.975) yPositions[i] = 0;
-                else yPositions[i] += Math.random() > 0.8 ? 2 : 1; // Random speed variation
+                else yPositions[i] += Math.random() > 0.8 ? 2 : 1;
             }
         }
 
