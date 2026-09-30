@@ -46,24 +46,24 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg: #050505;
-  --text: #e8eaed;
-  --text-muted: #a1a1aa;
-  --text-dim: #71717a;
-  --text-fade: #52525b;
-  --text-white: #fafafa;
-  --glass-bg: rgba(12, 12, 12, 0.55);
-  --glass-border: rgba(255, 255, 255, 0.07);
+  --bg: #000000;
+  --text: #e5e7eb;
+  --text-muted: #9ca3af;
+  --text-dim: #6b7280;
+  --text-fade: #4b5563;
+  --text-white: #ffffff;
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.09);
   --white-05: rgba(255, 255, 255, 0.05);
   --white-10: rgba(255, 255, 255, 0.1);
-  --white-20: rgba(255, 255, 255, 0.18);
-  --terminal-bg: #080808;
-  --terminal-border: #1c1c1c;
-  --terminal-header: #0c0c0c;
+  --white-20: rgba(255, 255, 255, 0.2);
+  --terminal-bg: #050505;
+  --terminal-border: #1a1a1a;
+  --terminal-header: #0a0a0a;
   --accent: #86efac;
-  --accent-dim: rgba(134, 239, 172, 0.15);
+  --accent-dim: rgba(134, 239, 172, 0.14);
   --accent-red: #b91c1c;
-  --accent-green: #4ade80;
+  --accent-green: #86efac;
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: 'JetBrains Mono', 'Courier New', monospace;
   --radius: 0.875rem;
@@ -121,7 +121,7 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
 
 #dedsec-canvas {
   position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-  z-index: 0; opacity: 0.12; pointer-events: none;
+  z-index: 0; opacity: 0.16; pointer-events: none;
   image-rendering: pixelated;
 }
 
@@ -129,10 +129,10 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
   position: fixed; top: 0; left: 0; width: 100%; z-index: 50;
   display: flex; justify-content: space-between; align-items: center;
   padding: 1rem 1rem;
-  background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--glass-border);
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(16px) saturate(1.2);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 .nav-logo { font-size: 1.125rem; font-weight: 700; letter-spacing: -0.05em; color: var(--text-white); }
 .nav-links { display: none; gap: 2rem; font-size: 0.875rem; font-weight: 500; color: var(--text-muted); }
@@ -199,21 +199,24 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
   border-radius: var(--radius); transition: all var(--transition);
 }
 .btn-primary {
-  background: var(--text-white);
-  border: 1px solid var(--text-white);
-  color: #0a0a0a;
+  background: #fff;
+  border: 1px solid #fff;
+  color: #000;
+  font-weight: 600;
 }
 .btn-primary:hover {
   background: transparent;
-  color: var(--text-white);
+  color: #fff;
 }
 .btn-ghost {
   color: var(--text-muted);
-  border: 1px solid var(--glass-border);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: transparent;
 }
 .btn-ghost:hover {
-  color: var(--text-white);
-  border-color: var(--white-20);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .section {
@@ -242,16 +245,16 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
 }
 .feature-card {
   padding: 1.75rem 1.5rem;
-  background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.09);
   border-radius: var(--radius);
-  transition: all var(--transition);
+  transition: border-color var(--transition), background var(--transition), transform var(--transition);
 }
 .feature-card:hover {
-  border-color: rgba(134, 239, 172, 0.22);
-  box-shadow: 0 18px 40px -18px rgba(0,0,0,0.6);
+  border-color: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.045);
   transform: translateY(-2px);
 }
 .feature-title {
@@ -265,15 +268,15 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
 
 .step {
   padding: 1.5rem;
-  background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.09);
   border-radius: var(--radius);
   margin-bottom: 1.5rem;
   transition: border-color var(--transition);
 }
-.step:hover { border-color: var(--white-20); }
+.step:hover { border-color: rgba(255, 255, 255, 0.16); }
 .step-title {
   font-size: 1.25rem; font-weight: 700;
   color: var(--text-white); margin-bottom: 0.75rem;
@@ -385,7 +388,7 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
 @media (max-width: 767.98px) {
   body { cursor: auto; }
   .cursor, .cursor-ring { display: none !important; }
-  #dedsec-canvas { opacity: 0.09; }
+  #dedsec-canvas { opacity: 0.13; }
   .feature-card:hover { transform: none; box-shadow: none; }
   .nav-logo { font-size: 0.98rem; max-width: 70vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 }
@@ -798,8 +801,8 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
     const CHARS = 'アィウェオカキクケコサシスセソタチツタトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF';
     const DEDSEC_WORDS = ['DEDSEC', 'HACK', 'CTOS', '0101', '1337'];
 
-    const COLOR_WHITE  = '#e5e5e5';
-    const COLOR_BLOOD  = '#7f1d1d';
+    const COLOR_WHITE  = '#f5f5f5';
+    const COLOR_BLOOD  = '#b91c1c';
     const COLOR_GLITCH = '#86efac';
 
     function setupCanvas() {
@@ -817,8 +820,9 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
       ctx.fillStyle = 'rgba(0, 0, 0, 0.06)';
       ctx.fillRect(0, 0, width, height);
 
-      if (Math.random() > 0.997) {
-        ctx.fillStyle = 'rgba(134, 239, 172, 0.03)';
+      /* rare mint wash — technical glitch, not a full-screen flash */
+      if (Math.random() > 0.996) {
+        ctx.fillStyle = 'rgba(134, 239, 172, 0.035)';
         ctx.fillRect(0, 0, width, height);
       }
 
@@ -830,9 +834,10 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
           ? DEDSEC_WORDS[(Math.random() * DEDSEC_WORDS.length) | 0]
           : CHARS[(Math.random() * CHARS.length) | 0];
 
+        /* mostly white, some blood-red, rare mint glitch */
         const roll = Math.random();
-        ctx.fillStyle = roll > 0.985 ? COLOR_GLITCH
-                      : roll > 0.82  ? COLOR_BLOOD
+        ctx.fillStyle = roll > 0.97  ? COLOR_GLITCH
+                      : roll > 0.78  ? COLOR_BLOOD
                       : COLOR_WHITE;
 
         ctx.fillText(text, i * drawFontSize, yPositions[i] * drawFontSize);
