@@ -83,12 +83,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-@media (pointer: fine) {
-  body.custom-cursor { cursor: none; }
-  body.custom-cursor a,
-  body.custom-cursor button { cursor: none; }
-}
-
 ::selection { background: #fff; color: #000; }
 
 code, pre { font-family: var(--font-mono); }
@@ -106,18 +100,26 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
 }
 .skip-link:focus { top: 1rem; }
 
-.cursor {
+/* Hidden by default — only shown when JS enables the custom cursor. */
+.cursor, .cursor-ring { display: none; }
+body.custom-cursor .cursor {
+  display: block;
   width: 8px; height: 8px; background: #fff; border-radius: 50%;
   position: fixed; top: 0; left: 0; pointer-events: none;
   z-index: 9999; mix-blend-mode: difference;
   transition: transform 0.1s ease; will-change: transform;
 }
-.cursor-ring {
+body.custom-cursor .cursor-ring {
+  display: block;
   width: 40px; height: 40px; border: 1px solid rgba(255,255,255,0.5);
   border-radius: 50%; position: fixed; top: 0; left: 0;
   pointer-events: none; z-index: 9998;
   transition: transform 0.15s ease-out; will-change: transform;
 }
+
+/* Hide the native cursor everywhere when the custom one is active. */
+body.custom-cursor,
+body.custom-cursor * { cursor: none !important; }
 
 #dedsec-canvas {
   position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -226,6 +228,14 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
   width: 100%;
 }
 .section-narrow { max-width: 56rem; }
+
+/* Keep the fixed navbar from covering the heading we just jumped to. */
+.section,
+#main,
+[id]:target {
+  scroll-margin-top: 5.5rem;
+}
+
 .section-header { text-align: left; margin-bottom: 1.75rem; }
 .section-title {
   font-size: clamp(1.55rem, 4.5vw, 2.6rem);
@@ -374,7 +384,7 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
 }
 .reveal.active { opacity: 1; transform: translateY(0); }
 
-/* —— Base = mobile-first. Scale up from here. —— */
+/* —— Mobile-first base —— */
 
 .feature-card { padding: 1.15rem 1.1rem; }
 .step { padding: 1.1rem; margin-bottom: 1rem; }
@@ -683,7 +693,7 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
 
     <p class="step-hint" style="margin-top:1rem;padding-top:0.75rem;border-top:1px solid var(--white-10)">
       <strong>Windows:</strong> delete <code>flask-adb-toolkit.bat</code> from wherever you saved it.<br>
-      <strong>Screenshots</strong> are saved in your <strong>Downloads</strong> folder (<code>~/Downloads</code> or <code>%USERPROFILE%\Downloads</code> on Windows).
+      <strong>Screenshots</strong> are saved in your <strong>Downloads</strong> folder (<code>~/Downloads</code> or <code>%USERPROFILE%\Downloads</code> on Windows) — that matches both the .sh and the .bat.
     </p>
   </div>
 
@@ -744,7 +754,6 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
 
   const isDesktop = window.matchMedia('(pointer: fine)').matches;
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const isMobile = window.matchMedia('(max-width: 768px)').matches;
 
   mobileMenuBtn.addEventListener('click', () => {
     const isOpen = mobileMenu.classList.toggle('open');
@@ -757,35 +766,73 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
     })
   );
 
+  /* ------------------------------------------------------------------
+     In-page anchor navigation.
+
+     The plain `href="#features"` links rely on native fragment navigation,
+     which resolves against the document base URI. When the page is inside
+     a sandboxed / srcdoc iframe, or a host injects <base target="_blank">,
+     that click becomes a real navigation and can open a new tab.
+
+     Doing the scroll ourselves with preventDefault() sidesteps all of that.
+  ------------------------------------------------------------------ */
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', (e) => {
+      const href = a.getAttribute('href');
+      if (!href || href === '#') return;
+
+      const target = document.getElementById(href.slice(1));
+      if (!target) return;
+
+      e.preventDefault();
+
+      target.scrollIntoView({
+        behavior: prefersReducedMotion ? 'auto' : 'smooth',
+        block: 'start'
+      });
+
+      if (!target.hasAttribute('tabindex')) {
+        target.setAttribute('tabindex', '-1');
+      }
+      target.focus({ preventScroll: true });
+
+      try {
+        history.replaceState(null, '', href);
+      } catch (_) { /* noop */ }
+
+      mobileMenu.classList.remove('open');
+      mobileMenuBtn.setAttribute('aria-expanded', 'false');
+    });
+  });
+
   if (isDesktop && !prefersReducedMotion) {
     document.body.classList.add('custom-cursor');
     const cursor = $('cursor');
     const cursorRing = $('cursor-ring');
     let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
+    let dotScale = 1, ringScale = 1;
+
+    const applyDot = () => {
+      cursor.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) scale(${dotScale})`;
+    };
 
     document.addEventListener('mousemove', (e) => {
       mouseX = e.clientX;
       mouseY = e.clientY;
-      cursor.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
+      applyDot();
     }, { passive: true });
 
     const followRing = () => {
       ringX += (mouseX - ringX - 16) * 0.18;
       ringY += (mouseY - ringY - 16) * 0.18;
-      cursorRing.style.transform = `translate3d(${ringX}px, ${ringY}px, 0)`;
+      cursorRing.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) scale(${ringScale})`;
       requestAnimationFrame(followRing);
     };
     requestAnimationFrame(followRing);
 
     document.querySelectorAll('a, button').forEach(el => {
-      el.addEventListener('mouseenter', () => {
-        cursor.style.transform += ' scale(2)';
-        cursorRing.style.transform += ' scale(1.4)';
-      });
-      el.addEventListener('mouseleave', () => {
-        cursor.style.transform = cursor.style.transform.replace(' scale(2)', '');
-        cursorRing.style.transform = cursorRing.style.transform.replace(' scale(1.4)', '');
-      });
+      el.addEventListener('mouseenter', () => { dotScale = 2; ringScale = 1.4; applyDot(); });
+      el.addEventListener('mouseleave', () => { dotScale = 1; ringScale = 1; applyDot(); });
     });
   }
 
@@ -820,7 +867,6 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
       ctx.fillStyle = 'rgba(0, 0, 0, 0.06)';
       ctx.fillRect(0, 0, width, height);
 
-      /* rare mint wash — technical glitch, not a full-screen flash */
       if (Math.random() > 0.996) {
         ctx.fillStyle = 'rgba(134, 239, 172, 0.035)';
         ctx.fillRect(0, 0, width, height);
@@ -834,7 +880,6 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
           ? DEDSEC_WORDS[(Math.random() * DEDSEC_WORDS.length) | 0]
           : CHARS[(Math.random() * CHARS.length) | 0];
 
-        /* mostly white, some blood-red, rare mint glitch */
         const roll = Math.random();
         ctx.fillStyle = roll > 0.97  ? COLOR_GLITCH
                       : roll > 0.78  ? COLOR_BLOOD
