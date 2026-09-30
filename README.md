@@ -58,11 +58,11 @@ It was built for people who **know nothing about custom ROMs, vendor images, or 
 
 | Option | What it does |
 | --- | --- |
-| ⚡ Performance pass | Trims caches + speed-compiles every app — **skips un-compilable system packages and auto-resumes if interrupted** |
+| ⚡ Performance pass | Trims caches + speed-compiles every app — **skips un-compilable system packages and auto-resumes if interrupted** (full resume on Linux/macOS; single pass on the Windows `.bat`) |
 | 🧹 Deep clean | Finds orphaned app data, empty folders, clears thumbnail cache |
 | 🔋 Battery & storage | Health + free-space report |
 | 📜 Live logcat | Watch logs in real time |
-| 📷 Screenshot | Saved straight to your Downloads folder |
+| 📷 Screenshot | Saved to your **Downloads** folder |
 | 📥 Install APK | Pick & install |
 | ⬇️⬆️ Pull / Push files | Move files both ways |
 
@@ -96,10 +96,12 @@ The flasher looks for: `vbmeta`, `vbmeta_system`, `dtbo`, `boot`, `init_boot`, `
 ## 📋 Requirements
 
 - A computer with Linux, macOS, or Windows
-- `adb` & `fastboot` installed
+- `adb` & `fastboot` (see the install steps for your OS)
 - A USB cable
 - A phone with an **unlocked bootloader** (for flashing)
 - ~30 seconds of courage
+
+Windows does **not** include `adb` / `fastboot`. You must download Google's platform-tools once. The `.bat` will find them for you after that.
 
 ## 🚀 Quick start (Linux / macOS)
 
@@ -129,14 +131,71 @@ chmod +x ~/flask-adb-toolkit.sh
 
 Prefer not to paste? The [live site](https://dedsec-1337.github.io/Flask-ADB-toolkit/) has **Copy Full Script** and **Download .sh** buttons.
 
-## 🪟 Windows
+## 🪟 Windows — full guide
 
-Two options:
+Windows does not ship `adb` or `fastboot`. You download them once, then double-click the toolkit. You do **not** need to open the platform-tools folder and type `CMD` every time.
 
-- **Easiest:** Install [Git for Windows](https://git-scm.com/download/win) + [platform-tools](https://developer.android.com/tools/releases/platform-tools), then double-click `flask-adb-toolkit.bat`
-- **Classic:** Use WSL (`wsl --install`) and follow the Linux steps
+### What you need
 
-The `.bat` works the same as the `.sh` (same safety checks, same commands). For full colours and the adaptive menu, use Git Bash or WSL with the `.sh`.
+- `flask-adb-toolkit.bat` from this repo
+- Google's [platform-tools](https://developer.android.com/tools/releases/platform-tools) zip (contains `adb.exe` and `fastboot.exe`)
+- A USB cable and the phone's USB driver (Windows Update usually handles Nothing / CMF phones; if not, install the OEM driver)
+
+### Step-by-step
+
+1. Download **platform-tools** from Google and unzip it.  
+   You should have a folder named `platform-tools` with `adb.exe` and `fastboot.exe` inside.
+
+2. Download `flask-adb-toolkit.bat` from this repo.
+
+3. Put them together using **one** of these layouts (pick whichever is easier):
+
+   **Option A — bat inside platform-tools (simplest)**
+
+   ```
+   platform-tools\
+     adb.exe
+     fastboot.exe
+     flask-adb-toolkit.bat
+   ```
+
+   **Option B — platform-tools next to the bat**
+
+   ```
+   SomeFolder\
+     flask-adb-toolkit.bat
+     platform-tools\
+       adb.exe
+       fastboot.exe
+   ```
+
+4. Double-click `flask-adb-toolkit.bat`.  
+   It searches those locations (and PATH) automatically. If tools are found, the menu opens. If not, it prints exactly what is missing.
+
+5. Plug in the phone, accept the USB debugging prompt, then use the numbered menu.
+
+You do **not** need to:
+
+- Open the platform-tools folder
+- Type `CMD` in the address bar
+- Add anything to System PATH (optional, not required)
+
+### Optional: Git Bash / WSL (full colour menu)
+
+The `.bat` is the easy Windows version: same real `adb` / `fastboot` commands, same `YES` confirmations, checksums via `certutil`.  
+No colours, and a flat menu instead of the mode-aware one.
+
+For the full visual `.sh` experience on Windows:
+
+- **Git Bash:** install [Git for Windows](https://git-scm.com/download/win), put platform-tools on PATH, run `flask-adb-toolkit.sh`
+- **WSL:** `wsl --install`, then follow the Linux steps inside Ubuntu
+
+### Windows notes
+
+- Screenshots are saved to `%USERPROFILE%\Downloads`
+- Performance pass on the `.bat` is a single compile pass (no resume file like the `.sh`)
+- Stock restore looks for `flash_all.bat` first; a `.sh` restore needs Git Bash or WSL
+- If Windows says “Windows protected your PC”, click **More info** → **Run anyway** (the file is a local script you downloaded, not a signed installer)
 
 ## 🗑️ Uninstalling
 
@@ -154,6 +213,7 @@ Screenshots taken through the toolkit are saved in your **Downloads** folder (`~
 - Arch: `sudo pacman -Rns android-tools`
 - Fedora: `sudo dnf remove android-tools`
 - macOS: `brew uninstall android-platform-tools`
+- Windows: delete the `platform-tools` folder you unzipped
 
 ## ⚠️ Disclaimer
 
