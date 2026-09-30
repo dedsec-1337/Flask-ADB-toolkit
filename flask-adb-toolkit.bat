@@ -5,13 +5,25 @@ title Flask-ADB-toolkit (Windows)
 :: ══════════════════════════════════════════════════════════════
 ::  Flask-ADB-toolkit — Windows batch version
 ::  Same commands as flask-adb-toolkit.sh, plainer menu.
-::  Needs adb and fastboot on PATH (platform-tools).
+::  Finds adb/fastboot automatically:
+::    1) same folder as this .bat
+::    2) platform-tools folder next to this .bat
+::    3) already on PATH
 ::  https://github.com/dedsec-1337/Flask-ADB-toolkit
 :: ══════════════════════════════════════════════════════════════
 
 set "BASE=%USERPROFILE%\Desktop\cmf"
 set "STOCK_NEW=%BASE%\Galaga_B4.1-260812-1729"
 set "STOCK_OLD=%BASE%\Galaga_V3.2-250507-1139_3.2"
+
+set "SCRIPTDIR=%~dp0"
+set "SCRIPTDIR=%SCRIPTDIR:~0,-1%"
+call :FINDTOOLS
+if errorlevel 1 (
+    echo.
+    pause
+    exit /b 1
+)
 
 :MENU
 cls
@@ -77,6 +89,53 @@ if "%CHOICE%"=="0" exit /b
 echo.
 pause
 goto MENU
+
+:: ── Find adb.exe / fastboot.exe without requiring a global PATH ──
+:FINDTOOLS
+set "TOOLDIR="
+
+if exist "%SCRIPTDIR%\adb.exe" set "TOOLDIR=%SCRIPTDIR%"
+if not defined TOOLDIR if exist "%SCRIPTDIR%\platform-tools\adb.exe" set "TOOLDIR=%SCRIPTDIR%\platform-tools"
+
+if not defined TOOLDIR (
+    where adb >nul 2>&1
+    if not errorlevel 1 goto :TOOLS_OK
+)
+
+if defined TOOLDIR (
+    set "PATH=%TOOLDIR%;%PATH%"
+    goto :TOOLS_OK
+)
+
+echo ================================================================
+echo  adb.exe / fastboot.exe not found.
+echo.
+echo  Windows does NOT include them. Do this once:
+echo.
+echo   1. Download platform-tools:
+echo      https://developer.android.com/tools/releases/platform-tools
+echo   2. Unzip the folder (it is named platform-tools).
+echo   3. EITHER:
+echo      - Put flask-adb-toolkit.bat INSIDE that platform-tools folder
+echo        and double-click it
+echo      OR
+echo      - Put the platform-tools folder next to this .bat
+echo        (same directory as flask-adb-toolkit.bat\platform-tools\adb.exe)
+echo.
+echo  You do not need to type CMD inside the folder anymore.
+echo ================================================================
+exit /b 1
+
+:TOOLS_OK
+where adb >nul 2>&1
+if errorlevel 1 (
+    echo adb still not usable. Check the platform-tools folder.
+    exit /b 1
+)
+echo Using adb from:
+where adb
+echo.
+exit /b 0
 
 :: ── State check — approximate; parses adb/fastboot output ──
 :CHECKSTATE
