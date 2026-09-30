@@ -1,0 +1,13 @@
+# Progress / cache files
+.flask-adb-compile-progress
+*.progress
+
+# Local ROM folders and screenshots (keep them out of the repo)
+cmf/
+screenshots/
+*.img
+*.zip
+
+# OS junk
+.DS_Store
+Thumbs.db
