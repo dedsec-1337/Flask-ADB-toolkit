@@ -62,7 +62,7 @@ It was built for people who **know nothing about custom ROMs, vendor images, or 
 | 🧹 Deep clean | Finds orphaned app data, empty folders, clears thumbnail cache |
 | 🔋 Battery & storage | Health + free-space report |
 | 📜 Live logcat | Watch logs in real time |
-| 📷 Screenshot | Saved straight to your desktop |
+| 📷 Screenshot | Saved straight to your Downloads folder |
 | 📥 Install APK | Pick & install |
 | ⬇️⬆️ Pull / Push files | Move files both ways |
 
@@ -146,7 +146,7 @@ The `.bat` works the same as the `.sh` (same safety checks, same commands). For 
   `rm -f ~/flask-adb-toolkit.sh ~/.flask-adb-compile-progress`
 - Windows: delete `flask-adb-toolkit.bat`
 
-Screenshots are saved in `~/Desktop/cmf/screenshots/` (or the Windows equivalent) — delete that folder too if you want.
+Screenshots taken through the toolkit are saved in your **Downloads** folder (`~/Downloads` or `%USERPROFILE%\Downloads` on Windows).
 
 **Optional – remove adb/fastboot:**
 
@@ -186,4 +186,3 @@ PRs and issues are welcome. Keep it friendly — this is a fun project. 🍪
 <p align="center">
   <i>Made with 💚, one frustrated evening, and an unhealthy love of terminal colors.</i>
 </p>
-```
