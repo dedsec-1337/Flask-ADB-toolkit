@@ -3,9 +3,11 @@
 #  ⚗️⚡ Flask-ADB-toolkit
 #  A fun terminal toolkit that makes flashing ROMs, vendor
 #  images & partitions easy — even for total beginners.
-#  https://github.com/YOUR-USERNAME/Flask-ADB-toolkit
-#  Version 1.1 — performance pass now skips un-compilable
-#  system packages and resumes where it left off.
+#  https://github.com/dedsec-1337/Flask-ADB-toolkit
+#  Version 1.2 — ROM flashing now auto-detects boot, dtbo,
+#  init_boot, vbmeta and vbmeta_system in the ROM folder and
+#  flashes whichever are present. Added direct reboot-to-recovery,
+#  a standalone sideload command, and a checksum verifier.
 # ══════════════════════════════════════════════════════════════
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[0;33m'
 CYAN='\033[0;36m'; BLUE='\033[0;34m'; MAGENTA='\033[0;35m'
@@ -155,7 +157,16 @@ reboot_bootloader(){
 reboot_system(){
   case "$MODE" in
     fastboot) fastboot reboot ;;
+    sideload) adb reboot ;;
     adb) echo -e "${YELLOW}Already booted.${RESET}" ;;
+    *) echo -e "${RED}No device found.${RESET}" ;;
+  esac
+}
+reboot_recovery(){
+  case "$MODE" in
+    adb) adb reboot recovery ;;
+    fastboot) fastboot reboot recovery ;;
+    sideload) echo -e "${YELLOW}Already in recovery.${RESET}" ;;
     *) echo -e "${RED}No device found.${RESET}" ;;
   esac
 }
@@ -205,15 +216,22 @@ flash_generic(){
   [[ -f "$image" ]] || { echo -e "${RED}File not found: $image${RESET}"; return; }
 
   echo
+  local extra_flags=""
   case "$partition" in
     userdata) echo -e "${BRED}Warning: flashing userdata erases all user data.${RESET}" ;;
     super) echo -e "${BRED}Warning: flashing super directly replaces the whole dynamic-partition layout.${RESET}" ;;
     system|vendor|product) echo -e "${BYELLOW}Note: this is usually a logical partition inside super. A plain flash may need extra steps on some devices.${RESET}" ;;
+    vbmeta|vbmeta_system)
+      if confirm "Also set --disable-verity --disable-verification on this vbmeta flash? (needed for most custom ROMs/kernels)"; then
+        extra_flags="--disable-verity --disable-verification "
+      fi
+      ;;
   esac
 
-  echo -e "${BOLD}Command:${RESET} fastboot flash $target \"$(basename "$image")\""
+  echo -e "${BOLD}Command:${RESET} fastboot ${extra_flags}flash $target \"$(basename "$image")\""
   confirm "Flash $(basename "$image") to $target?" || return
-  fastboot flash "$target" "$image"
+  # shellcheck disable=SC2086
+  fastboot ${extra_flags}flash "$target" "$image"
 }
 
 erase_partition(){
@@ -266,16 +284,73 @@ switch_slot(){
   echo -e "${GREEN}Active slot set to $s.${RESET}"
 }
 
-# ── CMF Phone 2 Pro (Galaga) specific ──
+# ── Sideload / recovery tools — work on any device ──
+pick_zip(){
+  local zips=() f
+  while IFS= read -r f; do zips+=("$f"); done < <(find ~/Desktop ~/Downloads -maxdepth 4 -iname '*.zip' 2>/dev/null)
+  zips+=("Type a custom path")
+  echo -e "${BOLD}Which package?${RESET}" >&2
+  select f in "${zips[@]}"; do [[ -n "$f" ]] && break; echo "Pick a number." >&2; done
+  local zip="$f"
+  [[ "$zip" == "Type a custom path" ]] && read -rp "Full path to zip: " zip
+  [[ -f "$zip" ]] || { echo -e "${RED}File not found: $zip${RESET}" >&2; return 1; }
+  echo "$zip"
+}
+
+sideload_package(){
+  if [[ "$MODE" != "sideload" ]]; then
+    echo -e "${BRED}Phone needs to be in recovery, at the \"Apply from ADB\" screen.${RESET}"
+    echo -e "${DIM}Reboot to recovery first, then in the recovery menu choose Apply update → Apply from ADB.${RESET}"
+    return
+  fi
+  local zip; zip=$(pick_zip) || return
+  echo -e "${CYAN}Sideloading $(basename "$zip")...${RESET}"
+  adb sideload "$zip"
+}
+
+verify_checksum(){
+  echo -e "${BOLD}${CYAN}🔎 Verify a file's checksum${RESET}"
+  line
+  read -rp "Path to file: " f
+  [[ -f "$f" ]] || { echo -e "${RED}File not found: $f${RESET}"; return; }
+  read -rp "Expected SHA256 (leave blank to just show it): " expected
+  echo -e "${DIM}Hashing (may take a moment for large files)...${RESET}"
+  local actual; actual=$(sha256sum "$f" | awk '{print $1}')
+  echo -e "${BOLD}SHA256:${RESET} $actual"
+  if [[ -n "$expected" ]]; then
+    expected="${expected,,}"
+    if [[ "$actual" == "$expected" ]]; then
+      echo -e "${GREEN}✓ Matches. Safe to flash.${RESET}"
+    else
+      echo -e "${BRED}✗ Does NOT match. Do not flash this file — re-download it.${RESET}"
+    fi
+  fi
+}
+
+# ── CMF Phone 2 Pro (Galaga) specific — but the auto-detect below works for any ROM folder laid out the same way ──
 pick_rom(){
   local dirs=() d
-  for d in "$BASE"/*/; do
-    d="${d%/}"
-    [[ -n "$(find "$d" -maxdepth 1 -name '*.zip' ! -name '*.json' 2>/dev/null)" ]] && dirs+=("$d")
+  if [[ -d "$BASE" ]]; then
+    for d in "$BASE"/*/; do
+      d="${d%/}"
+      [[ -n "$(find "$d" -maxdepth 1 -name '*.zip' ! -name '*.json' 2>/dev/null)" || -f "$d/vendor_boot.img" ]] && dirs+=("$d")
+    done
+  fi
+  dirs+=("Type a custom folder path")
+  if [[ ${#dirs[@]} -eq 1 ]]; then
+    echo -e "${DIM}No ROM folders found under $BASE — type the path directly.${RESET}" >&2
+  else
+    echo -e "${BOLD}Which ROM?${RESET}" >&2
+  fi
+  select d in "${dirs[@]}"; do
+    [[ -z "$d" ]] && { echo "Pick a number." >&2; continue; }
+    if [[ "$d" == "Type a custom folder path" ]]; then
+      read -rp "Full path to the ROM folder: " d
+    fi
+    [[ -d "$d" ]] || { echo -e "${RED}Folder not found: $d${RESET}" >&2; return 1; }
+    [[ -f "$d/vendor_boot.img" ]] || { echo -e "${RED}No vendor_boot.img in that folder.${RESET}" >&2; return 1; }
+    echo "$d"; return 0
   done
-  [[ ${#dirs[@]} -eq 0 ]] && { echo -e "${RED}No ROM folders found under $BASE.${RESET}" >&2; return 1; }
-  echo -e "${BOLD}Which ROM?${RESET}" >&2
-  select d in "${dirs[@]}"; do [[ -n "$d" ]] && { echo "$d"; return 0; }; echo "Pick a number." >&2; done
 }
 
 flash_rom(){
@@ -283,14 +358,51 @@ flash_rom(){
   local dir zip
   dir=$(pick_rom) || return
   zip=$(find "$dir" -maxdepth 1 -name "*.zip" ! -name "*.json" | head -n1)
-  echo -e "${CYAN}Steps: flash vendor_boot → wipe super → reboot recovery → sideload the zip.${RESET}"
-  confirm "ROM: $(basename "$zip"). This wipes data and system." || return
+
+  echo -e "${BOLD}${CYAN}Detected in $(basename "$dir"):${RESET}"
+  declare -A found
+  local name
+  for name in vbmeta vbmeta_system dtbo boot init_boot vendor_boot; do
+    if [[ -f "$dir/$name.img" ]]; then
+      found[$name]=1
+      echo -e "  ${GREEN}✓${RESET} $name.img"
+    fi
+  done
+  [[ -f "$dir/super_empty.img" ]] && { found[super_empty]=1; echo -e "  ${GREEN}✓${RESET} super_empty.img"; }
+  [[ -f "$dir/system.img" ]] && echo -e "  ${DIM}• system.img (present, not auto-flashed — see note below)${RESET}"
+  [[ -n "$zip" ]] && echo -e "  ${GREEN}✓${RESET} $(basename "$zip")"
+  echo
+
+  if [[ -z "${found[vendor_boot]:-}" ]]; then
+    echo -e "${BRED}vendor_boot.img not found in this folder — it carries the recovery and is required.${RESET}"
+    return
+  fi
+  if [[ -z "$zip" ]]; then
+    echo -e "${BYELLOW}No ROM zip found here either. You can still flash the images, then sideload manually with option elsewhere in this menu.${RESET}"
+  fi
+
+  echo -e "${CYAN}Plan: flash the detected images in order, wipe super if present, then reboot to recovery"
+  [[ -n "$zip" ]] && echo -e "and sideload $(basename "$zip")."
+  [[ -f "$dir/system.img" ]] && echo -e "${BYELLOW}Note: system.img won't be touched automatically. It's normally installed by the ROM zip itself — use \"Flash any partition\" if a guide specifically tells you to flash it directly.${RESET}"
+  confirm "Proceed? This wipes data and system." || return
+
+  [[ -n "${found[vbmeta]:-}" ]] && fastboot --disable-verity --disable-verification flash vbmeta "$dir/vbmeta.img"
+  [[ -n "${found[vbmeta_system]:-}" ]] && fastboot --disable-verity --disable-verification flash vbmeta_system "$dir/vbmeta_system.img"
+  [[ -n "${found[dtbo]:-}" ]] && fastboot flash dtbo "$dir/dtbo.img"
+  [[ -n "${found[boot]:-}" ]] && fastboot flash boot "$dir/boot.img"
+  [[ -n "${found[init_boot]:-}" ]] && fastboot flash init_boot "$dir/init_boot.img"
+  [[ -n "${found[super_empty]:-}" ]] && fastboot wipe-super "$dir/super_empty.img"
   fastboot flash vendor_boot "$dir/vendor_boot.img"
-  fastboot wipe-super "$dir/super_empty.img"
+
   fastboot reboot recovery
   echo -e "${YELLOW}On the phone: Factory reset → Format data, then Apply update → Apply from ADB.${RESET}"
   read -rp "Once the phone is waiting for the package, press Enter..."
-  adb sideload "$zip"
+
+  if [[ -n "$zip" ]]; then
+    adb sideload "$zip"
+  else
+    echo -e "${DIM}No zip to sideload — use the \"Sideload a package\" option once you're ready.${RESET}"
+  fi
 }
 
 restore_stock(){
@@ -321,15 +433,14 @@ performance_pass(){
 
   for p in "${pkgs[@]}"; do
     ((i++))
-    # skip packages already compiled in a previous (interrupted) run
     if [[ -f "$progress" ]] && grep -qx "$p" "$progress"; then
       continue
     fi
     printf "\r${DIM}[%d/%d] %s${RESET}    " "$i" "$total" "$p"
     if adb shell cmd package compile -m speed -f "$p" >/dev/null 2>&1; then
-      echo "$p" >> "$progress"          # remember success
+      echo "$p" >> "$progress"
     else
-      failed+=("$p")                    # remember failure, KEEP GOING
+      failed+=("$p")
     fi
   done
   echo
@@ -431,8 +542,8 @@ bootloader_menu(){
     echo -e "5) 🛠️  Reboot to fastbootd ${DIM}(needed for some logical-partition ops)${RESET}"
     echo -e "6) 📋 Show all fastboot variables"
     line
-    echo -e "${DIM}CMF Phone 2 Pro:${RESET}"
-    echo -e "7) 📦 Flash ROM"
+    echo -e "${DIM}ROM folders under $BASE:${RESET}"
+    echo -e "7) 📦 Flash ROM ${DIM}(auto-detects boot/dtbo/init_boot/vbmeta/vendor_boot)${RESET}"
     echo -e "8) ⏮  Restore stock — newest (B4.1)"
     echo -e "9) ⏮  Restore stock — older (V3.2)"
     line
@@ -503,15 +614,24 @@ while true; do
   if [[ "$MODE" == "fastboot" ]]; then
     echo -e "${BOLD}$n)${RESET} 🔧 Bootloader tools"; opt_bl=$n; ((n++))
     echo -e "${BOLD}$n)${RESET} Reboot to system"; opt_rs=$n; ((n++))
+    echo -e "${BOLD}$n)${RESET} Reboot to recovery"; opt_rec=$n; ((n++))
+  fi
+  if [[ "$MODE" == "adb" ]]; then
+    echo -e "${BOLD}$n)${RESET} 📱 Booted-phone tools"; opt_bt=$n; ((n++))
+    echo -e "${BOLD}$n)${RESET} Reboot to recovery"; opt_rec=$n; ((n++))
   fi
   if [[ "$MODE" == "adb" || "$MODE" == "sideload" ]]; then
-    [[ "$MODE" == "adb" ]] && { echo -e "${BOLD}$n)${RESET} 📱 Booted-phone tools"; opt_bt=$n; ((n++)); }
     echo -e "${BOLD}$n)${RESET} Reboot to bootloader"; opt_rb=$n; ((n++))
+  fi
+  if [[ "$MODE" == "sideload" ]]; then
+    echo -e "${BOLD}$n)${RESET} 📤 Sideload a package"; opt_sideload=$n; ((n++))
+    echo -e "${BOLD}$n)${RESET} Reboot to system"; opt_rs=$n; ((n++))
   fi
   if [[ "$MODE" != "none" ]]; then
     echo -e "${BOLD}$n)${RESET} ℹ️  Device info"; opt_info=$n; ((n++))
   fi
   echo -e "${BOLD}$n)${RESET} Check active slot"; opt_slot=$n; ((n++))
+  echo -e "${BOLD}$n)${RESET} 🔎 Verify a file's checksum"; opt_check=$n; ((n++))
   echo -e "${BOLD}0)${RESET} Exit"
   echo
   case "$MODE" in
@@ -521,12 +641,15 @@ while true; do
   read -rp "> " c; echo
   if [[ -n "${opt_bl:-}" && "$c" == "$opt_bl" ]]; then bootloader_menu
   elif [[ -n "${opt_rs:-}" && "$c" == "$opt_rs" ]]; then reboot_system; read -rp $'\nPress Enter...'
+  elif [[ -n "${opt_rec:-}" && "$c" == "$opt_rec" ]]; then reboot_recovery; read -rp $'\nPress Enter...'
   elif [[ -n "${opt_bt:-}" && "$c" == "$opt_bt" ]]; then booted_menu
   elif [[ -n "${opt_rb:-}" && "$c" == "$opt_rb" ]]; then reboot_bootloader; read -rp $'\nPress Enter...'
+  elif [[ -n "${opt_sideload:-}" && "$c" == "$opt_sideload" ]]; then sideload_package; read -rp $'\nPress Enter...'
   elif [[ -n "${opt_info:-}" && "$c" == "$opt_info" ]]; then device_info; read -rp $'\nPress Enter...'
   elif [[ -n "${opt_slot:-}" && "$c" == "$opt_slot" ]]; then check_slot; read -rp $'\nPress Enter...'
+  elif [[ -n "${opt_check:-}" && "$c" == "$opt_check" ]]; then verify_checksum; read -rp $'\nPress Enter...'
   elif [[ "$c" == "0" ]]; then exit 0
   else echo -e "${RED}Unknown option${RESET}"; read -rp $'\nPress Enter...'
   fi
-  unset opt_bl opt_rs opt_bt opt_rb opt_info opt_slot
+  unset opt_bl opt_rs opt_rec opt_bt opt_rb opt_sideload opt_info opt_slot opt_check
 done
