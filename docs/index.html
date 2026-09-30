@@ -436,7 +436,7 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
 
     <article class="feature-card reveal" style="transition-delay:200ms">
       <h3 class="feature-title">Cross-Platform</h3>
-      <p class="feature-desc">Runs on Linux, macOS, and Windows — via <code>flask-adb-toolkit.bat</code> in Git Bash or WSL. Same real <code>adb</code>/<code>fastboot</code> commands underneath, with <code>YES</code> confirmations before anything dangerous.</p>
+      <p class="feature-desc">Runs on Linux, macOS, and Windows. On Windows, double-click <code>flask-adb-toolkit.bat</code> — it finds Google's platform-tools next to the script (or on PATH). Same real <code>adb</code>/<code>fastboot</code> commands, with <code>YES</code> confirmations before anything dangerous. Git Bash / WSL optional for the full colour menu.</p>
     </article>
   </div>
 </section>
@@ -542,8 +542,8 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
     </div>
 
     <p class="step-hint" style="margin-top:1rem;padding-top:0.75rem;border-top:1px solid var(--white-10)">
-      <strong>Windows (Git Bash):</strong> Download <code>flask-adb-toolkit.bat</code> from the repository, double-click it, and follow the same menu.<br>
-      <strong>Windows (WSL):</strong> Follow the Linux steps above inside WSL.
+      <strong>Windows:</strong> Download Google's <a href="https://developer.android.com/tools/releases/platform-tools" style="color:var(--accent,#7dd3fc)">platform-tools</a> and unzip. Put <code>flask-adb-toolkit.bat</code> <em>inside</em> that folder <strong>or</strong> put the whole <code>platform-tools</code> folder next to the <code>.bat</code>. Double-click the <code>.bat</code> — it finds <code>adb.exe</code> automatically. No need to open the folder and type CMD.<br>
+      <strong>Windows (full colours):</strong> Use Git Bash or WSL with the <code>.sh</code> instead.
     </p>
   </div>
 </section>
@@ -575,8 +575,8 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
     </div>
 
     <p class="step-hint" style="margin-top:1rem;padding-top:0.75rem;border-top:1px solid var(--white-10)">
-      <strong>Windows (Git Bash):</strong> delete <code>flask-adb-toolkit.bat</code> from wherever you saved it, or run <code>rm ~/flask-adb-toolkit.bat</code>.<br>
-      <strong>Screenshots</strong> taken through the toolkit are saved in your <strong>Downloads</strong> folder (<code>~/Downloads</code> or <code>%USERPROFILE%\Downloads</code> on Windows).
+      <strong>Windows:</strong> delete <code>flask-adb-toolkit.bat</code> from wherever you saved it.<br>
+      <strong>Screenshots</strong> are saved in your <strong>Downloads</strong> folder (<code>~/Downloads</code> or <code>%USERPROFILE%\Downloads</code> on Windows).
     </p>
   </div>
 
@@ -608,7 +608,7 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
     </div>
 
     <p class="step-hint" style="margin-top:1rem;padding-top:0.75rem;border-top:1px solid var(--white-10)">
-      <strong>Windows (Git Bash):</strong> delete the <code>platform-tools</code> folder you extracted, then remove its path from <strong>System Properties → Environment Variables → Path</strong>. Uninstall Git for Windows via <strong>Settings → Apps</strong> if you don't use it.<br>
+      <strong>Windows:</strong> delete the <code>platform-tools</code> folder you unzipped. If you added it to System PATH, remove that entry under <strong>System Properties → Environment Variables → Path</strong> (optional — the <code>.bat</code> does not require a global PATH).<br>
       <strong>Windows (WSL):</strong> run the Ubuntu / Debian command inside your distro. To remove the distro entirely: <code>wsl --unregister Ubuntu</code> from PowerShell.
     </p>
   </div>
