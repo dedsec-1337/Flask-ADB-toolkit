@@ -325,11 +325,12 @@ exit /b
 
 :SCREENSHOT
 call :NEEDMODE adb || exit /b
-if not exist "%BASE%\screenshots" mkdir "%BASE%\screenshots"
+set "SHOTDIR=%USERPROFILE%\Downloads"
+if not exist "%SHOTDIR%" mkdir "%SHOTDIR%"
 set "TS=%date:~-4%%date:~4,2%%date:~7,2%_%time:~0,2%%time:~3,2%%time:~6,2%"
 set "TS=%TS: =0%"
-adb exec-out screencap -p > "%BASE%\screenshots\screenshot_%TS%.png"
-echo Saved: %BASE%\screenshots\screenshot_%TS%.png
+adb exec-out screencap -p > "%SHOTDIR%\screenshot_%TS%.png"
+echo Saved: %SHOTDIR%\screenshot_%TS%.png
 exit /b
 
 :INSTALLAPK
