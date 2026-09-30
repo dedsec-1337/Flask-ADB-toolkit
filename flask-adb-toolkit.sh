@@ -494,7 +494,7 @@ view_logcat(){
 
 take_screenshot(){
   need_mode adb || return
-  local dir=~/Desktop/cmf/screenshots
+  local dir=~/Downloads
   mkdir -p "$dir"
   local f="$dir/screenshot_$(date +%Y%m%d_%H%M%S).png"
   adb exec-out screencap -p > "$f"
