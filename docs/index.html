@@ -18,9 +18,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
 
 <style>
-/* ============================================
-   RESET & VARIABLES
-   ============================================ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
@@ -70,9 +67,6 @@ img, svg { display: block; max-width: 100%; }
 a { color: inherit; text-decoration: none; }
 button { font: inherit; background: none; border: none; color: inherit; cursor: pointer; }
 
-/* ============================================
-   ACCESSIBILITY
-   ============================================ */
 .skip-link {
   position: fixed; top: -100px; left: 1rem;
   background: #fff; color: #000; padding: 0.5rem 1rem;
@@ -80,9 +74,6 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
 }
 .skip-link:focus { top: 1rem; }
 
-/* ============================================
-   CUSTOM CURSOR (Desktop only)
-   ============================================ */
 .cursor {
   width: 8px; height: 8px; background: #fff; border-radius: 50%;
   position: fixed; top: 0; left: 0; pointer-events: none;
@@ -96,18 +87,12 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
   transition: transform 0.15s ease-out; will-change: transform;
 }
 
-/* ============================================
-   CANVAS BACKGROUND
-   ============================================ */
 #dedsec-canvas {
   position: fixed; top: 0; left: 0; width: 100%; height: 100%;
   z-index: 0; opacity: 0.22; pointer-events: none;
-  image-rendering: pixelated; /* rain renders at half-res, CSS upscales */
+  image-rendering: pixelated;
 }
 
-/* ============================================
-   NAVIGATION
-   ============================================ */
 .nav {
   position: fixed; top: 0; left: 0; width: 100%; z-index: 50;
   display: flex; justify-content: space-between; align-items: center;
@@ -148,9 +133,6 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
   padding: 0.5rem 1rem; border-radius: var(--radius-sm); text-align: center;
 }
 
-/* ============================================
-   HERO
-   ============================================ */
 .hero {
   position: relative; z-index: 10;
   min-height: 100vh; display: flex; flex-direction: column;
@@ -172,9 +154,6 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
 .hero-actions { display: flex; flex-direction: column; gap: 1rem; justify-content: center; align-items: center; }
 .hero-actions .btn { width: 100%; max-width: 260px; justify-content: center; }
 
-/* ============================================
-   BUTTONS
-   ============================================ */
 .btn {
   display: inline-flex; align-items: center; gap: 0.5rem;
   padding: 1rem 2rem; font-weight: 600;
@@ -190,9 +169,6 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
 .btn-ghost { color: var(--text-muted); }
 .btn-ghost:hover { color: var(--text-white); }
 
-/* ============================================
-   SECTIONS & CARDS
-   ============================================ */
 .section {
   position: relative; z-index: 10;
   max-width: 72rem; margin: 0 auto;
@@ -230,9 +206,6 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
 .feature-title { font-size: 1.5rem; font-weight: 700; color: var(--text-white); margin-bottom: 0.75rem; }
 .feature-desc { color: var(--text-muted); font-size: 0.875rem; line-height: 1.7; }
 
-/* ============================================
-   QUICK START STEPS
-   ============================================ */
 .step {
   padding: 1.5rem;
   background: var(--glass-bg);
@@ -252,9 +225,6 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
 .step-subtitle { color: #d1d5db; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem; }
 .step-hint { color: var(--text-dim); font-size: 0.75rem; margin-bottom: 1.25rem; }
 
-/* ============================================
-   TERMINAL WINDOW
-   ============================================ */
 .terminal {
   background: var(--terminal-bg);
   border: 1px solid var(--terminal-border);
@@ -299,9 +269,6 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
 .copy-btn.copied { color: var(--accent-green); }
 .copy-btn svg { width: 14px; height: 14px; }
 
-/* ============================================
-   OS TABS
-   ============================================ */
 .os-tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem; }
 .os-tab {
   padding: 0.4rem 0.8rem; font-size: 0.8rem; font-weight: 500;
@@ -315,9 +282,6 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
   border-color: var(--white-20);
 }
 
-/* ============================================
-   SCRIPT ACTIONS
-   ============================================ */
 .script-actions {
   display: flex; flex-direction: column; gap: 0.75rem;
   margin-bottom: 1.25rem;
@@ -331,9 +295,6 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
 }
 .script-btn:hover { background: var(--white-20); }
 
-/* ============================================
-   FOOTER
-   ============================================ */
 .footer {
   position: relative; z-index: 10;
   margin-top: 5rem; padding: 2rem 1rem;
@@ -342,9 +303,6 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
   border-top: 1px solid var(--white-10);
 }
 
-/* ============================================
-   SCROLL REVEAL
-   ============================================ */
 .reveal {
   opacity: 0; transform: translateY(30px);
   transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
@@ -353,9 +311,6 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
 }
 .reveal.active { opacity: 1; transform: translateY(0); }
 
-/* ============================================
-   RESPONSIVE — TABLET & DESKTOP
-   ============================================ */
 @media (min-width: 640px) {
   .hero-actions { flex-direction: row; }
   .hero-actions .btn { width: auto; }
@@ -380,9 +335,6 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
   .step-title { font-size: 1.25rem; }
 }
 
-/* ============================================
-   MOBILE OPTIMIZATIONS
-   ============================================ */
 @media (max-width: 768px) {
   body { cursor: auto; }
   .cursor, .cursor-ring { display: none; }
@@ -390,7 +342,6 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
   .terminal-body { font-size: 0.78rem; }
 }
 
-/* Respect reduced motion preferences */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
@@ -401,26 +352,23 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
   .reveal { opacity: 1; transform: none; }
 }
 </style>
-<base target="_blank">
 </head>
 <body>
 
 <a href="#main" class="skip-link">Skip to content</a>
 
-<!-- Custom Cursor (desktop only) -->
 <div class="cursor" id="cursor" aria-hidden="true"></div>
 <div class="cursor-ring" id="cursor-ring" aria-hidden="true"></div>
 
-<!-- Animated Background -->
 <canvas id="dedsec-canvas" aria-hidden="true"></canvas>
 
-<!-- Navigation -->
 <nav class="nav" role="navigation" aria-label="Main navigation">
   <div class="nav-logo">⚡ Flask-ADB-toolkit</div>
 
   <div class="nav-links">
     <a href="#features">Features</a>
     <a href="#quickstart">Quick Start</a>
+    <a href="#uninstall">Uninstall</a>
     <a href="https://github.com/dedsec-1337/Flask-ADB-toolkit" target="_blank" rel="noopener" class="nav-cta">GitHub</a>
   </div>
 
@@ -431,16 +379,15 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
   </button>
 </nav>
 
-<!-- Mobile Menu -->
 <div class="nav-mobile-menu" id="mobile-menu">
   <a href="#features">Features</a>
   <a href="#quickstart">Quick Start</a>
+  <a href="#uninstall">Uninstall</a>
   <a href="https://github.com/dedsec-1337/Flask-ADB-toolkit" target="_blank" rel="noopener" class="nav-cta">GitHub</a>
 </div>
 
 <main id="main">
 
-<!-- Hero -->
 <header class="hero">
   <div class="hero-content">
     <h1 class="hero-title">Flask-ADB-toolkit</h1>
@@ -455,7 +402,6 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
   </div>
 </header>
 
-<!-- Features -->
 <section id="features" class="section" aria-labelledby="features-title">
   <div class="section-header reveal">
     <h2 id="features-title" class="section-title">Key Features</h2>
@@ -495,14 +441,12 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
   </div>
 </section>
 
-<!-- Quick Start -->
 <section id="quickstart" class="section section-narrow" aria-labelledby="quickstart-title">
   <div class="section-header reveal">
     <h2 id="quickstart-title" class="section-title">Quick Start</h2>
     <p class="section-desc">Get up and running in under a minute.</p>
   </div>
 
-  <!-- Step 1 -->
   <div class="step reveal">
     <h3 class="step-title">1. Install Android Tools</h3>
     <p class="step-desc">You need <code>adb</code> and <code>fastboot</code> installed on your system.</p>
@@ -531,7 +475,6 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
     </div>
   </div>
 
-  <!-- Step 2 -->
   <div class="step reveal">
     <h3 class="step-title">2. Save the Toolkit Script</h3>
 
@@ -577,7 +520,6 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
     </div>
   </div>
 
-  <!-- Step 3 -->
   <div class="step reveal">
     <h3 class="step-title">3. Run the Toolkit</h3>
     <p class="step-desc">Make the script executable and launch it.</p>
@@ -600,8 +542,74 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
     </div>
 
     <p class="step-hint" style="margin-top:1rem;padding-top:0.75rem;border-top:1px solid var(--white-10)">
-      <strong>Windows (Git Bash):</strong> Download <code>flask-adb-toolkit.bat</code> from the repository, double-click it, and follow the same menu. 🪟<br>
+      <strong>Windows (Git Bash):</strong> Download <code>flask-adb-toolkit.bat</code> from the repository, double-click it, and follow the same menu.<br>
       <strong>Windows (WSL):</strong> Follow the Linux steps above inside WSL.
+    </p>
+  </div>
+</section>
+
+<section id="uninstall" class="section section-narrow" aria-labelledby="uninstall-title">
+  <div class="section-header reveal">
+    <h2 id="uninstall-title" class="section-title">Uninstall</h2>
+    <p class="section-desc">Removing the toolkit is one file deletion. Removing the dependencies is optional.</p>
+  </div>
+
+  <div class="step reveal">
+    <h3 class="step-title">1. Remove the toolkit</h3>
+    <p class="step-desc">The toolkit is a single script plus one progress file (created the first time you run the performance pass). Delete both:</p>
+
+    <div class="terminal">
+      <div class="terminal-header">
+        <div class="terminal-dots" aria-hidden="true">
+          <div class="terminal-dot dot-red"></div>
+          <div class="terminal-dot dot-yellow"></div>
+          <div class="terminal-dot dot-green"></div>
+        </div>
+        <span class="terminal-label">bash</span>
+        <button class="copy-btn" data-copy="cleanup" aria-label="Copy cleanup command">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span>Copy</span>
+        </button>
+      </div>
+      <div class="terminal-body"><span class="prompt">❯</span> rm -f ~/flask-adb-toolkit.sh ~/.flask-adb-compile-progress</div>
+    </div>
+
+    <p class="step-hint" style="margin-top:1rem;padding-top:0.75rem;border-top:1px solid var(--white-10)">
+      <strong>Windows (Git Bash):</strong> delete <code>flask-adb-toolkit.bat</code> from wherever you saved it, or run <code>rm ~/flask-adb-toolkit.bat</code>.<br>
+      <strong>Screenshots</strong> taken through the toolkit live in <code>~/Desktop/cmf/screenshots/</code> (or <code>%USERPROFILE%\Desktop\cmf\screenshots\</code> on Windows) — remove that folder too if you don't want to keep them.
+    </p>
+  </div>
+
+  <div class="step reveal">
+    <h3 class="step-title">2. Remove adb &amp; fastboot (optional)</h3>
+    <p class="step-desc">If you installed platform-tools just for this toolkit and want the disk space back:</p>
+
+    <div class="os-tabs" id="uninstall-tabs" role="tablist" aria-label="Operating system">
+      <button class="os-tab active" data-uninstall-os="debian" role="tab" aria-selected="true">Ubuntu / Debian</button>
+      <button class="os-tab" data-uninstall-os="arch" role="tab" aria-selected="false">Arch Linux</button>
+      <button class="os-tab" data-uninstall-os="fedora" role="tab" aria-selected="false">Fedora</button>
+      <button class="os-tab" data-uninstall-os="mac" role="tab" aria-selected="false">macOS</button>
+    </div>
+
+    <div class="terminal">
+      <div class="terminal-header">
+        <div class="terminal-dots" aria-hidden="true">
+          <div class="terminal-dot dot-red"></div>
+          <div class="terminal-dot dot-yellow"></div>
+          <div class="terminal-dot dot-green"></div>
+        </div>
+        <span class="terminal-label" id="uninstall-label">Ubuntu / Debian</span>
+        <button class="copy-btn" data-copy="uninstall" aria-label="Copy uninstall command">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span>Copy</span>
+        </button>
+      </div>
+      <div class="terminal-body" id="uninstall-command"><span class="prompt">❯</span> sudo apt remove android-tools-adb android-tools-fastboot && sudo apt autoremove</div>
+    </div>
+
+    <p class="step-hint" style="margin-top:1rem;padding-top:0.75rem;border-top:1px solid var(--white-10)">
+      <strong>Windows (Git Bash):</strong> delete the <code>platform-tools</code> folder you extracted, then remove its path from <strong>System Properties → Environment Variables → Path</strong>. Uninstall Git for Windows via <strong>Settings → Apps</strong> if you don't use it.<br>
+      <strong>Windows (WSL):</strong> run the Ubuntu / Debian command inside your distro. To remove the distro entirely: <code>wsl --unregister Ubuntu</code> from PowerShell.
     </p>
   </div>
 </section>
@@ -616,9 +624,6 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
 (() => {
   'use strict';
 
-  // ============================================
-  // CACHED DOM REFERENCES
-  // ============================================
   const $ = (id) => document.getElementById(id);
   const canvas = $('dedsec-canvas');
   const mobileMenu = $('mobile-menu');
@@ -626,14 +631,13 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
   const osLabel = $('os-label');
   const osCommand = $('os-command');
   const scriptContent = $('script-content');
+  const uninstallLabel = $('uninstall-label');
+  const uninstallCommand = $('uninstall-command');
 
   const isDesktop = window.matchMedia('(pointer: fine)').matches;
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const isMobile = window.matchMedia('(max-width: 768px)').matches;
 
-  // ============================================
-  // MOBILE MENU
-  // ============================================
   mobileMenuBtn.addEventListener('click', () => {
     const isOpen = mobileMenu.classList.toggle('open');
     mobileMenuBtn.setAttribute('aria-expanded', isOpen);
@@ -645,9 +649,6 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
     })
   );
 
-  // ============================================
-  // CUSTOM CURSOR (Desktop only)
-  // ============================================
   if (isDesktop && !prefersReducedMotion) {
     const cursor = $('cursor');
     const cursorRing = $('cursor-ring');
@@ -667,8 +668,7 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
     };
     requestAnimationFrame(followRing);
 
-    const interactives = document.querySelectorAll('a, button');
-    interactives.forEach(el => {
+    document.querySelectorAll('a, button').forEach(el => {
       el.addEventListener('mouseenter', () => {
         cursor.style.transform += ' scale(2)';
         cursorRing.style.transform += ' scale(1.4)';
@@ -680,20 +680,13 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
     });
   }
 
-  // ============================================
-  // DEDSEC MATRIX RAIN — white stream, blood-red accent
-  // Perf: renders at half resolution into the fixed canvas,
-  // CSS upscales it (pixelated). No shadowBlur — glow is
-  // faked with a bright head + dim trail via fillStyle only.
-  // ============================================
   if (!prefersReducedMotion) {
     const ctx = canvas.getContext('2d');
     const SCALE = 0.5;
     let width, height, columns, yPositions;
-    const fontSize = 14;          // logical glyph size
-    const drawFontSize = 7;       // half-res glyph size
+    const drawFontSize = 7;
     let lastFrame = 0;
-    const FRAME_INTERVAL = 50;    // ~20 FPS
+    const FRAME_INTERVAL = 50;
     let visible = true;
 
     const CHARS = 'アィウェオカキクケコサシスセソタチツタトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF';
@@ -715,11 +708,9 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
       if (ts - lastFrame < FRAME_INTERVAL) { requestAnimationFrame(draw); return; }
       lastFrame = ts;
 
-      // Fade previous frame (this IS the trail — no per-char glow needed)
       ctx.fillStyle = 'rgba(0, 0, 0, 0.06)';
       ctx.fillRect(0, 0, width, height);
 
-      // Rare full-screen red pulse
       if (Math.random() > 0.995) {
         ctx.fillStyle = 'rgba(185, 28, 28, 0.05)';
         ctx.fillRect(0, 0, width, height);
@@ -764,9 +755,6 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
     requestAnimationFrame(draw);
   }
 
-  // ============================================
-  // SCROLL REVEAL
-  // ============================================
   if ('IntersectionObserver' in window && !prefersReducedMotion) {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -782,9 +770,6 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
     document.querySelectorAll('.reveal').forEach(el => el.classList.add('active'));
   }
 
-  // ============================================
-  // OS TABS
-  // ============================================
   const OS_COMMANDS = {
     debian: 'sudo apt update && sudo apt install android-tools-adb android-tools-fastboot',
     arch: 'sudo pacman -S android-tools',
@@ -793,9 +778,9 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
   };
   let currentOsCommand = OS_COMMANDS.debian;
 
-  document.querySelectorAll('.os-tab').forEach(tab => {
+  document.querySelectorAll('#os-tabs .os-tab').forEach(tab => {
     tab.addEventListener('click', () => {
-      document.querySelectorAll('.os-tab').forEach(t => {
+      document.querySelectorAll('#os-tabs .os-tab').forEach(t => {
         t.classList.remove('active');
         t.setAttribute('aria-selected', 'false');
       });
@@ -809,9 +794,30 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
     });
   });
 
-  // ============================================
-  // UNIVERSAL COPY
-  // ============================================
+  const UNINSTALL_COMMANDS = {
+    debian: 'sudo apt remove android-tools-adb android-tools-fastboot && sudo apt autoremove',
+    arch: 'sudo pacman -Rns android-tools',
+    fedora: 'sudo dnf remove android-tools',
+    mac: 'brew uninstall android-platform-tools'
+  };
+  let currentUninstallCommand = UNINSTALL_COMMANDS.debian;
+
+  document.querySelectorAll('#uninstall-tabs .os-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('#uninstall-tabs .os-tab').forEach(t => {
+        t.classList.remove('active');
+        t.setAttribute('aria-selected', 'false');
+      });
+      tab.classList.add('active');
+      tab.setAttribute('aria-selected', 'true');
+
+      const os = tab.dataset.uninstallOs;
+      currentUninstallCommand = UNINSTALL_COMMANDS[os];
+      uninstallLabel.textContent = tab.textContent.trim();
+      uninstallCommand.innerHTML = `<span class="prompt">❯</span> ${currentUninstallCommand}`;
+    });
+  });
+
   const copyFeedback = (btn) => {
     const label = btn.querySelector('span') || btn;
     const original = label.textContent;
@@ -849,14 +855,13 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
     const type = btn.dataset.copy;
 
     if (type === 'command') copyText(currentOsCommand, btn);
+    else if (type === 'uninstall') copyText(currentUninstallCommand, btn);
+    else if (type === 'cleanup') copyText('rm -f ~/flask-adb-toolkit.sh ~/.flask-adb-compile-progress', btn);
     else if (type === 'script') copyText(scriptContent.innerText, btn);
     else if (type === 'nano') copyText('nano ~/flask-adb-toolkit.sh', btn);
     else if (type === 'run') copyText('chmod +x ~/flask-adb-toolkit.sh\n~/flask-adb-toolkit.sh', btn);
   });
 
-  // ============================================
-  // SCRIPT FETCH + DOWNLOAD
-  // ============================================
   const SCRIPT_URL = 'https://raw.githubusercontent.com/dedsec-1337/Flask-ADB-toolkit/main/flask-adb-toolkit.sh';
 
   fetch(SCRIPT_URL)
