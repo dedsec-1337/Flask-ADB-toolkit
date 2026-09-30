@@ -4,14 +4,39 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#000000">
-<meta name="description" content="Flask-ADB-toolkit — A powerful, menu-driven terminal toolkit for Android Debug Bridge. Auto-detecting ROM flasher, generic partition tools, checksum verifier, and more.">
-<meta name="keywords" content="adb, fastboot, android, flask, terminal, toolkit, rom flasher, custom rom, sideload">
+<meta name="description" content="Menu-driven adb & fastboot toolkit — auto ROM flash, partition tools, checksum checks, and maintenance helpers for any Android device.">
 <meta property="og:title" content="Flask-ADB-toolkit">
 <meta property="og:description" content="One little flask — every flashing tool you'll ever need.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://dedsec-1337.github.io/Flask-ADB-toolkit/">
 <meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://dedsec-1337.github.io/Flask-ADB-toolkit/">
 <title>Flask-ADB-toolkit</title>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Flask-ADB-toolkit",
+  "url": "https://dedsec-1337.github.io/Flask-ADB-toolkit/",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Linux, macOS, Windows",
+  "description": "Menu-driven adb and fastboot toolkit with auto ROM flashing, generic partition tools, checksum verification, and maintenance helpers for any Android device.",
+  "softwareVersion": "1.2",
+  "dateModified": "2026-09-30",
+  "license": "https://opensource.org/licenses/MIT",
+  "author": {
+    "@type": "Person",
+    "name": "dedsec-1337",
+    "url": "https://github.com/dedsec-1337"
+  },
+  "codeRepository": "https://github.com/dedsec-1337/Flask-ADB-toolkit",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+}
+</script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,27 +46,29 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg: #000;
-  --text: #e2e8f0;
-  --text-muted: #9ca3af;
-  --text-dim: #6b7280;
-  --text-fade: #4b5563;
-  --text-white: #ffffff;
-  --glass-bg: rgba(10, 10, 10, 0.5);
-  --glass-border: rgba(255, 255, 255, 0.08);
+  --bg: #050505;
+  --text: #e8eaed;
+  --text-muted: #a1a1aa;
+  --text-dim: #71717a;
+  --text-fade: #52525b;
+  --text-white: #fafafa;
+  --glass-bg: rgba(12, 12, 12, 0.55);
+  --glass-border: rgba(255, 255, 255, 0.07);
   --white-05: rgba(255, 255, 255, 0.05);
   --white-10: rgba(255, 255, 255, 0.1);
-  --white-20: rgba(255, 255, 255, 0.2);
-  --terminal-bg: #050505;
-  --terminal-border: #1a1a1a;
-  --terminal-header: #0a0a0a;
-  --accent-red: #ff0000;
+  --white-20: rgba(255, 255, 255, 0.18);
+  --terminal-bg: #080808;
+  --terminal-border: #1c1c1c;
+  --terminal-header: #0c0c0c;
+  --accent: #86efac;
+  --accent-dim: rgba(134, 239, 172, 0.15);
+  --accent-red: #b91c1c;
   --accent-green: #4ade80;
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: 'JetBrains Mono', 'Courier New', monospace;
-  --radius: 1rem;
+  --radius: 0.875rem;
   --radius-sm: 0.5rem;
-  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 html { scroll-behavior: smooth; }
@@ -50,11 +77,16 @@ body {
   font-family: var(--font-sans);
   background: var(--bg);
   color: var(--text);
-  line-height: 1.5;
+  line-height: 1.6;
   overflow-x: hidden;
-  cursor: none;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+@media (pointer: fine) {
+  body.custom-cursor { cursor: none; }
+  body.custom-cursor a,
+  body.custom-cursor button { cursor: none; }
 }
 
 ::selection { background: #fff; color: #000; }
@@ -89,7 +121,7 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
 
 #dedsec-canvas {
   position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-  z-index: 0; opacity: 0.22; pointer-events: none;
+  z-index: 0; opacity: 0.12; pointer-events: none;
   image-rendering: pixelated;
 }
 
@@ -135,24 +167,31 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
 
 .hero {
   position: relative; z-index: 10;
-  min-height: 100vh; display: flex; flex-direction: column;
+  min-height: 100svh;
+  display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  text-align: center; padding: 6rem 1rem 2rem;
+  text-align: center;
+  padding: 5.5rem 1.25rem 2.5rem;
 }
-.hero-content { max-width: 56rem; width: 100%; }
+.hero-content { max-width: 52rem; width: 100%; margin: 0 auto; }
 .hero-title {
-  font-size: clamp(3rem, 10vw, 6rem);
-  font-weight: 800; letter-spacing: -0.05em;
-  line-height: 1.05; margin-bottom: 1.5rem;
+  font-size: clamp(2.35rem, 9vw, 5rem);
+  font-weight: 800; letter-spacing: -0.04em;
+  line-height: 1.06; margin-bottom: 1.1rem;
   color: var(--text-white);
+  overflow-wrap: anywhere;
 }
 .hero-desc {
-  font-size: clamp(1.0625rem, 2.2vw, 1.5rem);
-  color: var(--text-muted); font-weight: 300;
-  max-width: 42rem; margin: 0 auto 3rem; line-height: 1.6;
+  font-size: clamp(1rem, 2.1vw, 1.3rem);
+  color: var(--text-muted); font-weight: 400;
+  max-width: 38rem; margin: 0 auto 2rem; line-height: 1.65;
 }
-.hero-actions { display: flex; flex-direction: column; gap: 1rem; justify-content: center; align-items: center; }
-.hero-actions .btn { width: 100%; max-width: 260px; justify-content: center; }
+.hero-actions {
+  display: flex; flex-direction: column;
+  gap: 0.75rem; justify-content: center; align-items: stretch;
+  width: min(100%, 22rem); margin: 0 auto;
+}
+.hero-actions .btn { width: 100%; justify-content: center; }
 
 .btn {
   display: inline-flex; align-items: center; gap: 0.5rem;
@@ -160,35 +199,46 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
   border-radius: var(--radius); transition: all var(--transition);
 }
 .btn-primary {
-  background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
+  background: var(--text-white);
+  border: 1px solid var(--text-white);
+  color: #0a0a0a;
+}
+.btn-primary:hover {
+  background: transparent;
   color: var(--text-white);
 }
-.btn-primary:hover { background: var(--white-10); }
-.btn-ghost { color: var(--text-muted); }
-.btn-ghost:hover { color: var(--text-white); }
+.btn-ghost {
+  color: var(--text-muted);
+  border: 1px solid var(--glass-border);
+}
+.btn-ghost:hover {
+  color: var(--text-white);
+  border-color: var(--white-20);
+}
 
 .section {
   position: relative; z-index: 10;
   max-width: 72rem; margin: 0 auto;
-  padding: 5rem 1rem;
+  padding: 3.5rem 1.15rem;
+  width: 100%;
 }
 .section-narrow { max-width: 56rem; }
-.section-header { text-align: center; margin-bottom: 4rem; }
+.section-header { text-align: left; margin-bottom: 1.75rem; }
 .section-title {
-  font-size: clamp(1.875rem, 5vw, 3rem);
+  font-size: clamp(1.55rem, 4.5vw, 2.6rem);
   font-weight: 700; letter-spacing: -0.03em;
-  margin-bottom: 1rem;
+  margin-bottom: 0.55rem;
   color: var(--text-white);
 }
 .section-desc {
-  color: var(--text-dim); max-width: 36rem;
-  margin: 0 auto; font-size: 0.9375rem;
+  color: var(--text-dim); max-width: 40rem;
+  margin: 0; font-size: 0.95rem; line-height: 1.6;
 }
 
 .feature-grid {
-  display: grid; grid-template-columns: 1fr; gap: 1.5rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.9rem;
 }
 .feature-card {
   padding: 1.75rem 1.5rem;
@@ -200,11 +250,18 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
   transition: all var(--transition);
 }
 .feature-card:hover {
-  border-color: var(--white-20);
-  box-shadow: 0 20px 40px -15px rgba(255,255,255,0.05);
+  border-color: rgba(134, 239, 172, 0.22);
+  box-shadow: 0 18px 40px -18px rgba(0,0,0,0.6);
+  transform: translateY(-2px);
 }
-.feature-title { font-size: 1.5rem; font-weight: 700; color: var(--text-white); margin-bottom: 0.75rem; }
-.feature-desc { color: var(--text-muted); font-size: 0.875rem; line-height: 1.7; }
+.feature-title {
+  font-size: 1.15rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  color: var(--text-white);
+  margin-bottom: 0.65rem;
+}
+.feature-desc { color: var(--text-muted); font-size: 0.9rem; line-height: 1.7; }
 
 .step {
   padding: 1.5rem;
@@ -297,11 +354,14 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
 
 .footer {
   position: relative; z-index: 10;
-  margin-top: 5rem; padding: 2rem 1rem;
-  text-align: center; font-size: 0.75rem;
+  margin-top: 4rem; padding: 2.5rem 1rem;
+  text-align: center; font-size: 0.8rem;
   color: var(--text-fade);
-  border-top: 1px solid var(--white-10);
+  border-top: 1px solid var(--glass-border);
 }
+.footer a { color: var(--text-dim); transition: color 0.2s; }
+.footer a:hover { color: var(--accent); }
+.footer-meta { margin-top: 0.5rem; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.04em; }
 
 .reveal {
   opacity: 0; transform: translateY(30px);
@@ -311,35 +371,79 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
 }
 .reveal.active { opacity: 1; transform: translateY(0); }
 
-@media (min-width: 640px) {
-  .hero-actions { flex-direction: row; }
-  .hero-actions .btn { width: auto; }
-  .script-actions { flex-direction: row; }
+/* —— Base = mobile-first. Scale up from here. —— */
+
+.feature-card { padding: 1.15rem 1.1rem; }
+.step { padding: 1.1rem; margin-bottom: 1rem; }
+.step-title { font-size: 1.05rem; }
+.terminal-body { font-size: 0.78rem; line-height: 1.5; word-break: break-word; }
+.script-actions { display: flex; flex-direction: column; gap: 0.5rem; }
+.script-btn { width: 100%; justify-content: center; }
+.os-tab { padding: 0.45rem 0.7rem; font-size: 0.8rem; }
+.footer { margin-top: 2rem; padding: 1.75rem 1.15rem; }
+
+@media (max-width: 767.98px) {
+  body { cursor: auto; }
+  .cursor, .cursor-ring { display: none !important; }
+  #dedsec-canvas { opacity: 0.09; }
+  .feature-card:hover { transform: none; box-shadow: none; }
+  .nav-logo { font-size: 0.98rem; max-width: 70vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 }
 
-@media (min-width: 768px) {
-  .nav { padding: 1rem 1.5rem; }
-  .nav-logo { font-size: 1.25rem; }
+/* Tablet */
+@media (min-width: 640px) {
+  .hero { padding: 6.5rem 1.5rem 3rem; }
+  .hero-actions {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    gap: 0.85rem;
+  }
+  .hero-actions .btn { width: auto; min-width: 9.5rem; }
+  .script-actions { flex-direction: row; flex-wrap: wrap; }
+  .script-btn { width: auto; }
+  .feature-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+  .section-header { text-align: center; margin-bottom: 2.25rem; }
+  .section-desc { margin: 0 auto; }
+}
+
+/* Desktop */
+@media (min-width: 900px) {
+  .nav { padding: 1rem 1.75rem; }
+  .nav-logo { font-size: 1.2rem; }
   .nav-links { display: flex; }
   .nav-mobile-btn { display: none; }
-  .nav-mobile-menu { display: none; }
+  .nav-mobile-menu { display: none !important; }
 
-  .section { padding: 8rem 1.5rem; }
-  .section-header { margin-bottom: 4rem; }
+  .hero {
+    min-height: 100vh;
+    padding: 7rem 2rem 3.5rem;
+  }
+  .section { padding: 5.5rem 1.75rem; }
+  .section-header { margin-bottom: 2.75rem; }
   .section-desc { font-size: 1rem; }
 
-  .feature-grid { grid-template-columns: repeat(3, 1fr); gap: 2rem; }
-  .feature-card { padding: 2rem 1.5rem; }
+  .feature-grid { grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+  .feature-card { padding: 1.5rem 1.35rem; }
+  .feature-title { font-size: 1.12rem; }
 
-  .step { padding: 1.5rem; }
-  .step-title { font-size: 1.25rem; }
+  .step { padding: 1.4rem 1.35rem; margin-bottom: 1.25rem; }
+  .step-title { font-size: 1.2rem; }
+  .terminal-body { font-size: 0.84rem; padding: 1rem 1.15rem; }
+  .footer { margin-top: 3rem; padding: 2.25rem 1.5rem; }
 }
 
-@media (max-width: 768px) {
-  body { cursor: auto; }
-  .cursor, .cursor-ring { display: none; }
-  #dedsec-canvas { opacity: 0.14; }
-  .terminal-body { font-size: 0.78rem; }
+/* Wide */
+@media (min-width: 1200px) {
+  .section { padding: 6.5rem 2rem; }
+  .feature-grid { gap: 1.5rem; }
+  .feature-card { padding: 1.75rem 1.5rem; }
+}
+
+@media (pointer: coarse) {
+  .cursor, .cursor-ring { display: none !important; }
+  body.custom-cursor { cursor: auto; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -392,7 +496,7 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
   <div class="hero-content">
     <h1 class="hero-title">Flask-ADB-toolkit</h1>
     <p class="hero-desc">
-      One little flask 🧪 — every flashing tool you'll ever need. Auto-detecting ROM flasher,
+      One little flask — every flashing tool you'll ever need. Auto-detecting ROM flasher,
       generic partition tools for any Android device, and a checksum verifier, all in one friendly terminal menu.
     </p>
     <div class="hero-actions">
@@ -617,7 +721,8 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
 </main>
 
 <footer class="footer">
-  <p>Built by dedsec-1337. Hosted on GitHub Pages.</p>
+  <p>Built by <a href="https://github.com/dedsec-1337" target="_blank" rel="noopener">dedsec-1337</a> · <a href="https://github.com/dedsec-1337/Flask-ADB-toolkit" target="_blank" rel="noopener">Source</a> · MIT</p>
+  <p class="footer-meta">Updated September 2026 · Hosted on GitHub Pages</p>
 </footer>
 
 <script>
@@ -650,6 +755,7 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
   );
 
   if (isDesktop && !prefersReducedMotion) {
+    document.body.classList.add('custom-cursor');
     const cursor = $('cursor');
     const cursorRing = $('cursor-ring');
     let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
@@ -690,11 +796,11 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
     let visible = true;
 
     const CHARS = 'アィウェオカキクケコサシスセソタチツタトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF';
-    const DEDSEC_WORDS = ['DEDSEC', 'HACK', 'CTOS', '0101', 'WATCH_DOGS'];
+    const DEDSEC_WORDS = ['DEDSEC', 'HACK', 'CTOS', '0101', '1337'];
 
-    const COLOR_WHITE  = '#ffffff';
-    const COLOR_BLOOD  = '#b91c1c';
-    const COLOR_GLITCH = '#ff0000';
+    const COLOR_WHITE  = '#e5e5e5';
+    const COLOR_BLOOD  = '#7f1d1d';
+    const COLOR_GLITCH = '#86efac';
 
     function setupCanvas() {
       width  = canvas.width  = Math.ceil(window.innerWidth  * SCALE);
@@ -711,8 +817,8 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
       ctx.fillStyle = 'rgba(0, 0, 0, 0.06)';
       ctx.fillRect(0, 0, width, height);
 
-      if (Math.random() > 0.995) {
-        ctx.fillStyle = 'rgba(185, 28, 28, 0.05)';
+      if (Math.random() > 0.997) {
+        ctx.fillStyle = 'rgba(134, 239, 172, 0.03)';
         ctx.fillRect(0, 0, width, height);
       }
 
