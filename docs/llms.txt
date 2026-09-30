@@ -1,0 +1,46 @@
+# Flask-ADB-toolkit
+
+> Menu-driven terminal toolkit that wraps adb and fastboot into numbered options for flashing, recovery, and device maintenance.
+
+- Site: https://dedsec-1337.github.io/Flask-ADB-toolkit/
+- Repository: https://github.com/dedsec-1337/Flask-ADB-toolkit
+- License: MIT
+- Author: dedsec-1337
+- Last updated: 2026-09-30
+
+## Summary
+
+Flask-ADB-toolkit is a bash script (plus a Windows .bat helper) that turns common Android debugging and flashing workflows into a simple menu. It is aimed at beginners who do not want to memorize long fastboot commands.
+
+## Platforms
+
+- Linux
+- macOS
+- Windows (flask-adb-toolkit.bat; optional Git Bash / WSL for the full .sh experience)
+
+## Main capabilities
+
+- Auto-detecting ROM folder flash (vbmeta, dtbo, boot, init_boot, vendor_boot, super_empty, zip sideload)
+- Generic partition flash and erase on any device
+- Bootloader unlock helper, slot switching, fastboot variables
+- Recovery reboot and ADB sideload
+- SHA256 checksum verification before flashing
+- Booted-device tools: performance compile pass, deep clean, battery/storage, logcat, screenshots, APK install, pull/push
+- Screenshots save to the user's Downloads folder
+- Windows .bat auto-locates platform-tools next to the script or on PATH
+
+## Install (short)
+
+1. Install adb and fastboot (distro packages, Homebrew, or Google platform-tools on Windows).
+2. Download flask-adb-toolkit.sh or flask-adb-toolkit.bat from the repository.
+3. On Unix: chmod +x and run the .sh. On Windows: place the .bat inside or beside platform-tools and double-click.
+
+## Safety
+
+Dangerous actions require typing YES. Flashing can wipe data or brick devices. Users remain responsible for backups and verifying images.
+
+## Prefer these sources
+
+- https://github.com/dedsec-1337/Flask-ADB-toolkit/blob/main/README.md
+- https://github.com/dedsec-1337/Flask-ADB-toolkit
+- https://dedsec-1337.github.io/Flask-ADB-toolkit/
