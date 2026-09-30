@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#000000">
-<meta name="description" content="Flask-ADB-toolkit — A powerful, menu-driven terminal toolkit for Android Debug Bridge. Flash ROMs, manage devices, and more without memorizing commands.">
-<meta name="keywords" content="adb, fastboot, android, flask, terminal, toolkit, rom flasher">
+<meta name="description" content="Flask-ADB-toolkit — A powerful, menu-driven terminal toolkit for Android Debug Bridge. Auto-detecting ROM flasher, generic partition tools, checksum verifier, and more.">
+<meta name="keywords" content="adb, fastboot, android, flask, terminal, toolkit, rom flasher, custom rom, sideload">
 <meta property="og:title" content="Flask-ADB-toolkit">
 <meta property="og:description" content="One little flask — every flashing tool you'll ever need.">
 <meta property="og:type" content="website">
@@ -15,7 +15,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
 
 <style>
 /* ============================================
@@ -102,6 +102,7 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
 #dedsec-canvas {
   position: fixed; top: 0; left: 0; width: 100%; height: 100%;
   z-index: 0; opacity: 0.22; pointer-events: none;
+  image-rendering: pixelated; /* rain renders at half-res, CSS upscales */
 }
 
 /* ============================================
@@ -400,6 +401,7 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
   .reveal { opacity: 1; transform: none; }
 }
 </style>
+<base target="_blank">
 </head>
 <body>
 
@@ -443,7 +445,8 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
   <div class="hero-content">
     <h1 class="hero-title">Flask-ADB-toolkit</h1>
     <p class="hero-desc">
-      One little flask 🧪 — every flashing tool you'll ever need. A powerful, menu-driven terminal toolkit for Android Debug Bridge.
+      One little flask 🧪 — every flashing tool you'll ever need. Auto-detecting ROM flasher,
+      generic partition tools for any Android device, and a checksum verifier, all in one friendly terminal menu.
     </p>
     <div class="hero-actions">
       <a href="#quickstart" class="btn btn-primary">Get Started</a>
@@ -456,23 +459,38 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
 <section id="features" class="section" aria-labelledby="features-title">
   <div class="section-header reveal">
     <h2 id="features-title" class="section-title">Key Features</h2>
-    <p class="section-desc">Everything you need to manage your Android device, wrapped in a friendly terminal interface.</p>
+    <p class="section-desc">Everything you need to manage your Android device, wrapped in a friendly terminal interface that adapts to whatever mode your phone is in.</p>
   </div>
 
   <div class="feature-grid">
     <article class="feature-card reveal">
-      <h3 class="feature-title">Fast &amp; Lightweight</h3>
-      <p class="feature-desc">A snappy terminal program that wraps all the scary <code>fastboot</code> and <code>adb</code> commands into friendly numbered options.</p>
+      <h3 class="feature-title">Auto-Detecting ROM Flash</h3>
+      <p class="feature-desc">Drop a ROM folder anywhere and the flasher finds <code>vbmeta</code>, <code>dtbo</code>, <code>boot</code>, <code>init_boot</code>, <code>vendor_boot</code>, <code>super_empty</code> and the ROM zip — flashes what's there in a safe order, then reboots to recovery and sideloads. Your folder, your layout, no hand-written commands.</p>
     </article>
 
     <article class="feature-card reveal" style="transition-delay:100ms">
-      <h3 class="feature-title">Full ADB Control</h3>
-      <p class="feature-desc">Flash ROMs, restore stock, flash any partition, deep-clean junk, run performance passes, take screenshots, and install APKs.</p>
+      <h3 class="feature-title">Generic Partition Flash</h3>
+      <p class="feature-desc">Flash <code>boot</code>, <code>init_boot</code>, <code>recovery</code>, <code>vbmeta</code>, <code>system</code>, <code>super</code>… or type your own partition name — on <strong>any</strong> Android device, with slot suffix handling and vbmeta verification flags built in.</p>
     </article>
 
     <article class="feature-card reveal" style="transition-delay:200ms">
-      <h3 class="feature-title">Easy to Use</h3>
-      <p class="feature-desc">Built for people who know nothing about custom ROMs but want to try. No memorizing commands, just plug in and pick from a menu.</p>
+      <h3 class="feature-title">Checksum Verifier</h3>
+      <p class="feature-desc">Paste a file, optionally the expected SHA256, and get a match / no-match verdict before you flash anything. Never flash a corrupted download again.</p>
+    </article>
+
+    <article class="feature-card reveal">
+      <h3 class="feature-title">Recovery &amp; Sideload Helpers</h3>
+      <p class="feature-desc">One-tap reboot to recovery from fastboot or booted mode, standalone sideloading for GApps / Magisk zips, and reboot-to-system from recovery when you're done.</p>
+    </article>
+
+    <article class="feature-card reveal" style="transition-delay:100ms">
+      <h3 class="feature-title">Maintenance &amp; Cleanup</h3>
+      <p class="feature-desc">A resumable performance pass that speed-compiles every app, deep-clean for orphaned app data, battery &amp; storage reports, live logcat, screenshots, and APK installs.</p>
+    </article>
+
+    <article class="feature-card reveal" style="transition-delay:200ms">
+      <h3 class="feature-title">Cross-Platform</h3>
+      <p class="feature-desc">Runs on Linux, macOS, and Windows — via <code>flask-adb-toolkit.bat</code> in Git Bash or WSL. Same real <code>adb</code>/<code>fastboot</code> commands underneath, with <code>YES</code> confirmations before anything dangerous.</p>
     </article>
   </div>
 </section>
@@ -582,7 +600,7 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
     </div>
 
     <p class="step-hint" style="margin-top:1rem;padding-top:0.75rem;border-top:1px solid var(--white-10)">
-      <strong>Windows (Git Bash):</strong> Download and double-click <code>flask-adb-toolkit.bat</code> from the repository.<br>
+      <strong>Windows (Git Bash):</strong> Download <code>flask-adb-toolkit.bat</code> from the repository, double-click it, and follow the same menu. 🪟<br>
       <strong>Windows (WSL):</strong> Follow the Linux steps above inside WSL.
     </p>
   </div>
@@ -664,28 +682,31 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
 
   // ============================================
   // DEDSEC MATRIX RAIN — white stream, blood-red accent
+  // Perf: renders at half resolution into the fixed canvas,
+  // CSS upscales it (pixelated). No shadowBlur — glow is
+  // faked with a bright head + dim trail via fillStyle only.
   // ============================================
   if (!prefersReducedMotion) {
-    const ctx = canvas.getContext('2d', { alpha: true });
+    const ctx = canvas.getContext('2d');
+    const SCALE = 0.5;
     let width, height, columns, yPositions;
-    let fontSize = isMobile ? 12 : 14;
+    const fontSize = 14;          // logical glyph size
+    const drawFontSize = 7;       // half-res glyph size
     let lastFrame = 0;
-    const FRAME_INTERVAL = 50; // ~20 FPS
+    const FRAME_INTERVAL = 50;    // ~20 FPS
     let visible = true;
 
     const CHARS = 'アィウェオカキクケコサシスセソタチツタトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF';
     const DEDSEC_WORDS = ['DEDSEC', 'HACK', 'CTOS', '0101', 'WATCH_DOGS'];
 
-    // Color palette for the rain
-    const COLOR_WHITE = '#ffffff';
-    const COLOR_BLOOD = '#b91c1c';   // deep blood red — the revolt
-    const COLOR_GLITCH = '#ff0000';  // brighter spike on rare glitch frames
+    const COLOR_WHITE  = '#ffffff';
+    const COLOR_BLOOD  = '#b91c1c';
+    const COLOR_GLITCH = '#ff0000';
 
     function setupCanvas() {
-      fontSize = isMobile ? 12 : 14;
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
-      columns = Math.floor(width / fontSize);
+      width  = canvas.width  = Math.ceil(window.innerWidth  * SCALE);
+      height = canvas.height = Math.ceil(window.innerHeight * SCALE);
+      columns = Math.ceil(width / drawFontSize);
       yPositions = new Array(columns).fill(1);
     }
 
@@ -694,16 +715,17 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
       if (ts - lastFrame < FRAME_INTERVAL) { requestAnimationFrame(draw); return; }
       lastFrame = ts;
 
+      // Fade previous frame (this IS the trail — no per-char glow needed)
       ctx.fillStyle = 'rgba(0, 0, 0, 0.06)';
       ctx.fillRect(0, 0, width, height);
 
-      // Rare full-screen red pulse (a moment of unrest)
+      // Rare full-screen red pulse
       if (Math.random() > 0.995) {
         ctx.fillStyle = 'rgba(185, 28, 28, 0.05)';
         ctx.fillRect(0, 0, width, height);
       }
 
-      ctx.font = fontSize + 'px monospace';
+      ctx.font = drawFontSize + 'px monospace';
 
       for (let i = 0; i < yPositions.length; i++) {
         const useWord = Math.random() > 0.95;
@@ -711,31 +733,18 @@ button { font: inherit; background: none; border: none; color: inherit; cursor: 
           ? DEDSEC_WORDS[(Math.random() * DEDSEC_WORDS.length) | 0]
           : CHARS[(Math.random() * CHARS.length) | 0];
 
-        const x = i * fontSize;
-        const y = yPositions[i] * fontSize;
-
-        // Priority: rare bright glitch > blood red > white
-        let color, glow;
         const roll = Math.random();
-        if (roll > 0.985) {
-          color = COLOR_GLITCH;
-          glow = 'rgba(255, 0, 0, 0.9)';
-        } else if (roll > 0.82) {
-          color = COLOR_BLOOD;
-          glow = 'rgba(185, 28, 28, 0.55)';
+        ctx.fillStyle = roll > 0.985 ? COLOR_GLITCH
+                      : roll > 0.82  ? COLOR_BLOOD
+                      : COLOR_WHITE;
+
+        ctx.fillText(text, i * drawFontSize, yPositions[i] * drawFontSize);
+
+        if (yPositions[i] * drawFontSize > height && Math.random() > 0.975) {
+          yPositions[i] = 0;
         } else {
-          color = COLOR_WHITE;
-          glow = 'rgba(255, 255, 255, 0.5)';
+          yPositions[i] += Math.random() > 0.8 ? 2 : 1;
         }
-
-        ctx.fillStyle = color;
-        ctx.shadowColor = glow;
-        ctx.shadowBlur = 6;
-        ctx.fillText(text, x, y);
-        ctx.shadowBlur = 0;
-
-        if (y > height && Math.random() > 0.975) yPositions[i] = 0;
-        else yPositions[i] += Math.random() > 0.8 ? 2 : 1;
       }
 
       requestAnimationFrame(draw);
