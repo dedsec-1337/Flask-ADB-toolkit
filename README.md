@@ -3,7 +3,7 @@
 > **One little flask 🧪 — every flashing tool you'll ever need.**
 
 ![Bash](https://img.shields.io/badge/language-bash-4EAA25?style=for-the-badge&logo=gnubash&logoColor=white)
-![Platform](https://img.shields.io/badge/platform-Linux%20%C2%B7%20macOS%20%C2%B7%20Windows%20%28WSL%2FGit--Bash%29-0078D6?style=for-the-badge)
+![Platform](https://img.shields.io/badge/platform-Linux%20%C2%B7%20macOS%20%C2%B7%20Windows%20%28Git--Bash%20%2F%20WSL%29-0078D6?style=for-the-badge)
 ![License](https://img.shields.io/badge/license-MIT-yellow?style=for-the-badge)
 ![Vibes](https://img.shields.io/badge/vibes-100%25%20fun-ff69b4?style=for-the-badge)
 
@@ -29,8 +29,9 @@ but want to try anyway.
 > So I thought: *why not put everything in one flask — like a lab flask 🧪 — and just… pour?*
 >
 > What began as a tiny menu for my own CMF Phone 2 Pro grew into a full toolkit:
-> flash ROMs, restore stock, flash *any* partition on *any* device, deep-clean junk,
-> run a "performance pass," take screenshots, install APKs and more.
+> auto-detected ROM flashing, a generic partition flasher for *any* Android device,
+> recovery/sideload helpers, a checksum verifier, deep-clean junk hunting,
+> a resumable "performance pass," screenshots, APK installs and more.
 >
 > It's a little rough around the edges, made for fun — but it works, and it might save
 > someone else from the same headache. 🍻
@@ -49,13 +50,13 @@ but want to try anyway.
 | Option | What it does |
 |---|---|
 | 🔓 Unlock bootloader | Guided unlock (with warnings!) |
-| ⚡ Flash any partition | boot, init_boot, recovery, vendor_boot, dtbo, vbmeta, system, vendor, super, userdata… or type your own — **works on any device** |
+| ⚡ Flash any partition | boot, init_boot, recovery, vendor_boot, dtbo, vbmeta, vbmeta_system, system, vendor, super, userdata… or type your own — **works on any device** |
 | 🔄 Switch active slot | A/B slot switching |
 | 🧹 Erase a partition | cache, userdata, metadata… (with warnings) |
 | 🛠️ Reboot to fastbootd | For logical-partition operations |
 | 📋 Show all fastboot variables | Debug info dump |
-| 📦 Flash ROM *(CMF Phone 2 Pro)* | vendor_boot → wipe-super → recovery → sideload, automated |
-| ⏮ Restore stock | Newest (B4.1) or older (V3.2) build, both slots |
+| 📦 Flash ROM | **Auto-detects** `boot`, `dtbo`, `init_boot`, `vbmeta`, `vbmeta_system`, `super_empty` in your ROM folder and flashes whichever exist, in a safe order — `vbmeta` flashed with `--disable-verity --disable-verification` (correctly placed before `flash`) |
+| ⏮ Restore stock *(CMF Phone 2 Pro)* | Newest (B4.1) or older (V3.2) build, both slots |
 
 ### 📱 Booted-phone (ADB) mode
 
@@ -69,8 +70,38 @@ but want to try anyway.
 | 📥 Install APK | Pick & install |
 | ⬇️⬆️ Pull / Push files | Move files both ways |
 
+### 🔄 Recovery / Sideload mode
+
+| Option | What it does |
+|---|---|
+| 📤 Sideload a package | ADB-sideload any zip — GApps, Magisk, anything that isn't a full ROM install |
+| 🔁 Reboot to system | Bounce back out of recovery when you're done |
+
+### 🌐 Works everywhere in the menu
+
+| Option | What it does |
+|---|---|
+| 🎯 Reboot to recovery | Straight to recovery — from fastboot *or* booted mode, no digging through the ROM flow |
+| 🔎 Verify a file's checksum | Paste a file, optionally the expected SHA256 — get a match / no-match verdict before you flash |
+
 Plus: live **device status bar** (connection mode 🔌, bootloader lock 🔒/🔓, active slot)
 and a menu that **adapts to whatever state your phone is in**.
+
+### 💡 About the ROM flasher
+
+Drop your ROM folder **anywhere** — `~/Desktop/cmf` is just the default suggestion, not a requirement.
+If the auto-picker finds nothing there, you type the path directly.
+
+The flasher looks for: `vbmeta`, `vbmeta_system`, `dtbo`, `boot`, `init_boot`, `vendor_boot`,
+`super_empty`, and the ROM `.zip` — flashes whatever's present in a safe order, then
+wipes super (if present), reboots to recovery, and sideloads the zip.
+
+`system.img` is deliberately **never auto-flashed**: it's normally a logical partition
+the ROM zip installs itself. It's listed when found, and reachable through
+"Flash any partition" if a guide specifically tells you to flash it directly.
+
+> **CMF Phone 2 Pro owners:** options 8–9 in the bootloader menu light up when your
+> stock folders are in `~/Desktop/cmf`.
 
 ## 📋 Requirements
 
@@ -103,15 +134,17 @@ Rather paste than type? The [live site](https://dedsec-1337.github.io/Flask-ADB-
 
 Then just follow the colorful menus. 🎨
 
-> **CMF Phone 2 Pro owners:** drop your ROM/stock folders into `~/Desktop/cmf`
-> (each folder needs its `.zip` / `.img` files), and options 7–9 in the bootloader menu light up.
-
 ## 🪟 Windows?
 
 Yes! Two ways — pick your comfort level:
 
 - **🟢 Easiest:** [Git for Windows](https://git-scm.com/download/win) (gives you Git Bash) + Google's [platform-tools](https://developer.android.com/tools/releases/platform-tools) on your `PATH` → then double-click **`flask-adb-toolkit.bat`** 🎉
 - **🟣 Classic:** Ubuntu inside Windows via **WSL** (`wsl --install`) — it's basically Linux, then follow the Linux steps above.
+
+The `.bat` is functionally equivalent to the `.sh` — same real adb/fastboot commands, same
+checks before anything dangerous, checksums verified via Windows-native `certutil -hashfile`.
+No color, and a flat menu instead of the mode-aware one (batch can't do that cleanly),
+but everything works. For the full visual experience, use Git Bash or WSL with the `.sh`.
 
 ## ⚠️ Disclaimer
 
@@ -121,6 +154,7 @@ but **you** are still the one pressing the buttons. 🔘
 
 - Not responsible for lost data, bricked phones, or voided warranties
 - Always back up first 📦
+- Always **verify checksums** before flashing a download 🔎 (the toolkit has one built in)
 - Everything here is provided **as-is**, made for fun & learning
 
 ## 🗺️ Roadmap
