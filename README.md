@@ -146,6 +146,28 @@ checks before anything dangerous, checksums verified via Windows-native `certuti
 No color, and a flat menu instead of the mode-aware one (batch can't do that cleanly),
 but everything works. For the full visual experience, use Git Bash or WSL with the `.sh`.
 
+## 🗑️ Uninstalling
+
+Removing the toolkit is one file deletion. Removing the dependencies is optional.
+
+### Remove the toolkit itself
+
+- **Linux / macOS / WSL:** `rm -f ~/flask-adb-toolkit.sh ~/.flask-adb-compile-progress`
+- **Windows (Git Bash):** delete `flask-adb-toolkit.bat` from wherever you saved it, or run `rm ~/flask-adb-toolkit.bat`
+
+Screenshots taken through the toolkit live in `~/Desktop/cmf/screenshots/` (or `%USERPROFILE%\Desktop\cmf\screenshots\` on Windows) — remove that folder too if you don't want to keep them.
+
+### Remove adb & fastboot (optional)
+
+If you installed platform-tools just for this toolkit and want the disk space back:
+
+- **Ubuntu / Debian:** `sudo apt remove android-tools-adb android-tools-fastboot` — add `sudo apt autoremove` afterwards to clear unused dependencies too.
+- **Arch / CachyOS:** `sudo pacman -Rns android-tools`
+- **Fedora:** `sudo dnf remove android-tools`
+- **macOS:** `brew uninstall android-platform-tools` — if you don't use Homebrew for anything else, remove it with the official uninstall script from brew.sh.
+- **Windows (Git Bash):** delete the `platform-tools` folder you extracted, and remove its path from **System Properties → Environment Variables → Path**. Uninstall Git for Windows via **Settings → Apps** if you don't use it.
+- **Windows (WSL):** `sudo apt remove android-tools-adb android-tools-fastboot` inside your distro. To remove the distro entirely: `wsl --unregister Ubuntu` from PowerShell.
+
 ## ⚠️ Disclaimer
 
 Flashing partitions **erases data** and can, if misused, brick your device.
