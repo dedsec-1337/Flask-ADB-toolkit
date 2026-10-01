@@ -12,9 +12,7 @@ title Flask-ADB-toolkit (Windows)
 ::  https://github.com/dedsec-1337/Flask-ADB-toolkit
 :: ══════════════════════════════════════════════════════════════
 
-set "BASE=%USERPROFILE%\Desktop\cmf"
-set "STOCK_NEW=%BASE%\Galaga_B4.1-260812-1729"
-set "STOCK_OLD=%BASE%\Galaga_V3.2-250507-1139_3.2"
+set "BASE=%USERPROFILE%\Desktop\flashing"
 
 set "SCRIPTDIR=%~dp0"
 set "SCRIPTDIR=%SCRIPTDIR:~0,-1%"
@@ -46,17 +44,16 @@ echo  8) Reboot to bootloader
 echo  9) Reboot to recovery
 echo 10) Reboot to system
 echo 11) Sideload a package
-echo 12) Restore stock - newest (B4.1)
-echo 13) Restore stock - older (V3.2)
-echo 14) Performance pass
-echo 15) Deep clean (orphaned app data)
-echo 16) Battery and storage
-echo 17) Take screenshot
-echo 18) Install an APK
-echo 19) Pull a file from phone
-echo 20) Push a file to phone
-echo 21) Device info
-echo 22) Verify a file's checksum
+echo 12) Restore stock firmware
+echo 13) Performance pass
+echo 14) Deep clean (orphaned app data)
+echo 15) Battery and storage
+echo 16) Take screenshot
+echo 17) Install an APK
+echo 18) Pull a file from phone
+echo 19) Push a file to phone
+echo 20) Device info
+echo 21) Verify a file's checksum
 echo  0) Exit
 echo.
 set /p CHOICE=^> 
@@ -73,17 +70,16 @@ if "%CHOICE%"=="8" call :REBOOTBOOTLOADER
 if "%CHOICE%"=="9" call :REBOOTRECOVERY
 if "%CHOICE%"=="10" call :REBOOTSYSTEM
 if "%CHOICE%"=="11" call :SIDELOAD
-if "%CHOICE%"=="12" call :RESTORESTOCK "%STOCK_NEW%"
-if "%CHOICE%"=="13" call :RESTORESTOCK "%STOCK_OLD%"
-if "%CHOICE%"=="14" call :PERFPASS
-if "%CHOICE%"=="15" call :DEEPCLEAN
-if "%CHOICE%"=="16" call :BATTERYSTORAGE
-if "%CHOICE%"=="17" call :SCREENSHOT
-if "%CHOICE%"=="18" call :INSTALLAPK
-if "%CHOICE%"=="19" call :PULLFILE
-if "%CHOICE%"=="20" call :PUSHFILE
-if "%CHOICE%"=="21" call :DEVICEINFO
-if "%CHOICE%"=="22" call :VERIFYCHECKSUM
+if "%CHOICE%"=="12" call :RESTORESTOCK
+if "%CHOICE%"=="13" call :PERFPASS
+if "%CHOICE%"=="14" call :DEEPCLEAN
+if "%CHOICE%"=="15" call :BATTERYSTORAGE
+if "%CHOICE%"=="16" call :SCREENSHOT
+if "%CHOICE%"=="17" call :INSTALLAPK
+if "%CHOICE%"=="18" call :PULLFILE
+if "%CHOICE%"=="19" call :PUSHFILE
+if "%CHOICE%"=="20" call :DEVICEINFO
+if "%CHOICE%"=="21" call :VERIFYCHECKSUM
 if "%CHOICE%"=="0" exit /b
 
 echo.
@@ -333,11 +329,15 @@ exit /b
 
 :RESTORESTOCK
 call :NEEDMODE fastboot || exit /b
-set "DIR=%~1"
+set /p DIR=Full path to the stock firmware folder: 
+if not exist "%DIR%" (
+    echo Folder not found: %DIR%
+    exit /b
+)
 echo Restores stock from %DIR%. Wipes the phone.
 call :CONFIRM "Continue?" || exit /b
 if not exist "%DIR%\flash_all.bat" if not exist "%DIR%\flash_all.sh" (
-    echo flash_all script missing in that folder - get it from spike0en/nothing_flasher, galaga-tetris branch.
+    echo No flash_all script in that folder. This expects the layout your device's stock-firmware archive uses (for Nothing/CMF phones: spike0en/nothing_flasher, galaga-tetris branch^).
     exit /b
 )
 pushd "%DIR%"
