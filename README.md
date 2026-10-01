@@ -1,4 +1,4 @@
-> **Note:** This project has moved to Codeberg. You can find the new repository at [https://codeberg.org/dedsect/Flask-ADB-toolkit](https://codeberg.org/dedsect/Flask-ADB-toolkit).
+-- > **Note:** This project has moved to Codeberg. You can find the new repository at [https://codeberg.org/dedsect/Flask-ADB-toolkit](https://codeberg.org/dedsect/Flask-ADB-toolkit). --
 
 
 
