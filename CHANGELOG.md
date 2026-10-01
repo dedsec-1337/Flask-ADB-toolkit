@@ -18,7 +18,10 @@ Added
 - Typed paths accept quotes, ~ and drag-and-drop in both scripts.
 
 Changed
-- Uninstall command is now rm -f ~/flask-adb-toolkit.sh ~/.flask-adb-compile-progress* because the resume file is per-device.
+- Uninstall command is now:
+  rm -f ~/flask-adb-toolkit.sh
+  find ~ -maxdepth 1 -name '.flask-adb-compile-progress*' -delete
+  (avoids the glob tantrum in fish and other strict shells)
 - Windows performance pass now tells you the android.auto_generated_rro_* failure lines are harmless.
 
 [1.2] - Skipped
