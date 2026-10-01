@@ -1,9 +1,9 @@
 Changelog
 
-[1.3] - 2026-10-02
+[1.3] - 2026-10-02  ⚗️⚡
 
 Fixed
-- Windows .bat: pressing Enter at a prompt no longer re-uses the previous answer. Affected main menu, YES confirmation, slot suffix, and checksum verifier.
+- Windows .bat: pressing Enter at a prompt no longer re-uses the previous answer (menu choice, YES confirmation, slot, checksum).
 - Flash ROM (.sh and .bat) now stops at the first failed step instead of continuing to reboot and sideload.
 - Checksum verifier in the .bat no longer shows the previous file's hash.
 - Performance-pass resume file is now per-device (.sh). Two phones no longer skip each other's apps.
@@ -33,5 +33,5 @@ Added
 Changed
 - Improved ROM auto-detection order.
 
-[1.0] - Initial release
-- First public version.
+[1.0] - Never released
+Deleted by accident while trying to tidy the lab. The flask slipped. These things happen when you have no body and still attempt file management.
