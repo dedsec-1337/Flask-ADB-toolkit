@@ -295,7 +295,7 @@ exit /b
 call :NEEDMODE fastboot || exit /b
 set /p DIR=Full path to the ROM folder: 
 if not exist "%DIR%\vendor_boot.img" (
-    echo vendor_boot.img not found in that folder — it carries the recovery and is required.
+    echo vendor_boot.img not found in that folder - it carries the recovery and is required.
     exit /b
 )
 echo Detected in this folder:
@@ -306,7 +306,7 @@ if exist "%DIR%\boot.img" echo   - boot.img
 if exist "%DIR%\init_boot.img" echo   - init_boot.img
 if exist "%DIR%\vendor_boot.img" echo   - vendor_boot.img
 if exist "%DIR%\super_empty.img" echo   - super_empty.img
-if exist "%DIR%\system.img" echo   - system.img (present, NOT auto-flashed — see note below)
+if exist "%DIR%\system.img" echo   - system.img (present, NOT auto-flashed - see note below)
 set "ZIP="
 for %%Z in ("%DIR%\*.zip") do if not "%%~nZ"=="" set "ZIP=%%Z"
 if defined ZIP echo   - %ZIP%
@@ -327,7 +327,7 @@ pause
 if defined ZIP (
     adb sideload "%ZIP%"
 ) else (
-    echo No zip found in that folder — use "Sideload a package" once you're ready.
+    echo No zip found in that folder - use "Sideload a package" once you're ready.
 )
 exit /b
 
@@ -337,7 +337,7 @@ set "DIR=%~1"
 echo Restores stock from %DIR%. Wipes the phone.
 call :CONFIRM "Continue?" || exit /b
 if not exist "%DIR%\flash_all.bat" if not exist "%DIR%\flash_all.sh" (
-    echo flash_all script missing in that folder — get it from spike0en/nothing_flasher, galaga-tetris branch.
+    echo flash_all script missing in that folder - get it from spike0en/nothing_flasher, galaga-tetris branch.
     exit /b
 )
 pushd "%DIR%"
@@ -348,7 +348,7 @@ exit /b
 :PERFPASS
 call :NEEDMODE adb || exit /b
 echo Trims app cache, then force-compiles every app for speed.
-echo This is a plain single pass on Windows — no resume tracking like the .sh version.
+echo This is a plain single pass on Windows - no resume tracking like the .sh version.
 adb shell pm trim-caches 999G
 adb shell cmd package compile -m speed -f -a
 echo Done.
@@ -461,7 +461,7 @@ if not "%EXPECTED%"=="" (
     if /i "%ACTUAL%"=="%EXPECTED%" (
         echo Matches. Safe to flash.
     ) else (
-        echo Does NOT match. Do not flash this file — re-download it.
+        echo Does NOT match. Do not flash this file - re-download it.
     )
 )
 exit /b
