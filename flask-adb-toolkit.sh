@@ -15,11 +15,8 @@ BRED='\033[1;31m'; BGREEN='\033[1;32m'; BYELLOW='\033[1;33m'
 BCYAN='\033[1;36m'; BBLUE='\033[1;34m'; BMAGENTA='\033[1;35m'
 BOLD='\033[1m'; DIM='\033[2m'; RESET='\033[0m'
 
-# ── Device-specific config (CMF Phone 2 Pro / Galaga) ──
-# Edit or delete this block for a different phone.
-BASE=~/Desktop/cmf
-STOCK_NEW="$BASE/Galaga_B4.1-260812-1729"
-STOCK_OLD="$BASE/Galaga_V3.2-250507-1139_3.2"
+# ── Default folder suggestion — not required, just where "Flash ROM" looks first ──
+BASE=~/Desktop/flashing
 
 set -uo pipefail
 PS3="> "
@@ -407,10 +404,11 @@ flash_rom(){
 
 restore_stock(){
   need_mode fastboot || return
-  local dir="$1"
+  read -rp "Full path to the stock firmware folder: " dir
+  [[ -d "$dir" ]] || { echo -e "${RED}Folder not found: $dir${RESET}"; return; }
   echo -e "${CYAN}Steps: run flash_all.sh, wipe data, flash both slots, boot to stock.${RESET}"
   confirm "Restores stock from $(basename "$dir"). Wipes the phone." || return
-  [[ -f "$dir/flash_all.sh" ]] || { echo -e "${RED}flash_all.sh missing — get it from spike0en/nothing_flasher (galaga-tetris branch)${RESET}"; return; }
+  [[ -f "$dir/flash_all.sh" ]] || { echo -e "${RED}No flash_all.sh in that folder. This expects the layout your device's stock-firmware archive uses (for Nothing/CMF phones: spike0en/nothing_flasher, galaga-tetris branch).${RESET}"; return; }
   (cd "$dir" && bash flash_all.sh)
 }
 
@@ -544,8 +542,7 @@ bootloader_menu(){
     line
     echo -e "${DIM}ROM folders under $BASE:${RESET}"
     echo -e "7) 📦 Flash ROM ${DIM}(auto-detects boot/dtbo/init_boot/vbmeta/vendor_boot)${RESET}"
-    echo -e "8) ⏮  Restore stock — newest (B4.1)"
-    echo -e "9) ⏮  Restore stock — older (V3.2)"
+    echo -e "8) ⏮  Restore stock firmware ${DIM}(pick any folder with a flash_all.sh)${RESET}"
     line
     echo -e "0) Back"
     echo
@@ -558,8 +555,7 @@ bootloader_menu(){
       5) reboot_fastbootd ;;
       6) show_fastboot_vars ;;
       7) flash_rom ;;
-      8) restore_stock "$STOCK_NEW" ;;
-      9) restore_stock "$STOCK_OLD" ;;
+      8) restore_stock ;;
       0) return ;;
       *) echo -e "${RED}Unknown option${RESET}" ;;
     esac
