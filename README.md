@@ -13,18 +13,18 @@
 
 **Flask-ADB-toolkit** is a colorful, menu-driven terminal program that wraps all the scary `fastboot` / `adb` commands into friendly numbered options.
 
-No memorizing commands.
-No copy-pasting from random forum posts at 2 AM.
+No memorizing commands.  
+No copy-pasting from random forum posts at 2 AM.  
 Just plug in your phone, launch the script, and pick what you want from a menu. 🎮
 
 It was built for people who **know nothing about custom ROMs, vendor images, or flashing** — but want to try anyway.
 
 ## 🌱 The story (why this exists)
 
-> This started as a fun personal project because **I had an issue** — flashing my phone meant juggling long, cryptic fastboot commands, and one wrong move could brick the thing.
-> So I thought: *why not put everything in one flask — like a lab flask 🧪 — and just… pour?*
+> This started as a fun personal project because **I had an issue** — flashing my phone meant juggling long, cryptic fastboot commands, and one wrong move could brick the thing.  
+> So I thought: *why not put everything in one flask — like a lab flask 🧪 — and just… pour?*  
 >
-> What began as a tiny menu for my own CMF Phone 2 Pro grew into a full toolkit: auto-detected ROM flashing, a generic partition flasher for *any* Android device, recovery/sideload helpers, a checksum verifier, deep-clean junk hunting, a resumable "performance pass," screenshots, APK installs and more.
+> What began as a tiny menu for my own CMF Phone 2 Pro grew into a full toolkit: auto-detected ROM flashing, a generic partition flasher for *any* Android device, recovery/sideload helpers, a checksum verifier, deep-clean junk hunting, a resumable "performance pass," screenshots, APK installs and more.  
 >
 > It's a little rough around the edges, made for fun — but it works, and it might save someone else from the same headache. 🍻
 
@@ -42,7 +42,7 @@ It was built for people who **know nothing about custom ROMs, vendor images, or 
 | Option | What it does |
 | ------ | ------------ |
 | 🔓 Unlock bootloader | Guided unlock (with warnings!) |
-| ⚡ Flash any partition | boot, init\_boot, recovery, vendor\_boot, dtbo, vbmeta, vbmeta\_system, system, vendor, product, super, userdata… or type your own — **works on any device** |
+| ⚡ Flash any partition | boot, init_boot, recovery, vendor_boot, dtbo, vbmeta, vbmeta_system, system, vendor, product, super, userdata… or type your own — **works on any device** |
 | 🔄 Switch active slot | A/B slot switching |
 | 🧹 Erase a partition | cache, userdata, metadata… (with warnings) |
 | 🛠️ Reboot to fastbootd | For logical-partition operations |
@@ -114,7 +114,7 @@ Windows does **not** include `adb` / `fastboot`. You must download Google's plat
 
 This is the #1 "why isn't my phone showing up?" moment, so let's get it out of the way — with a pun, as is tradition:
 
-> **Enable USB debugging, and tap "Allow" on the USB debugging prompt.** Otherwise your phone and your computer are basically a bad first date: both showed up, nobody said hello, and they spend the whole evening pretending they can't see each other. 💔
+> **Enable USB debugging, and tap "Allow" on the USB debugging prompt.** Otherwise your phone and your computer are basically a bad first date: both showed up, nobody said hello, and they spend the whole evening pretending they can't see each other. 💔  
 >
 > USB debugging is your phone's way of saying *"new phone, who dis?"* — and tapping **Allow** is how it saves your PC's number. Skip either one and the toolkit will sit there saying "not connected" while your phone is literally plugged in. Awkward. Very "it's not you, it's USB." 🔌🙃
 
@@ -166,7 +166,7 @@ Windows does not ship `adb` or `fastboot`. You download them once, then double-c
 
 ### Step-by-step
 
-1. Download **platform-tools** from Google and unzip it.
+1. Download **platform-tools** from Google and unzip it.  
    You should have a folder named `platform-tools` with `adb.exe` and `fastboot.exe` inside.
 
 2. Download `flask-adb-toolkit.bat` from this repo.
@@ -192,7 +192,7 @@ Windows does not ship `adb` or `fastboot`. You download them once, then double-c
        fastboot.exe
    ```
 
-4. Double-click `flask-adb-toolkit.bat`.
+4. Double-click `flask-adb-toolkit.bat`.  
    It searches those locations (and PATH) automatically. If tools are found, the menu opens. If not, it prints exactly what is missing.
 
 5. Enable **USB debugging** on the phone, plug it in, tap **Allow** on the prompt, then use the numbered menu.
@@ -227,8 +227,11 @@ For the full visual `.sh` experience on Windows:
 
 **Remove the toolkit:**
 
-- Linux / macOS / WSL:
-  `rm -f ~/flask-adb-toolkit.sh ~/.flask-adb-compile-progress*`
+- Linux / macOS / WSL / fish:
+  ```bash
+  rm -f ~/flask-adb-toolkit.sh
+  find ~ -maxdepth 1 -name '.flask-adb-compile-progress*' -delete
+  ```
 - Windows: delete `flask-adb-toolkit.bat`
 
 Screenshots taken through the toolkit are saved in your **Downloads** folder (`~/Downloads` or `%USERPROFILE%\Downloads` on Windows).
@@ -243,7 +246,7 @@ Screenshots taken through the toolkit are saved in your **Downloads** folder (`~
 
 ## ⚠️ Disclaimer
 
-Flashing can erase data and brick your device if misused.
+Flashing can erase data and brick your device if misused.  
 This tool asks you to type `YES` before anything dangerous — but **you** are still the one pressing the buttons.
 
 - Not responsible for lost data, bricked phones, or voided warranties
@@ -261,7 +264,7 @@ This tool asks you to type `YES` before anything dangerous — but **you** are s
 
 ## 🤝 Contributing
 
-Found a bug? Got a device profile to add?
+Found a bug? Got a device profile to add?  
 PRs and issues are welcome. Keep it friendly — this is a fun project. 🍪
 
 ## 📜 License
@@ -271,3 +274,4 @@ PRs and issues are welcome. Keep it friendly — this is a fun project. 🍪
 ---
 
 *Made with 💚, one frustrated evening, and an unhealthy love of terminal colors.*
+```
