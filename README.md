@@ -1,7 +1,3 @@
--- > **Note:** This project has moved to Codeberg. You can find the new repository at [https://codeberg.org/dedsect/Flask-ADB-toolkit](https://codeberg.org/dedsect/Flask-ADB-toolkit). --
-
-
-
 # ⚗️⚡ Flask-ADB-toolkit
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
