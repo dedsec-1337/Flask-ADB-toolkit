@@ -25,7 +25,7 @@ Changed
 - Windows performance pass now tells you the android.auto_generated_rro_* failure lines are harmless.
 
 [1.2] - Skipped
-(Too many errors. Not worth the bandwidth.)
+(Too many errors. Not worth the bandwidth.) actually i lost the file!! :(
 
 [1.1] - 2026-09-30
 
