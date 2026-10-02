@@ -829,7 +829,8 @@ body.custom-cursor.cursor-on .cursor,body.custom-cursor.cursor-on .cursor-ring{o
           <span>Copy</span>
         </button>
       </div>
-      <div class="terminal-body"><span class="prompt">❯</span> rm -f ~/flask-adb-toolkit.sh ~/.flask-adb-compile-progress*</div>
+      <div class="terminal-body"><span class="prompt">❯</span> rm -f ~/flask-adb-toolkit.sh
+<span class="prompt">❯</span> find ~ -maxdepth 1 -name '.flask-adb-compile-progress*' -delete</div>
     </div>
 
     <p class="step-hint" style="margin-top:1rem;padding-top:0.75rem;border-top:1px solid var(--white-10)">
@@ -1162,7 +1163,7 @@ body.custom-cursor.cursor-on .cursor,body.custom-cursor.cursor-on .cursor-ring{o
 
     if (type === 'command') copyText(currentOsCommand, btn);
     else if (type === 'uninstall') copyText(currentUninstallCommand, btn);
-    else if (type === 'cleanup') copyText('rm -f ~/flask-adb-toolkit.sh ~/.flask-adb-compile-progress*', btn);
+    else if (type === 'cleanup') copyText('rm -f ~/flask-adb-toolkit.sh\nfind ~ -maxdepth 1 -name \'.flask-adb-compile-progress*\' -delete', btn);
     else if (type === 'nano') copyText('nano ~/flask-adb-toolkit.sh', btn);
     else if (type === 'run') copyText('chmod +x ~/flask-adb-toolkit.sh\n~/flask-adb-toolkit.sh', btn);
   });
