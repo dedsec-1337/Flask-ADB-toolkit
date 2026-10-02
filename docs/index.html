@@ -9,8 +9,16 @@
 <meta property="og:description" content="One little flask — every flashing tool you'll ever need.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://dedsec-1337.github.io/Flask-ADB-toolkit/">
+<meta property="og:site_name" content="Flask-ADB-toolkit">
+<meta property="og:image" content="https://dedsec-1337.github.io/Flask-ADB-toolkit/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Flask-ADB-toolkit: one little flask, every flashing tool you will ever need">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://dedsec-1337.github.io/Flask-ADB-toolkit/og-image.png">
+<meta name="color-scheme" content="dark">
 <link rel="canonical" href="https://dedsec-1337.github.io/Flask-ADB-toolkit/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23000'/%3E%3Cpath d='M36 6 14 36h14l-4 22 26-34H36z' fill='%23fff'/%3E%3C/svg%3E">
 <title>Flask-ADB-toolkit</title>
 <script type="application/ld+json">
 {
@@ -40,7 +48,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=JetBrains+Mono:wght@400&family=Unbounded:wght@700;800;900&family=Barlow+Condensed:wght@600&display=swap" rel="stylesheet">
 
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -468,9 +476,139 @@ body.custom-cursor * { cursor: none !important; }
   }
   .reveal { opacity: 1; transform: none; }
 }
+
+/* ===== Y2K / futuristic layer ===== */
+:root{
+  --bg:#000000;--ink:#000000;--blue:#666;--blue-hi:#b3b3b3;--red:#ffffff;
+  --accent:#ffffff;--accent-green:#ffffff;
+  --glass-bg:rgba(0,0,0,.9);--glass-border:rgba(255,255,255,.22);
+  --terminal-bg:#050505;--terminal-border:rgba(255,255,255,.18);--terminal-header:#0d0d0d;
+  --radius:3px;--font-display:'Unbounded','Inter',sans-serif;--font-cond:'Barlow Condensed','Arial Narrow',sans-serif;
+}
+body{background-color:var(--bg);background-image:none}
+::selection{background:var(--red);color:var(--ink)}
+:focus-visible{outline:2px solid var(--red);outline-offset:3px}
+body::before{content:"";position:fixed;inset:0;z-index:9990;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 3px)}
+body::after{content:"";position:fixed;inset:-50%;z-index:9991;pointer-events:none;opacity:.06;animation:grain .9s steps(6) infinite;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+@keyframes grain{0%{transform:translate(0,0)}20%{transform:translate(-6%,4%)}40%{transform:translate(5%,-7%)}60%{transform:translate(-4%,-3%)}80%{transform:translate(7%,6%)}100%{transform:translate(0,0)}}
+@keyframes blink{50%{opacity:0}}
+body.custom-cursor .cursor{background:#fff}
+body.custom-cursor .cursor-ring{border:1px solid rgba(255,255,255,.5);border-radius:0}
+
+.nav{border-bottom:1px solid var(--blue);background:rgba(0,0,0,.78)}
+.nav-logo{font-family:var(--font-display);font-weight:900;font-size:.9rem;letter-spacing:-.03em}
+.nav-links a{font-family:var(--font-cond);font-size:1.05rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.nav-links .nav-cta,.nav-mobile-menu .nav-cta{border:1px solid var(--red);background:transparent;color:var(--red);border-radius:999px}
+.nav-links .nav-cta:hover{background:var(--red);color:var(--ink)}
+.nav-mobile-menu{background:rgba(0,0,0,.95);border-bottom:1px solid var(--blue)}
+
+.hero::before{content:"";position:absolute;inset:0;pointer-events:none;background:none}
+.hero-content{position:relative}
+.hero-title{font-family:var(--font-display);font-weight:900;font-size:clamp(3.2rem,20vw,10rem);letter-spacing:-.045em;line-height:.98;margin-bottom:1.4rem;
+  background:linear-gradient(105deg,transparent 42%,rgba(255,255,255,.95) 50%,transparent 58%) 0 0/250% 100% no-repeat,linear-gradient(180deg,#fff 0%,#e6e6e6 36%,#6b6b6b 49%,#f5f5f5 51%,#a8a8a8 76%,#fff 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;
+  filter:none;animation:sheen 4.5s ease-in-out infinite}
+.hero-title span{display:block}
+.hero-title.glitch{animation:sheen 4.5s ease-in-out infinite,jitter .24s steps(2) 1}
+@keyframes sheen{0%,40%{background-position:100% 0,0 0}85%,100%{background-position:0% 0,0 0}}
+@keyframes jitter{0%{transform:translate(0)}25%{transform:translate(-5px,1px);filter:drop-shadow(5px 0 #fff) drop-shadow(-5px 0 #666)}50%{transform:translate(6px,-1px);filter:drop-shadow(-5px 0 #fff) drop-shadow(5px 0 #666)}75%{transform:translate(-2px,0)}100%{transform:none}}
+.hero-desc{color:#a3a3a3;max-width:36rem;margin:0 auto 1rem}
+.hero-status{font:400 .85rem/1.4 var(--font-mono);color:var(--blue-hi);min-height:1.4em;margin:0 auto 1.8rem}
+.hero-status .prompt{color:var(--red)}
+#hero-status::after{content:"\258C";margin-left:2px;color:var(--red);animation:blink 1s steps(1) infinite}
+
+.star{position:absolute;top:-3.4rem;right:-.2rem;width:6rem;height:6rem;display:grid;place-content:center;text-align:center;color:var(--ink);font-family:var(--font-display);font-weight:900;font-size:1.05rem;line-height:1;transform:rotate(12deg);z-index:2}
+.star>*{position:relative}
+.star::before{content:"";position:absolute;inset:0;background:var(--red);animation:spin 14s linear infinite;clip-path:polygon(50% 0,60% 18%,80% 7%,78% 29%,100% 30%,86% 47%,100% 62%,78% 66%,82% 90%,60% 82%,50% 100%,40% 82%,18% 90%,22% 66%,0 62%,14% 47%,0 30%,22% 29%,20% 7%,40% 18%)}
+.star small{display:block;font:600 .8rem var(--font-cond);letter-spacing:.08em;text-transform:uppercase;margin-top:.2rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.hud{position:absolute;z-index:11;font:600 .8rem/1.3 var(--font-cond);letter-spacing:.08em;text-transform:uppercase;color:var(--blue-hi)}
+.hud b{color:#fff;font-weight:600}
+.hud-tl{top:5rem;left:1.1rem}.hud-tr{top:5rem;right:1.1rem;text-align:right}
+.hud-bl{bottom:1.4rem;left:1.1rem}.hud-br{bottom:1.4rem;right:1.1rem;text-align:right}
+.hud .live::before{content:"";display:inline-block;width:.5rem;height:.5rem;border-radius:50%;background:var(--red);margin-right:.4rem;animation:blink 1.2s steps(1) infinite}
+.barcode{width:6.5rem;height:2rem;margin-bottom:.3rem;background:repeating-linear-gradient(90deg,#fff 0 2px,transparent 2px 4px,#fff 4px 5px,transparent 5px 8px,#fff 8px 11px,transparent 11px 12px,#fff 12px 13px,transparent 13px 16px)}
+@media(max-width:639px){.hud-tl{display:none}}
+@media(max-height:700px){.hud-bl,.hud-br{display:none}}
+@media(min-width:900px){.star{top:-2.6rem;right:-3.2rem;width:8.5rem;height:8.5rem;font-size:1.5rem}.hud{font-size:.9rem}.hud-tl,.hud-bl{left:2rem}.hud-tr,.hud-br{right:2rem}.hud-tl,.hud-tr{top:5.8rem}}
+
+.ticker{position:relative;z-index:12;overflow:hidden;background:var(--red);color:var(--ink);transform:rotate(-1.4deg);width:104%;margin:0 -2% 1rem;border-block:2px solid var(--ink);box-shadow:none}
+.ticker-track{display:flex;width:max-content;animation:marquee 28s linear infinite}
+.ticker span{font:900 1.05rem/1 var(--font-display);letter-spacing:-.02em;padding:.8rem 1.4rem;white-space:nowrap}
+.ticker:hover .ticker-track{animation-play-state:paused}
+@keyframes marquee{to{transform:translateX(-50%)}}
+
+.section-title{font-family:var(--font-display);font-weight:800;letter-spacing:-.04em}
+.section-title::before{content:"[ ";color:var(--red)}
+.section-title::after{content:" ]";color:var(--red)}
+.section-desc{color:#8a8a8a}
+
+.feature-card,.step{position:relative;border:1px solid var(--glass-border);border-radius:var(--radius);background:linear-gradient(155deg,rgba(255,255,255,.05),rgba(0,0,0,.72) 55%)}
+.feature-card.reveal,.step.reveal{transition:opacity .8s cubic-bezier(.4,0,.2,1),transform .8s cubic-bezier(.4,0,.2,1),border-color .25s,box-shadow .25s}
+.feature-card::before,.feature-card::after{content:"";position:absolute;width:14px;height:14px;border:2px solid var(--red);transition:width .25s,height .25s}
+.feature-card::before{top:-1px;left:-1px;border-right:0;border-bottom:0}
+.feature-card::after{right:-1px;bottom:-1px;border-left:0;border-top:0}
+.feature-card:hover{border-color:var(--blue-hi);box-shadow:none}
+.feature-card:hover::before,.feature-card:hover::after{width:30px;height:30px}
+.step:hover{border-color:var(--blue-hi)}
+.feature-title,.step-title{font-family:var(--font-display);font-weight:700;letter-spacing:-.03em}
+.feature-title{font-size:1rem}
+.feature-card:first-child{background:#f2f2f2;border-color:#fff}
+.feature-card:first-child .feature-title,.feature-card:first-child .feature-desc{color:var(--ink)}
+.feature-card:first-child code{background:var(--ink);color:var(--red)}
+.feature-card:first-child::before,.feature-card:first-child::after{border-color:var(--ink)}
+
+.btn{border-radius:999px;font-family:var(--font-cond);font-weight:600;font-size:1.05rem;letter-spacing:.06em;text-transform:uppercase}
+.btn-primary{background:linear-gradient(180deg,#fff 0%,#e6e6e6 46%,#9a9a9a 54%,#e0e0e0 100%);border:1px solid #fff;color:var(--ink);box-shadow:0 0 0 3px rgba(255,255,255,.18),inset 0 2px 0 #fff}
+.btn-primary:hover{background:var(--red);border-color:var(--red);color:var(--ink);box-shadow:0 0 0 3px rgba(255,255,255,.25)}
+.btn-ghost{border:1px solid var(--blue);color:var(--blue-hi)}
+.btn-ghost:hover{border-color:var(--red);color:var(--red);background:rgba(255,255,255,.06)}
+.os-tab{border-radius:999px;border:1px solid var(--glass-border);font-family:var(--font-cond);font-size:.95rem;letter-spacing:.05em}
+.os-tab:hover{color:var(--red);background:transparent}
+.os-tab.active{background:var(--red);border-color:var(--red);color:var(--ink)}
+.script-btn{border:1px solid var(--blue);background:rgba(255,255,255,.06);font-family:var(--font-cond);font-size:.95rem;letter-spacing:.05em;text-transform:uppercase}
+.script-btn:hover{background:var(--red);color:var(--ink);border-color:var(--red)}
+
+.terminal{border:1px solid var(--blue);border-radius:2px;box-shadow:5px 5px 0 rgba(255,255,255,.16)}
+.terminal-label{font-family:var(--font-cond);font-size:.85rem;letter-spacing:.06em;color:var(--blue-hi)}
+.prompt{color:var(--red)}
+#os-command::after,#uninstall-command::after{content:"\258C";color:var(--red);animation:blink 1s steps(1) infinite}
+.footer{border-top:1px dashed var(--blue)}
+.footer a:hover{color:var(--red)}
+.nav-links .nav-cta:hover,.btn-primary:hover,.os-tab.active,.script-btn:hover,.ticker,.star{color:#000}
+
+/* ===== launch pass ===== */
+:root{--text-muted:#a3a3a3;--text-dim:#8c8c8c;--text-fade:#7a7a7a;color-scheme:dark}
+html{background:#000}
+.hero{min-height:100vh;min-height:100svh}
+.terminal-dot{border:1px solid rgba(255,255,255,.35)}
+.dot-red{background:#e5e5e5}.dot-yellow{background:#8c8c8c}.dot-green{background:#4a4a4a}
+.nav-mobile-btn{padding:.6rem;margin:-.4rem}
+.nav-mobile-menu{visibility:hidden;transition:transform .3s ease,opacity .3s ease,visibility 0s .3s}
+.nav-mobile-menu.open{visibility:visible;transition-delay:0s}
+.copy-btn{min-height:2rem;padding:.25rem .5rem}
+.feature-card,.step{-webkit-backdrop-filter:none;backdrop-filter:none}
+.reveal.active{will-change:auto}
+.step-hint a,.footer a{text-decoration:underline;text-underline-offset:3px}
+.section[tabindex="-1"]:focus,#main:focus{outline:none}
+.ticker-wrap{position:relative;z-index:12;overflow:hidden;padding:1.4rem 0}
+.ticker{margin:0 -2%}
+.tg{display:flex;flex:none}
+.ticker-track{will-change:transform}
+.section-title::before{content:"[ " / ""}
+.section-title::after{content:" ]" / ""}
+#os-command::after,#uninstall-command::after{content:"\258C" / ""}
+body.custom-cursor .cursor,body.custom-cursor .cursor-ring{opacity:0}
+body.custom-cursor.cursor-on .cursor,body.custom-cursor.cursor-on .cursor-ring{opacity:1}
+@media(max-width:899px){.star{top:-2.6rem;width:4.8rem;height:4.8rem;font-size:.9rem}}
+@media(max-height:600px){.hud{display:none}}
+@media(pointer:coarse){body::after{animation:none}}
 </style>
 </head>
 <body>
+<noscript><style>.reveal{opacity:1!important;transform:none!important}</style></noscript>
 
 <a href="#main" class="skip-link">Skip to content</a>
 
@@ -506,18 +644,26 @@ body.custom-cursor * { cursor: none !important; }
 <main id="main">
 
 <header class="hero">
+  <div class="hud hud-tl" aria-hidden="true"><b>Flask/ADB</b><br>sys 1.3</div>
+  <div class="hud hud-tr" aria-hidden="true"><span class="live"><b id="hud-clock">00:00:00</b></span><br>adb online</div>
+  <div class="hud hud-bl" aria-hidden="true"><div class="barcode"></div>0001 / 1337</div>
+  <div class="hud hud-br" aria-hidden="true">MIT licence<br><b>open source</b></div>
   <div class="hero-content">
-    <h1 class="hero-title">Flask-ADB-toolkit</h1>
+    <div class="star" aria-hidden="true"><b>v1.3</b></div>
+    <h1 class="hero-title" aria-label="Flask-ADB-toolkit"><span>Flask</span></h1>
     <p class="hero-desc">
       One little flask — every flashing tool you'll ever need. Auto-detecting ROM flasher,
       generic partition tools for any Android device, and a checksum verifier, all in one friendly terminal menu.
     </p>
+    <p class="hero-status" aria-hidden="true"><span class="prompt">❯</span> <span id="hero-status"></span></p>
     <div class="hero-actions">
       <a href="#quickstart" class="btn btn-primary">Get Started</a>
       <a href="https://github.com/dedsec-1337/Flask-ADB-toolkit" target="_blank" rel="noopener" class="btn btn-ghost">View Source</a>
     </div>
   </div>
 </header>
+
+<div class="ticker-wrap" aria-hidden="true"><div class="ticker"><div class="ticker-track"><div class="tg"><span>BOOT ✦ INIT_BOOT ✦ VBMETA ✦ DTBO ✦ VENDOR_BOOT ✦ SUPER ✦ RECOVERY ✦ SIDELOAD ✦</span><span>BOOT ✦ INIT_BOOT ✦ VBMETA ✦ DTBO ✦ VENDOR_BOOT ✦ SUPER ✦ RECOVERY ✦ SIDELOAD ✦</span><span>BOOT ✦ INIT_BOOT ✦ VBMETA ✦ DTBO ✦ VENDOR_BOOT ✦ SUPER ✦ RECOVERY ✦ SIDELOAD ✦</span></div><div class="tg"><span>BOOT ✦ INIT_BOOT ✦ VBMETA ✦ DTBO ✦ VENDOR_BOOT ✦ SUPER ✦ RECOVERY ✦ SIDELOAD ✦</span><span>BOOT ✦ INIT_BOOT ✦ VBMETA ✦ DTBO ✦ VENDOR_BOOT ✦ SUPER ✦ RECOVERY ✦ SIDELOAD ✦</span><span>BOOT ✦ INIT_BOOT ✦ VBMETA ✦ DTBO ✦ VENDOR_BOOT ✦ SUPER ✦ RECOVERY ✦ SIDELOAD ✦</span></div></div></div></div>
 
 <section id="features" class="section" aria-labelledby="features-title">
   <div class="section-header reveal">
@@ -568,11 +714,11 @@ body.custom-cursor * { cursor: none !important; }
     <h3 class="step-title">1. Install Android Tools</h3>
     <p class="step-desc">You need <code>adb</code> and <code>fastboot</code> installed on your system.</p>
 
-    <div class="os-tabs" id="os-tabs" role="tablist" aria-label="Operating system">
-      <button class="os-tab active" data-os="debian" role="tab" aria-selected="true">Ubuntu / Debian</button>
-      <button class="os-tab" data-os="arch" role="tab" aria-selected="false">Arch Linux</button>
-      <button class="os-tab" data-os="fedora" role="tab" aria-selected="false">Fedora</button>
-      <button class="os-tab" data-os="mac" role="tab" aria-selected="false">macOS</button>
+    <div class="os-tabs" id="os-tabs" role="group" aria-label="Operating system">
+      <button class="os-tab active" data-os="debian" aria-pressed="true">Ubuntu / Debian</button>
+      <button class="os-tab" data-os="arch" aria-pressed="false">Arch Linux</button>
+      <button class="os-tab" data-os="fedora" aria-pressed="false">Fedora</button>
+      <button class="os-tab" data-os="mac" aria-pressed="false">macOS</button>
     </div>
 
     <div class="terminal">
@@ -614,9 +760,8 @@ body.custom-cursor * { cursor: none !important; }
     </div>
     <p class="step-hint">(Paste the script below, then press <code>Ctrl+O</code>, <code>Enter</code>, and <code>Ctrl+X</code> to save and exit)</p>
 
-    <p class="step-subtitle">Option B: Use the buttons below</p>
+    <p class="step-subtitle">Option B: Download the script</p>
     <div class="script-actions">
-      <button class="script-btn" data-copy="script">Copy Full Script</button>
       <button class="script-btn" id="download-btn">Download .sh</button>
     </div>
 
@@ -628,10 +773,6 @@ body.custom-cursor * { cursor: none !important; }
           <div class="terminal-dot dot-green"></div>
         </div>
         <span class="terminal-label">flask-adb-toolkit.sh</span>
-        <button class="copy-btn" data-copy="script" aria-label="Copy full script">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-          <span>Copy</span>
-        </button>
       </div>
       <div class="terminal-body max-h" id="script-content"><code>Loading script from GitHub...</code></div>
     </div>
@@ -688,8 +829,7 @@ body.custom-cursor * { cursor: none !important; }
           <span>Copy</span>
         </button>
       </div>
-      <div class="terminal-body"><span class="prompt">❯</span> rm -f ~/flask-adb-toolkit.sh
-<span class="prompt">❯</span> find ~ -maxdepth 1 -name '.flask-adb-compile-progress*' -delete</div>
+      <div class="terminal-body"><span class="prompt">❯</span> rm -f ~/flask-adb-toolkit.sh ~/.flask-adb-compile-progress*</div>
     </div>
 
     <p class="step-hint" style="margin-top:1rem;padding-top:0.75rem;border-top:1px solid var(--white-10)">
@@ -702,11 +842,11 @@ body.custom-cursor * { cursor: none !important; }
     <h3 class="step-title">2. Remove adb &amp; fastboot (optional)</h3>
     <p class="step-desc">If you installed platform-tools just for this toolkit and want the disk space back:</p>
 
-    <div class="os-tabs" id="uninstall-tabs" role="tablist" aria-label="Operating system">
-      <button class="os-tab active" data-uninstall-os="debian" role="tab" aria-selected="true">Ubuntu / Debian</button>
-      <button class="os-tab" data-uninstall-os="arch" role="tab" aria-selected="false">Arch Linux</button>
-      <button class="os-tab" data-uninstall-os="fedora" role="tab" aria-selected="false">Fedora</button>
-      <button class="os-tab" data-uninstall-os="mac" role="tab" aria-selected="false">macOS</button>
+    <div class="os-tabs" id="uninstall-tabs" role="group" aria-label="Operating system">
+      <button class="os-tab active" data-uninstall-os="debian" aria-pressed="true">Ubuntu / Debian</button>
+      <button class="os-tab" data-uninstall-os="arch" aria-pressed="false">Arch Linux</button>
+      <button class="os-tab" data-uninstall-os="fedora" aria-pressed="false">Fedora</button>
+      <button class="os-tab" data-uninstall-os="mac" aria-pressed="false">macOS</button>
     </div>
 
     <div class="terminal">
@@ -736,7 +876,7 @@ body.custom-cursor * { cursor: none !important; }
 
 <footer class="footer">
   <p>Built by <a href="https://github.com/dedsec-1337" target="_blank" rel="noopener">dedsec-1337</a> · <a href="https://github.com/dedsec-1337/Flask-ADB-toolkit" target="_blank" rel="noopener">Source</a> · MIT</p>
-  <p class="footer-meta">Updated September 2026 · Hosted on GitHub Pages</p>
+  <p class="footer-meta">Updated October 2026 · Hosted on GitHub Pages</p>
 </footer>
 
 <script>
@@ -812,20 +952,22 @@ body.custom-cursor * { cursor: none !important; }
     const cursorRing = $('cursor-ring');
     let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
     let dotScale = 1, ringScale = 1;
+    let cursorOn = false;
 
     const applyDot = () => {
-      cursor.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) scale(${dotScale})`;
+      cursor.style.transform = `translate3d(${mouseX - 4}px, ${mouseY - 4}px, 0) scale(${dotScale})`;
     };
 
     document.addEventListener('mousemove', (e) => {
       mouseX = e.clientX;
       mouseY = e.clientY;
+      if (!cursorOn) { cursorOn = true; document.body.classList.add('cursor-on'); }
       applyDot();
     }, { passive: true });
 
     const followRing = () => {
-      ringX += (mouseX - ringX - 16) * 0.18;
-      ringY += (mouseY - ringY - 16) * 0.18;
+      ringX += (mouseX - ringX - 20) * 0.18;
+      ringY += (mouseY - ringY - 20) * 0.18;
       cursorRing.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) scale(${ringScale})`;
       requestAnimationFrame(followRing);
     };
@@ -843,15 +985,15 @@ body.custom-cursor * { cursor: none !important; }
     let width, height, columns, yPositions;
     const drawFontSize = 7;
     let lastFrame = 0;
-    const FRAME_INTERVAL = 50;
+    const FRAME_INTERVAL = window.matchMedia('(pointer: coarse)').matches ? 90 : 50;
     let visible = true;
 
     const CHARS = 'アィウェオカキクケコサシスセソタチツタトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF';
     const DEDSEC_WORDS = ['DEDSEC', 'HACK', 'CTOS', '0101', '1337'];
 
     const COLOR_WHITE  = '#f5f5f5';
-    const COLOR_BLOOD  = '#b91c1c';
-    const COLOR_GLITCH = '#86efac';
+    const COLOR_DIM    = '#6b6b6b';
+    const COLOR_GLITCH = '#ffffff';
 
     function setupCanvas() {
       width  = canvas.width  = Math.ceil(window.innerWidth  * SCALE);
@@ -869,7 +1011,7 @@ body.custom-cursor * { cursor: none !important; }
       ctx.fillRect(0, 0, width, height);
 
       if (Math.random() > 0.996) {
-        ctx.fillStyle = 'rgba(134, 239, 172, 0.035)';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.035)';
         ctx.fillRect(0, 0, width, height);
       }
 
@@ -883,7 +1025,7 @@ body.custom-cursor * { cursor: none !important; }
 
         const roll = Math.random();
         ctx.fillStyle = roll > 0.97  ? COLOR_GLITCH
-                      : roll > 0.78  ? COLOR_BLOOD
+                      : roll > 0.78  ? COLOR_DIM
                       : COLOR_WHITE;
 
         ctx.fillText(text, i * drawFontSize, yPositions[i] * drawFontSize);
@@ -901,7 +1043,9 @@ body.custom-cursor * { cursor: none !important; }
     let resizeTimer;
     window.addEventListener('resize', () => {
       clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(setupCanvas, 150);
+      resizeTimer = setTimeout(() => {
+        if (Math.abs(window.innerWidth * SCALE - width) > 1 || window.innerHeight * SCALE > height) setupCanvas();
+      }, 150);
     }, { passive: true });
 
     document.addEventListener('visibilitychange', () => {
@@ -917,6 +1061,8 @@ body.custom-cursor * { cursor: none !important; }
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add('active');
+          const t = entry.target;
+          setTimeout(() => { t.style.transitionDelay = ''; }, 1300);
           observer.unobserve(entry.target);
         }
       });
@@ -939,10 +1085,10 @@ body.custom-cursor * { cursor: none !important; }
     tab.addEventListener('click', () => {
       document.querySelectorAll('#os-tabs .os-tab').forEach(t => {
         t.classList.remove('active');
-        t.setAttribute('aria-selected', 'false');
+        t.setAttribute('aria-pressed', 'false');
       });
       tab.classList.add('active');
-      tab.setAttribute('aria-selected', 'true');
+      tab.setAttribute('aria-pressed', 'true');
 
       const os = tab.dataset.os;
       currentOsCommand = OS_COMMANDS[os];
@@ -963,10 +1109,10 @@ body.custom-cursor * { cursor: none !important; }
     tab.addEventListener('click', () => {
       document.querySelectorAll('#uninstall-tabs .os-tab').forEach(t => {
         t.classList.remove('active');
-        t.setAttribute('aria-selected', 'false');
+        t.setAttribute('aria-pressed', 'false');
       });
       tab.classList.add('active');
-      tab.setAttribute('aria-selected', 'true');
+      tab.setAttribute('aria-pressed', 'true');
 
       const os = tab.dataset.uninstallOs;
       currentUninstallCommand = UNINSTALL_COMMANDS[os];
@@ -975,14 +1121,16 @@ body.custom-cursor * { cursor: none !important; }
     });
   });
 
-  const copyFeedback = (btn) => {
+  const copyFeedback = (btn, msg = 'Copied!') => {
     const label = btn.querySelector('span') || btn;
-    const original = label.textContent;
-    label.textContent = 'Copied!';
+    if (!btn.dataset.orig) btn.dataset.orig = label.textContent;
+    label.textContent = msg;
     btn.classList.add('copied');
-    setTimeout(() => {
-      label.textContent = original;
+    clearTimeout(btn._t);
+    btn._t = setTimeout(() => {
+      label.textContent = btn.dataset.orig;
       btn.classList.remove('copied');
+      delete btn.dataset.orig;
     }, 2000);
   };
 
@@ -1003,6 +1151,7 @@ body.custom-cursor * { cursor: none !important; }
       copyFeedback(btn);
     } catch (err) {
       console.error('Copy failed:', err);
+      copyFeedback(btn, 'Failed');
     }
   };
 
@@ -1013,8 +1162,7 @@ body.custom-cursor * { cursor: none !important; }
 
     if (type === 'command') copyText(currentOsCommand, btn);
     else if (type === 'uninstall') copyText(currentUninstallCommand, btn);
-    else if (type === 'cleanup') copyText('rm -f ~/flask-adb-toolkit.sh\nfind ~ -maxdepth 1 -name \'.flask-adb-compile-progress*\' -delete', btn);
-    else if (type === 'script') copyText(scriptContent.innerText, btn);
+    else if (type === 'cleanup') copyText('rm -f ~/flask-adb-toolkit.sh ~/.flask-adb-compile-progress*', btn);
     else if (type === 'nano') copyText('nano ~/flask-adb-toolkit.sh', btn);
     else if (type === 'run') copyText('chmod +x ~/flask-adb-toolkit.sh\n~/flask-adb-toolkit.sh', btn);
   });
@@ -1031,11 +1179,12 @@ body.custom-cursor * { cursor: none !important; }
       scriptContent.dataset.raw = text;
     })
     .catch(() => {
-      scriptContent.innerHTML = '<code style="color:#f87171">Error loading script. Please view it directly on <a href="https://github.com/dedsec-1337/Flask-ADB-toolkit" target="_blank" rel="noopener" style="text-decoration:underline">GitHub</a>.</code>';
+      scriptContent.innerHTML = '<code style="color:#fff">Error loading script. Please view it directly on <a href="https://github.com/dedsec-1337/Flask-ADB-toolkit" target="_blank" rel="noopener" style="text-decoration:underline">GitHub</a>.</code>';
     });
 
   $('download-btn').addEventListener('click', () => {
-    const content = scriptContent.dataset.raw || scriptContent.innerText;
+    const content = scriptContent.dataset.raw;
+    if (!content) { window.open(SCRIPT_URL, '_blank', 'noopener'); return; }
     const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -1046,6 +1195,52 @@ body.custom-cursor * { cursor: none !important; }
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && mobileMenu.classList.contains('open')) {
+      mobileMenu.classList.remove('open');
+      mobileMenuBtn.setAttribute('aria-expanded', 'false');
+      mobileMenuBtn.focus();
+    }
+  });
+  document.querySelectorAll('.terminal-body').forEach(el => el.setAttribute('tabindex', '0'));
+
+  /* Y2K layer: hud clock, status typewriter, title glitch */
+  const statusEl = $('hero-status');
+  const clockEl = $('hud-clock');
+  const heroTitle = document.querySelector('.hero-title');
+  if (clockEl) {
+    const tick = () => { clockEl.textContent = new Date().toLocaleTimeString('en-GB'); };
+    tick();
+    setInterval(tick, 1000);
+  }
+  if (statusEl) {
+    const LINES = ['adb devices ... 1 device attached', 'fastboot getvar product ... ok', 'vbmeta ... verified', 'ready.'];
+    if (prefersReducedMotion) {
+      statusEl.textContent = LINES[LINES.length - 1];
+    } else {
+      let line = 0, ch = 0;
+      const type = () => {
+        const s = LINES[line];
+        if (ch <= s.length) {
+          statusEl.textContent = s.slice(0, ch++);
+          setTimeout(type, 38);
+        } else {
+          setTimeout(() => { line = (line + 1) % LINES.length; ch = 0; type(); }, 1500);
+        }
+      };
+      type();
+    }
+  }
+  if (heroTitle && !prefersReducedMotion) {
+    const pulse = () => {
+      heroTitle.classList.add('glitch');
+      setTimeout(() => heroTitle.classList.remove('glitch'), 240);
+    };
+    const loop = () => { pulse(); setTimeout(loop, 3500 + Math.random() * 3500); };
+    setTimeout(loop, 2500);
+    heroTitle.addEventListener('mouseenter', pulse);
+  }
 
 })();
 </script>
