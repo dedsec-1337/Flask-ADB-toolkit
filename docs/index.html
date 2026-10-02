@@ -372,6 +372,7 @@ body.custom-cursor * { cursor: none !important; }
   transition: background var(--transition);
 }
 .script-btn:hover { background: var(--white-20); }
+.script-btn.copied { background: rgba(255,255,255,0.28); }
 
 .footer {
   position: relative; z-index: 10;
@@ -760,9 +761,10 @@ body.custom-cursor.cursor-on .cursor,body.custom-cursor.cursor-on .cursor-ring{o
     </div>
     <p class="step-hint">(Paste the script below, then press <code>Ctrl+O</code>, <code>Enter</code>, and <code>Ctrl+X</code> to save and exit)</p>
 
-    <p class="step-subtitle">Option B: Download the script</p>
+    <p class="step-subtitle">Option B: Download or copy the script</p>
     <div class="script-actions">
       <button class="script-btn" id="download-btn">Download .sh</button>
+      <button class="script-btn" id="copy-script-btn" data-copy="script">Copy .sh</button>
     </div>
 
     <div class="terminal">
@@ -773,6 +775,10 @@ body.custom-cursor.cursor-on .cursor,body.custom-cursor.cursor-on .cursor-ring{o
           <div class="terminal-dot dot-green"></div>
         </div>
         <span class="terminal-label">flask-adb-toolkit.sh</span>
+        <button class="copy-btn" data-copy="script" aria-label="Copy script contents">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span>Copy</span>
+        </button>
       </div>
       <div class="terminal-body max-h" id="script-content"><code>Loading script from GitHub...</code></div>
     </div>
@@ -1156,6 +1162,31 @@ body.custom-cursor.cursor-on .cursor,body.custom-cursor.cursor-on .cursor-ring{o
     }
   };
 
+  const SCRIPT_URL = 'https://raw.githubusercontent.com/dedsec-1337/Flask-ADB-toolkit/main/flask-adb-toolkit.sh';
+
+  const getScriptText = () => {
+    const raw = scriptContent.dataset.raw;
+    if (raw) return Promise.resolve(raw);
+    return fetch(SCRIPT_URL)
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch script');
+        return res.text();
+      })
+      .then(text => {
+        scriptContent.dataset.raw = text;
+        return text;
+      });
+  };
+
+  const copyScript = (btn) => {
+    getScriptText()
+      .then(text => copyText(text, btn))
+      .catch(err => {
+        console.error('Copy failed:', err);
+        copyFeedback(btn, 'Failed');
+      });
+  };
+
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('[data-copy]');
     if (!btn) return;
@@ -1163,12 +1194,11 @@ body.custom-cursor.cursor-on .cursor,body.custom-cursor.cursor-on .cursor-ring{o
 
     if (type === 'command') copyText(currentOsCommand, btn);
     else if (type === 'uninstall') copyText(currentUninstallCommand, btn);
+    else if (type === 'script') copyScript(btn);
     else if (type === 'cleanup') copyText('rm -f ~/flask-adb-toolkit.sh\nfind ~ -maxdepth 1 -name \'.flask-adb-compile-progress*\' -delete', btn);
     else if (type === 'nano') copyText('nano ~/flask-adb-toolkit.sh', btn);
     else if (type === 'run') copyText('chmod +x ~/flask-adb-toolkit.sh\n~/flask-adb-toolkit.sh', btn);
   });
-
-  const SCRIPT_URL = 'https://raw.githubusercontent.com/dedsec-1337/Flask-ADB-toolkit/main/flask-adb-toolkit.sh';
 
   fetch(SCRIPT_URL)
     .then(res => {
