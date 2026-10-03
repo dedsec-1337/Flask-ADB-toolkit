@@ -5,7 +5,10 @@
 # images & partitions easy — even for total beginners.
 # https://github.com/dedsec-1337/Flask-ADB-toolkit
 #
-# Version 1.4
+# Version 1.5
+#   • payload.bin support in the ROM flasher (payload-dumper-go)
+#   • PowerShell launcher for Windows (flask-adb-toolkit.ps1 + .bat)
+#   • Auto-detect .sha256 / SHA256SUMS next to ROM zips
 #   • Connection doctor: names the real problem (unauthorized,
 #     offline, no permissions, several phones) and the fix
 #   • Pre-flight check: stops flashing on a locked bootloader
@@ -16,11 +19,6 @@
 #   • Learn mode: show every command, or dry-run
 #   • ROM flasher no longer demands vendor_boot.img and stops
 #     at the first failed step
-#   • 1.4 fixes: dry-run no longer claims to have saved files,
-#     flash_generic also scans ~/Downloads, snapshots use a
-#     readable __ separator, unlock re-reads lock state,
-#     reboot-to-bootloader waits for the device, set_active
-#     fallback, PIPESTATUS split for portability.
 # ══════════════════════════════════════════════════════════════
 
 # ── Needs bash 4+ (macOS ships bash 3.2) ──
@@ -30,7 +28,7 @@ if (( BASH_VERSINFO[0] < 4 )); then
   exit 1
 fi
 
-VERSION="1.4"
+VERSION="1.5"
 
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[0;33m'
 CYAN='\033[0;36m'; BLUE='\033[0;34m'; MAGENTA='\033[0;35m'
@@ -150,6 +148,7 @@ clean_path(){
     \"*\") p="${p:1:${#p}-2}" ;;
   esac
   p="${p//\\ / }"
+  # shellcheck disable=SC2088  # case patterns, not paths — $HOME substitution is intentional
   case "$p" in
     "~") p="$HOME" ;;
     "~/"*) p="$HOME/${p:2}" ;;
@@ -606,7 +605,6 @@ restore_snapshot(){
   if [[ "$name" == *"__"* ]]; then
     target="${name%%__*}"
   else
-    # Old format fallback: ask.
     target=""
   fi
   if [[ -z "$target" ]]; then
@@ -802,6 +800,130 @@ verify_checksum(){
 }
 
 # ══════════════════════════════════════════════════════════════
+# payload.bin support — modern ROMs ship one container, not images
+# ══════════════════════════════════════════════════════════════
+
+# Does the zip contain a payload.bin at its root?
+rom_zip_has_payload(){
+  local zip="$1"
+  command -v unzip >/dev/null 2>&1 || return 1
+  unzip -l "$zip" 2>/dev/null | grep -q 'payload\.bin$'
+}
+
+# Locate a payload-dumper binary on PATH.
+find_payload_dumper(){
+  local cmd
+  for cmd in payload-dumper-go payload_dumper payload-dumper; do
+    if command -v "$cmd" >/dev/null 2>&1; then echo "$cmd"; return 0; fi
+  done
+  return 1
+}
+
+payload_dumper_install_hint(){
+  echo -e "${BYELLOW}payload-dumper-go is not installed. Get it here:${RESET}"
+  echo -e "  ${DIM}Linux / macOS (Go):${RESET} go install github.com/ssut/payload-dumper-go@latest"
+  echo -e "  ${DIM}macOS (Homebrew):${RESET}  brew install payload-dumper-go"
+  echo -e "  ${DIM}Arch (AUR):${RESET}        yay -S payload-dumper-go-bin"
+  echo -e "  ${DIM}Prebuilt binaries:${RESET} https://github.com/ssut/payload-dumper-go/releases"
+}
+
+# Extract payload.bin from ZIP and dump every partition into OUTDIR.
+# Returns 0 on success, 1 on any failure (already cleaned up).
+extract_payload(){
+  local zip="$1" outdir="$2" dumper tmp payload_file
+  dumper=$(find_payload_dumper) || { payload_dumper_install_hint; return 1; }
+  mkdir -p "$outdir" || return 1
+  tmp="$outdir/.payload_tmp"
+  rm -rf "$tmp"; mkdir -p "$tmp"
+  echo -e "${CYAN}Extracting payload.bin from the zip...${RESET}"
+  if ! run unzip -o "$zip" payload.bin -d "$tmp"; then
+    echo -e "${BRED}Could not pull payload.bin out of the zip.${RESET}"
+    rm -rf "$tmp"; return 1
+  fi
+  payload_file="$tmp/payload.bin"
+  if [[ ! -f "$payload_file" ]]; then
+    echo -e "${BRED}payload.bin was not produced by unzip.${RESET}"
+    rm -rf "$tmp"; return 1
+  fi
+  echo -e "${CYAN}Unpacking partitions with $dumper... (this can take a minute)${RESET}"
+  if ! run_tty "$dumper" -o "$outdir" "$payload_file"; then
+    echo -e "${BRED}payload-dumper failed. Details: $LOGFILE${RESET}"
+    rm -rf "$tmp"; return 1
+  fi
+  rm -rf "$tmp"
+  rm -f "$outdir/payload.bin" 2>/dev/null
+  return 0
+}
+
+# ══════════════════════════════════════════════════════════════
+# Checksum sidecar auto-detection — look for .sha256 / SHA256SUMS
+# ══════════════════════════════════════════════════════════════
+
+# Find a checksum file that likely belongs to ZIP. Echoes its path.
+find_checksum_file(){
+  local zip="$1" dir base c
+  dir=$(dirname "$zip"); base=$(basename "$zip")
+  local candidates=(
+    "${zip}.sha256" "${zip}.sha256sum" "${zip}.sha256.txt"
+    "${dir}/${base}.sha256" "${dir}/${base}.sha256sum"
+    "${dir}/SHA256SUMS" "${dir}/SHA256SUMS.txt"
+    "${dir}/sha256sums.txt" "${dir}/CHECKSUMS.sha256"
+    "${dir}/checksums.txt" "${dir}/checksum.txt"
+  )
+  for c in "${candidates[@]}"; do
+    [[ -f "$c" ]] && { printf '%s' "$c"; return 0; }
+  done
+  return 1
+}
+
+# Extract the expected hash for TARGET (or a lone hash) from CHECKFILE.
+expected_hash_for(){
+  local checkfile="$1" target="$2"
+  local base line hash file
+  base=$(basename "$target")
+  while IFS= read -r line; do
+    line="${line%$'\r'}"
+    [[ -z "$line" || "$line" == "#"* ]] && continue
+    hash="${line%%[[:space:]]*}"
+    [[ "$hash" =~ ^[0-9a-fA-F]{64}$ ]] || continue
+    file="${line#"$hash"}"
+    file="${file#"${file%%[![:space:]]*}"}"   # trim leading whitespace
+    file="${file#\*}"                          # binary marker
+    file="${file##*/}"                         # basename
+    if [[ -z "$file" || "$file" == "$base" ]]; then
+      printf '%s' "${hash,,}"; return 0
+    fi
+  done < "$checkfile"
+  # Single-line file with just a hash?
+  hash=$(head -n1 "$checkfile" | tr -d '[:space:]')
+  if [[ "$hash" =~ ^[0-9a-fA-F]{64}$ ]]; then
+    printf '%s' "${hash,,}"; return 0
+  fi
+  return 1
+}
+
+# Verify TARGET against a sidecar next to it. Silent if no sidecar.
+# Returns 0 (match or no sidecar), 1 (mismatch / hash tool missing).
+verify_sidecar_if_present(){
+  local target="$1" checkfile expected actual
+  checkfile=$(find_checksum_file "$target") || return 0
+  expected=$(expected_hash_for "$checkfile" "$target") || return 0
+  echo -e "${BCYAN}Found $(basename "$checkfile"). Verifying $(basename "$target")...${RESET}"
+  actual=$(sha256_of "$target") || {
+    echo -e "${YELLOW}No sha256 tool found; skipping verification.${RESET}"
+    return 0
+  }
+  if [[ "$actual" == "$expected" ]]; then
+    echo -e "${BGREEN}✓ Checksum matches.${RESET}"
+    return 0
+  fi
+  echo -e "${BRED}✗ Checksum does NOT match!${RESET}"
+  echo -e "${DIM}Expected: $expected${RESET}"
+  echo -e "${DIM}Actual:   $actual${RESET}"
+  return 1
+}
+
+# ══════════════════════════════════════════════════════════════
 # ROM folder flashing — CMF Phone 2 Pro (Galaga) was the first target,
 # but the auto-detect works for any ROM folder laid out the same way.
 # ══════════════════════════════════════════════════════════════
@@ -856,25 +978,50 @@ flash_step(){
 flash_rom(){
   need_mode fastboot || return
   preflight || return
+
   local dir zip
   dir=$(pick_rom) || return
   zip=$(find "$dir" -maxdepth 1 -iname '*.zip' 2>/dev/null | head -n1)
-  echo -e "${BOLD}${CYAN}Detected in $(basename "$dir"):${RESET}"
+
+  # ── payload.bin handling ──
+  local payload_dir=""
+  if [[ -n "$zip" ]] && rom_zip_has_payload "$zip"; then
+    echo -e "${BCYAN}This ROM ships a payload.bin (modern format).${RESET}"
+    echo -e "${DIM}The toolkit can extract its partitions so the flasher can use them.${RESET}"
+    if command -v unzip >/dev/null 2>&1; then
+      if ask_yes "Extract payload.bin into $(basename "$dir")/payload_extracted now?"; then
+        payload_dir="$dir/payload_extracted"
+        if ! extract_payload "$zip" "$payload_dir"; then
+          payload_dir=""
+          echo -e "${BYELLOW}Continuing without extracted payload images.${RESET}"
+        fi
+      fi
+    else
+      echo -e "${BYELLOW}unzip is not installed — cannot unpack payload.bin.${RESET}"
+      echo -e "${DIM}Install unzip, then run Flash ROM again.${RESET}"
+    fi
+  fi
+
+  # Where to look for .img files: prefer the extracted payload folder if present
+  local img_src="$dir"
+  [[ -n "$payload_dir" && -d "$payload_dir" ]] && img_src="$payload_dir"
+
+  echo -e "${BOLD}${CYAN}Detected in $(basename "$img_src"):${RESET}"
   declare -A found
   local name
   for name in vbmeta vbmeta_system dtbo boot init_boot vendor_boot recovery; do
-    if [[ -f "$dir/$name.img" ]]; then
+    if [[ -f "$img_src/$name.img" ]]; then
       found[$name]=1
       echo -e " ${GREEN}✓${RESET} $name.img"
     fi
   done
-  [[ -f "$dir/super_empty.img" ]] && { found[super_empty]=1; echo -e " ${GREEN}✓${RESET} super_empty.img"; }
-  [[ -f "$dir/system.img" ]] && echo -e " ${DIM}• system.img (present, not auto-flashed — see note below)${RESET}"
+  [[ -f "$img_src/super_empty.img" ]] && { found[super_empty]=1; echo -e " ${GREEN}✓${RESET} super_empty.img"; }
+  [[ -f "$img_src/system.img" ]] && echo -e " ${DIM}• system.img (present, not auto-flashed — see note below)${RESET}"
   [[ -n "$zip" ]] && echo -e " ${GREEN}✓${RESET} $(basename "$zip")"
   echo
 
   if [[ -z "${found[vendor_boot]:-}" && -z "${found[recovery]:-}" ]]; then
-    echo -e "${BYELLOW}No vendor_boot.img or recovery.img in this folder.${RESET}"
+    echo -e "${BYELLOW}No vendor_boot.img or recovery.img detected.${RESET}"
     echo -e "${DIM}The phone must already have a recovery that can sideload the ROM zip.${RESET}"
     confirm "Continue without flashing a recovery?" || return
   fi
@@ -884,10 +1031,20 @@ flash_rom(){
 
   echo -e "${CYAN}Plan: save a snapshot of what's there, flash the detected images in order, wipe super if present, then reboot to recovery"
   [[ -n "$zip" ]] && echo -e "and sideload $(basename "$zip")."
-  [[ -f "$dir/system.img" ]] && echo -e "${BYELLOW}Note: system.img won't be touched automatically. It's normally installed by the ROM zip itself — use \"Flash any partition\" if a guide specifically tells you to flash it directly.${RESET}"
+  [[ -f "$img_src/system.img" ]] && echo -e "${BYELLOW}Note: system.img won't be touched automatically. It's normally installed by the ROM zip itself — use \"Flash any partition\" if a guide specifically tells you to flash it directly.${RESET}"
 
-  if [[ -n "$zip" ]] && ask_no "Verify the ROM zip's SHA256 before flashing? (recommended)"; then
-    verify_checksum "$zip" || { echo -e "${BRED}Stopped. Sort out the checksum first.${RESET}"; return; }
+  # Checksum verification: prefer a sidecar next to the zip when present
+  if [[ -n "$zip" ]]; then
+    local checkfile
+    if checkfile=$(find_checksum_file "$zip"); then
+      echo -e "${BCYAN}Found $(basename "$checkfile") next to the zip.${RESET}"
+      if ! verify_sidecar_if_present "$zip"; then
+        echo -e "${BRED}Stopped. Sort out the checksum first.${RESET}"
+        return
+      fi
+    elif ask_no "Verify the ROM zip's SHA256 before flashing? (recommended)"; then
+      verify_checksum "$zip" || { echo -e "${BRED}Stopped. Sort out the checksum first.${RESET}"; return; }
+    fi
   fi
 
   confirm "Proceed? This wipes data and system.\nBack up first: boot the phone → Booted-phone tools → Back up before wipe." || return
@@ -908,14 +1065,14 @@ flash_rom(){
     echo -e "${DIM}$saved saved, $failed could not be saved. Only the saved ones can be restored later.${RESET}"
   fi
 
-  [[ -n "${found[vbmeta]:-}" ]] && { flash_step fastboot --disable-verity --disable-verification flash vbmeta "$dir/vbmeta.img" || return; }
-  [[ -n "${found[vbmeta_system]:-}" ]] && { flash_step fastboot --disable-verity --disable-verification flash vbmeta_system "$dir/vbmeta_system.img" || return; }
-  [[ -n "${found[dtbo]:-}" ]] && { flash_step fastboot flash dtbo "$dir/dtbo.img" || return; }
-  [[ -n "${found[boot]:-}" ]] && { flash_step fastboot flash boot "$dir/boot.img" || return; }
-  [[ -n "${found[init_boot]:-}" ]] && { flash_step fastboot flash init_boot "$dir/init_boot.img" || return; }
-  [[ -n "${found[super_empty]:-}" ]] && { flash_step fastboot wipe-super "$dir/super_empty.img" || return; }
-  [[ -n "${found[vendor_boot]:-}" ]] && { flash_step fastboot flash vendor_boot "$dir/vendor_boot.img" || return; }
-  [[ -n "${found[recovery]:-}" ]] && { flash_step fastboot flash recovery "$dir/recovery.img" || return; }
+  [[ -n "${found[vbmeta]:-}" ]] && { flash_step fastboot --disable-verity --disable-verification flash vbmeta "$img_src/vbmeta.img" || return; }
+  [[ -n "${found[vbmeta_system]:-}" ]] && { flash_step fastboot --disable-verity --disable-verification flash vbmeta_system "$img_src/vbmeta_system.img" || return; }
+  [[ -n "${found[dtbo]:-}" ]] && { flash_step fastboot flash dtbo "$img_src/dtbo.img" || return; }
+  [[ -n "${found[boot]:-}" ]] && { flash_step fastboot flash boot "$img_src/boot.img" || return; }
+  [[ -n "${found[init_boot]:-}" ]] && { flash_step fastboot flash init_boot "$img_src/init_boot.img" || return; }
+  [[ -n "${found[super_empty]:-}" ]] && { flash_step fastboot wipe-super "$img_src/super_empty.img" || return; }
+  [[ -n "${found[vendor_boot]:-}" ]] && { flash_step fastboot flash vendor_boot "$img_src/vendor_boot.img" || return; }
+  [[ -n "${found[recovery]:-}" ]] && { flash_step fastboot flash recovery "$img_src/recovery.img" || return; }
   flash_step fastboot reboot recovery || return
 
   echo -e "${YELLOW}On the phone: Factory reset → Format data, then Apply update → Apply from ADB.${RESET}"
@@ -1034,7 +1191,8 @@ take_screenshot(){
   need_mode adb || return
   local dir=~/Downloads
   mkdir -p "$dir"
-  local f="$dir/screenshot_$(date +%Y%m%d_%H%M%S).png"
+  local f
+  f="$dir/screenshot_$(date +%Y%m%d_%H%M%S).png"
   if run_to_file "$f" adb exec-out screencap -p && { (( LEARN == 2 )) || [[ -s "$f" ]]; }; then
     if (( LEARN == 2 )); then
       echo -e "${DIM}(dry-run: would save)${RESET} $f"
@@ -1100,7 +1258,8 @@ backup_phone(){
   local opts=("Photos & files (DCIM, Pictures, Download, Documents)" "Everything in /sdcard (can be many GB)" "App list only" "Cancel") o
   select o in "${opts[@]}"; do [[ -n "$o" ]] && break; echo "Pick a number."; done
   [[ "$o" == "Cancel" ]] && return
-  local dest="$BACKUPDIR/$(date +%Y%m%d_%H%M%S)" d
+  local dest d
+  dest="$BACKUPDIR/$(date +%Y%m%d_%H%M%S)"
   mkdir -p "$dest" || { echo -e "${RED}Could not create $dest${RESET}"; return; }
 
   _show "adb shell pm list packages -3 > $dest/third-party-apps.txt"
@@ -1230,7 +1389,7 @@ bootloader_menu(){
     echo -e "6) 📋 Show all fastboot variables"
     line
     echo -e "${DIM}ROM folders under $BASE:${RESET}"
-    echo -e "7) 📦 Flash ROM ${DIM}(auto-detects boot/dtbo/init_boot/vbmeta/vendor_boot/recovery)${RESET}"
+    echo -e "7) 📦 Flash ROM ${DIM}(auto-detects boot/dtbo/init_boot/vbmeta/vendor_boot/recovery, unpacks payload.bin)${RESET}"
     echo -e "8) ⏮ Restore stock firmware ${DIM}(pick any folder with a flash_all.sh)${RESET}"
     line
     echo -e "${DIM}Safety net:${RESET}"

@@ -1,6 +1,6 @@
 # ⚗️⚡ Flask-ADB-toolkit
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Version](https://img.shields.io/badge/version-1.3-blue)](https://github.com/dedsec-1337/Flask-ADB-toolkit/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Version](https://img.shields.io/badge/version-1.5-blue)](https://github.com/dedsec-1337/Flask-ADB-toolkit/releases)
 > **One little flask 🧪 — every flashing tool you'll ever need.**
 
 [![Bash](https://img.shields.io/badge/language-bash-4EAA25?style=for-the-badge&logo=gnubash&logoColor=white)](https://github.com/dedsec-1337/Flask-ADB-toolkit) [![Platform](https://img.shields.io/badge/platform-Linux%20%C2%B7%20macOS%20%C2%B7%20Windows%20%28Git--Bash%20%2F%20WSL%29-0078D6?style=for-the-badge)](https://github.com/dedsec-1337/Flask-ADB-toolkit) [![Vibes](https://img.shields.io/badge/vibes-100%25%20fun-ff69b4?style=for-the-badge)](https://github.com/dedsec-1337/Flask-ADB-toolkit)
@@ -41,26 +41,27 @@ It was built for people who **know nothing about custom ROMs, vendor images, or 
 
 | Option | What it does |
 | ------ | ------------ |
-| 🔓 Unlock bootloader | Guided unlock (with warnings!) |
+| 🔓 Unlock bootloader | Guided unlock (with warnings!) — re-reads the lock state after the command so you know it actually worked |
 | ⚡ Flash any partition | boot, init_boot, recovery, vendor_boot, dtbo, vbmeta, vbmeta_system, system, vendor, product, super, userdata… or type your own — **works on any device** |
-| 🔄 Switch active slot | A/B slot switching |
+| 🔄 Switch active slot | A/B slot switching (`--set-active`, with a `set_active` fallback) |
 | 🧹 Erase a partition | cache, userdata, metadata… (with warnings) |
 | 🛠️ Reboot to fastbootd | For logical-partition operations |
 | 📋 Show all fastboot variables | Debug info dump |
-| 📦 Flash ROM | **Auto-detects** `boot`, `dtbo`, `init_boot`, `vbmeta`, `vbmeta_system`, `super_empty` in your ROM folder and flashes whichever exist, in a safe order — `vbmeta` flashed with `--disable-verity --disable-verification`. **Stops at the first failed step** instead of pressing on |
-| ⏮ Restore stock firmware | Point it at **any** stock-firmware folder that contains a `flash_all` script — no presets, no hardcoded versions. Shows the connected device's product name and asks before it wipes anything (wipes data, restores both slots on multi-slot devices) |
+| 📦 Flash ROM | **Auto-detects** images, unpacks `payload.bin` when present, verifies checksums via sidecar files, saves a snapshot first, and stops at the first failed step |
+| ⏮ Restore stock firmware | Point it at **any** stock-firmware folder with a `flash_all` script — no presets |
 
 ### 📱 Booted-phone (ADB) mode
 
 | Option | What it does |
 | ------ | ------------ |
-| ⚡ Performance pass | Trims caches + speed-compiles every app — **skips un-compilable system packages and auto-resumes if interrupted** (full resume on Linux/macOS; single pass on the Windows `.bat`) |
+| ⚡ Performance pass | Trims caches + speed-compiles every app — **skips un-compilable system packages and auto-resumes if interrupted** |
 | 🧹 Deep clean | Finds orphaned app data, empty folders, clears thumbnail cache |
 | 🔋 Battery & storage | Health + free-space report |
 | 📜 Live logcat | Watch logs in real time |
 | 📷 Screenshot | Saved to your **Downloads** folder |
 | 📥 Install APK | Pick & install |
 | ⬇️⬆️ Pull / Push files | Move files both ways |
+| 💾 Back up before wipe | Pulls `/sdcard` (or selected folders) + third-party app list to `~/flask-adb-backups/` |
 
 ### 🔄 Recovery / Sideload mode
 
@@ -69,34 +70,36 @@ It was built for people who **know nothing about custom ROMs, vendor images, or 
 | 📤 Sideload a package | ADB-sideload any zip — GApps, Magisk, anything that isn't a full ROM install |
 | 🔁 Reboot to system | Bounce back out of recovery when you're done |
 
-### 🌐 Works everywhere in the menu
+### 🩺 Safety & diagnostics (any mode)
 
 | Option | What it does |
 | ------ | ------------ |
-| 🎯 Reboot to recovery | Straight to recovery — from fastboot *or* booted mode |
-| ℹ️ Device info | Model, codename, Android/build/security-patch — booted or in bootloader |
-| 🔎 Verify a file's checksum | Paste a file + optional expected SHA256 — get a match / no-match verdict before you flash |
+| 🩺 Connection doctor | Names the real problem — *unauthorized*, *offline*, *no permissions*, *multiple devices* — and prints the fix |
+| 🎓 Learn mode | Show every command before it runs, or run in `--dry-run` (show, execute nothing) |
+| 🧾 Support report | Bundles version + device info + log tail into `~/Downloads/flask-adb-support-report.txt` for a GitHub issue |
+| ↩️ Restore a saved snapshot | Undo a `boot` / `vbmeta` / `dtbo` flash from `~/flask-adb-snapshots/` |
 
-Plus: live **device status bar** (connection mode 🔌, bootloader lock 🔒/🔓, active slot) and a menu that **adapts to whatever state your phone is in** — including recovery, and a plain-English hint when the phone is plugged in but unauthorized or offline.
+Plus: live **device status bar** (connection mode 🔌, bootloader lock 🔒/🔓, active slot, battery warning below 30 %) and a menu that **adapts to whatever state your phone is in**.
 
 ### 💡 About the ROM flasher
 
-Drop your ROM folder **anywhere** — `~/Desktop/flashing` (`%USERPROFILE%\Desktop\flashing` on Windows) is just the default suggestion where "Flash ROM" looks first, not a requirement.
+Drop your ROM folder **anywhere** — `~/Desktop/flashing` is just the default suggestion where "Flash ROM" looks first, not a requirement.
 
-If the auto-picker finds nothing there, you type or paste the path directly. Quotes, `~` and drag-and-drop paths all work.
+The flasher:
 
-The flasher looks for: `vbmeta`, `vbmeta_system`, `dtbo`, `boot`, `init_boot`, `vendor_boot`, `super_empty`, and the ROM `.zip` — flashes whatever's present in a safe order, then wipes super (if present), reboots to recovery, and sideloads the zip. If any step fails, it stops right there instead of continuing.
+1. Finds the ROM `.zip` and scans for `vbmeta`, `vbmeta_system`, `dtbo`, `boot`, `init_boot`, `vendor_boot`, `recovery`, `super_empty`.
+2. **If the zip contains `payload.bin`** (LineageOS, crDroid, EvolutionX, most Nothing/CMF builds), offers to unpack it with `payload-dumper-go` and uses the extracted `.img` files as the source.
+3. **If a `<zip>.sha256`, `SHA256SUMS` or `checksums.txt` sits next to the zip**, verifies automatically. Otherwise asks if you want to paste a hash manually.
+4. Saves a **snapshot** of every partition it's about to overwrite, via `fastboot fetch`.
+5. Flashes each image in a safe order (`vbmeta` with `--disable-verity --disable-verification`), stops at the first failure, then reboots to recovery and sideloads the zip.
 
-`system.img` is deliberately **never auto-flashed** (it's normally a logical partition the ROM zip installs itself). It's still listed when found and available through "Flash any partition" if a guide specifically requires it.
+`system.img` is deliberately **never auto-flashed** — it's normally installed by the ROM zip itself. Use *Flash any partition* if a guide specifically requires it.
 
-### 💡 About stock restore
-
-Restore stock firmware works the same way the ROM flasher does: it asks for a folder path instead of relying on hardcoded presets. If your phone's stock archive extracts to a folder with a `flash_all` script inside, the toolkit can run it. It shows the connected device's product name first — **make sure the firmware is built for that exact device**, because the wrong firmware can brick it.
-
-- **Windows `.bat`**: looks for `flash_all.bat` first, falls back to `flash_all.sh` (needs Git Bash or WSL for the `.sh`)
-- **`.sh`**: runs `flash_all.sh` directly
-
-For Nothing / CMF phones, that layout matches the stock firmware from projects like `spike0en/nothing_flasher` (galaga-tetris branch). Your own restore folders keep working exactly as before — you just type or paste the path once instead of pressing a preset button.
+`payload-dumper-go` install:
+- **Linux / macOS (Go):** `go install github.com/ssut/payload-dumper-go@latest`
+- **macOS (Homebrew):** `brew install payload-dumper-go`
+- **Arch (AUR):** `yay -S payload-dumper-go-bin`
+- **Prebuilt binaries:** [github.com/ssut/payload-dumper-go/releases](https://github.com/ssut/payload-dumper-go/releases)
 
 ## 📋 Requirements
 
@@ -105,30 +108,25 @@ For Nothing / CMF phones, that layout matches the stock firmware from projects l
 - A USB cable
 - A phone with **USB debugging enabled** (see below — don't skip this, it bites everyone)
 - A phone with an **unlocked bootloader** (for flashing)
-- **macOS only:** bash 4 or newer (`brew install bash`). macOS ships bash 3.2, which the script can't run on. The script tells you if yours is too old.
+- **macOS only:** bash 4 or newer (`brew install bash`). macOS ships bash 3.2, which the script can't run on.
 - ~30 seconds of courage
-
-Windows does **not** include `adb` / `fastboot`. You must download Google's platform-tools once. The `.bat` will find them for you after that.
 
 ## 🔌 Don't forget: USB debugging & the allow prompt
 
-This is the #1 "why isn't my phone showing up?" moment, so let's get it out of the way — with a pun, as is tradition:
+This is the #1 "why isn't my phone showing up?" moment:
 
 > **Enable USB debugging, and tap "Allow" on the USB debugging prompt.** Otherwise your phone and your computer are basically a bad first date: both showed up, nobody said hello, and they spend the whole evening pretending they can't see each other. 💔  
 >
-> USB debugging is your phone's way of saying *"new phone, who dis?"* — and tapping **Allow** is how it saves your PC's number. Skip either one and the toolkit will sit there saying "not connected" while your phone is literally plugged in. Awkward. Very "it's not you, it's USB." 🔌🙃
+> USB debugging is your phone's way of saying *"new phone, who dis?"* — and tapping **Allow** is how it saves your PC's number. Skip either one and the toolkit will sit there saying "not connected" while your phone is literally plugged in. Awkward. 🔌🙃
 
 How to actually do it:
 
-1. On the phone: **Settings → About phone → tap "Build number" 7 times** → you are now a developer. Congrats. 🎓
+1. On the phone: **Settings → About phone → tap "Build number" 7 times** → you are now a developer. 🎓
 2. **Settings → System → Developer options → USB debugging** → turn it on.
 3. Plug the phone into the computer.
 4. When the phone pops up **"Allow USB debugging?"** — check **"Always allow from this computer"** and tap **OK**.
-   - No popup? Unplug, replug, or toggle USB debugging off/on. The prompt is shy; it re-asks when the RSA key changes (new OS, new user, wiped data).
 
-Unlocking the bootloader also wipes the phone, which resets those remembered permissions — so **re-allow the prompt after every unlock/wipe**. Don't let your phone ghost your PC after it just got a fresh start. 👻
-
-The toolkit now tells you when the phone is connected but **unauthorized** (or **offline**) instead of just saying "not connected".
+Unlocking the bootloader also wipes the phone, which resets those remembered permissions — so **re-allow the prompt after every unlock/wipe**. 👻
 
 ## 🚀 Quick start (Linux / macOS)
 
@@ -156,85 +154,66 @@ Prefer not to paste? The [live site](https://dedsec-1337.github.io/Flask-ADB-too
 
 ## 🪟 Windows — full guide
 
-Windows does not ship `adb` or `fastboot`. You download them once, then double-click the toolkit. You do **not** need to open the platform-tools folder and type `CMD` every time.
+Windows does not ship `adb` or `fastboot`. The new **PowerShell launcher** self-heals that — it finds Git Bash, downloads Google's platform-tools for you, and puts them on your PATH in one click.
 
 ### What you need
 
-- `flask-adb-toolkit.bat` from this repo
-- Google's [platform-tools](https://developer.android.com/tools/releases/platform-tools) zip (contains `adb.exe` and `fastboot.exe`)
+- `flask-adb-toolkit.ps1`
+- `flask-adb-toolkit.bat`
+- `flask-adb-toolkit.sh`
 - A USB cable and the phone's USB driver (Windows Update usually handles Nothing / CMF phones; if not, install the OEM driver)
+
+Put all three files **in the same folder**. That's it.
 
 ### Step-by-step
 
-1. Download **platform-tools** from Google and unzip it.  
-   You should have a folder named `platform-tools` with `adb.exe` and `fastboot.exe` inside.
-
-2. Download `flask-adb-toolkit.bat` from this repo.
-
-3. Put them together using **one** of these layouts (pick whichever is easier):
-
-   **Option A — bat inside platform-tools (simplest)**
+1. Download the three files above and put them in a folder like `Desktop\flask-adb`.
 
    ```text
-   platform-tools\
-     adb.exe
-     fastboot.exe
-     flask-adb-toolkit.bat
+   flask-adb\
+     flask-adb-toolkit.bat      ← double-click this
+     flask-adb-toolkit.ps1
+     flask-adb-toolkit.sh
    ```
 
-   **Option B — platform-tools next to the bat**
+2. Double-click **`flask-adb-toolkit.bat`**.
 
-   ```text
-   SomeFolder\
-     flask-adb-toolkit.bat
-     platform-tools\
-       adb.exe
-       fastboot.exe
-   ```
+3. First run, the launcher will:
+   - Check for Git Bash. If missing, offer to install it with `winget install Git.Git`.
+   - Check for `adb` and `fastboot`. If missing, offer to download Google's platform-tools into `%LOCALAPPDATA%\Android\platform-tools` and add them to your user PATH.
+   - Hand off to `flask-adb-toolkit.sh` inside Git Bash → you get the **full-colour, mode-aware menu**.
 
-4. Double-click `flask-adb-toolkit.bat`.  
-   It searches those locations (and PATH) automatically. If tools are found, the menu opens. If not, it prints exactly what is missing.
+4. Enable **USB debugging** on the phone, plug it in, tap **Allow** on the prompt, then use the numbered menu.
 
-5. Enable **USB debugging** on the phone, plug it in, tap **Allow** on the prompt, then use the numbered menu.
+### What if PowerShell opens in a blue window and closes instantly?
 
-You do **not** need to:
+That means the launcher hit an error before it could print to the screen. Open **PowerShell** manually (Start → *Windows PowerShell*), `cd` to the folder, and run:
 
-- Open the platform-tools folder
-- Type `CMD` in the address bar
-- Add anything to System PATH (optional, not required)
+```powershell
+powershell -ExecutionPolicy Bypass -File .\flask-adb-toolkit.ps1
+```
 
-### Optional: Git Bash / WSL (full colour menu)
-
-The `.bat` is the easy Windows version: same real `adb` / `fastboot` commands, same `YES` confirmations, checksums via `certutil`.
-
-Instead of the mode-aware colour menu it shows one **flat list of all 21 options**.
-
-For the full visual `.sh` experience on Windows:
-
-- **Git Bash:** install [Git for Windows](https://git-scm.com/download/win), put platform-tools on PATH, run `flask-adb-toolkit.sh`
-- **WSL:** `wsl --install`, then follow the Linux steps inside Ubuntu
+The error will stay on screen. Paste it into a GitHub issue with the support report.
 
 ### Windows notes
 
 - Screenshots are saved to `%USERPROFILE%\Downloads`
-- Performance pass on the `.bat` is a single compile pass (no resume file like the `.sh`)
-- The performance pass prints `Failure: ... android.auto_generated_rro_...` lines. Those are harmless system overlays — ignore them.
-- Restore stock looks for `flash_all.bat` first; a `.sh` restore needs Git Bash or WSL
-- Press **Enter** on an empty prompt and nothing happens — the menu just redraws. (Older versions re-ran the last answer; v1.3 fixed that.)
+- The PowerShell launcher does not need anything on PATH permanently — it can clean up after itself
+- Restore stock looks for `flash_all.bat` first; a `.sh` restore uses Git Bash or WSL
 - If Windows says "Windows protected your PC", click **More info** → **Run anyway** (the file is a local script you downloaded, not a signed installer)
 
 ## 🗑️ Uninstalling
 
 **Remove the toolkit:**
 
-- Linux / macOS / WSL / fish:
+- Linux / macOS / WSL:
   ```bash
   rm -f ~/flask-adb-toolkit.sh
   find ~ -maxdepth 1 -name '.flask-adb-compile-progress*' -delete
   ```
-- Windows: delete `flask-adb-toolkit.bat`
+- Windows: delete the `flask-adb` folder (all three files)
 
-Screenshots taken through the toolkit are saved in your **Downloads** folder (`~/Downloads` or `%USERPROFILE%\Downloads` on Windows).
+Screenshots taken through the toolkit are saved in your **Downloads** folder.
 
 **Optional – remove adb/fastboot:**
 
@@ -242,7 +221,7 @@ Screenshots taken through the toolkit are saved in your **Downloads** folder (`~
 - Arch: `sudo pacman -Rns android-tools`
 - Fedora: `sudo dnf remove android-tools`
 - macOS: `brew uninstall android-platform-tools`
-- Windows: delete the `platform-tools` folder you unzipped
+- Windows: delete `%LOCALAPPDATA%\Android\platform-tools` and remove that folder from your user PATH
 
 ## ⚠️ Disclaimer
 
@@ -251,15 +230,15 @@ This tool asks you to type `YES` before anything dangerous — but **you** are s
 
 - Not responsible for lost data, bricked phones, or voided warranties
 - Always back up first
-- Always verify checksums before flashing
-- Always enable USB debugging and allow the connection — a phone that won't talk to your PC can't be flashed, un-bricked, or reasoned with
+- Always verify checksums before flashing — the toolkit now auto-detects `<zip>.sha256` / `SHA256SUMS` for you
+- Always enable USB debugging and allow the connection
 - Provided as-is, made for fun & learning
 
 ## 🗺️ Roadmap
 
-- [ ] More device-specific profiles (open an issue with your device!)
 - [ ] macOS one-liner installer
-- [ ] Undo-last-flash safety snapshot (if feasible)
+- [ ] Config file at `~/.flask-adb-toolkit.conf`
+- [ ] More device-specific profiles (open an issue with your device!)
 - [ ] Even more colors 🌈
 
 ## 🤝 Contributing
@@ -274,4 +253,3 @@ PRs and issues are welcome. Keep it friendly — this is a fun project. 🍪
 ---
 
 *Made with 💚, one frustrated evening, and an unhealthy love of terminal colors.*
-```
