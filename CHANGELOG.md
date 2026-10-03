@@ -1,40 +1,58 @@
-Changelog
+# Changelog
 
-[1.3] - 2026-10-02  ⚗️⚡
+## [Unreleased]
 
-Fixed
-- Windows .bat: pressing Enter at a prompt no longer re-uses the previous answer (menu choice, YES confirmation, slot, checksum).
-- Flash ROM (.sh and .bat) now stops at the first failed step instead of continuing to reboot and sideload.
-- Checksum verifier in the .bat no longer shows the previous file's hash.
-- Performance-pass resume file is now per-device (.sh). Two phones no longer skip each other's apps.
-- Screenshot file names no longer depend on the Windows regional date format.
-- Failed screenshots no longer leave an empty file behind.
-- Deep clean handles folder names with spaces (.sh).
+### Planned
+- `payload.bin` support in the ROM flasher (extract via `payload-dumper-go` before flashing).
+- PowerShell launcher (`flask-adb-toolkit.ps1` + `.bat` wrapper) for Windows.
+- Auto-detect `.sha256` / `SHA256SUMS` next to ROM zips.
+- Config file at `~/.flask-adb-toolkit.conf`.
 
-Added
-- Restore stock shows the connected device's product name and asks before running.
-- Phones in recovery, unauthorized or offline state are detected and explained instead of showing "not connected".
-- bash 4 check with a clear message on macOS, and a shasum fallback for checksums.
-- Typed paths accept quotes, ~ and drag-and-drop in both scripts.
+## [1.4] — 2026-10-03
 
-Changed
-- Uninstall command is now:
-  rm -f ~/flask-adb-toolkit.sh
-  find ~ -maxdepth 1 -name '.flask-adb-compile-progress*' -delete
-  (avoids the glob tantrum in fish and other strict shells)
-- Windows performance pass now tells you the android.auto_generated_rro_* failure lines are harmless.
+### Added
+- **Battery pre-flight check.** Before rebooting to the bootloader to flash, the toolkit reads the phone's battery level over adb. Below 30 %, it stops and asks you to confirm.
+- **`fastboot set_active` fallback.** Some bootloaders only accept the newer `set_active` spelling. Both forms are now tried.
+- **Wait-for-device after reboot.** After `adb reboot bootloader`, the toolkit waits up to 30 s for the bootloader to appear so the next menu shows the real state instead of a stale one.
+- **Unlock verification.** After `fastboot flashing unlock` / `oem unlock`, the toolkit re-reads the lock state and tells you whether it actually changed, instead of assuming success.
+- **Dry-run honesty for snapshots and screenshots.** `--dry-run` now says *"would save"* instead of *"✓ saved"* for files that were never written.
 
-[1.2] - Skipped
-(Too many errors. Not worth the bandwidth.) actually i lost the file!! :(
+### Changed
+- **`flash_generic` also scans `~/Downloads`.** Image picker no longer only looks at `~/Desktop`, matching the other pickers.
+- **Snapshot filenames use a readable separator.** New format: `<partition>__YYYYmmdd_HHMMSS.img`. `restore_snapshot` parses on `__`, no more fixed-width timestamp guessing.
 
-[1.1] - 2026-09-30
+### Fixed
+- **`run()` `PIPESTATUS` read split onto its own line.** Same behaviour, but portable across bash versions instead of relying on `local x=…` assignment quirks.
 
-Added
-- Performance pass now skips un-compilable system packages.
-- Auto-resume if interrupted.
+## [1.3] — 2026-10-02
 
-Changed
-- Improved ROM auto-detection order.
+### Added
+- **Connection doctor.** Names the real adb problem — `unauthorized`, `offline`, `no permissions`, `multi`, `wait` — and prints the fix step-by-step.
+- **Pre-flight gate.** Flashing and erasing refuse to start when the bootloader is locked.
+- **Snapshot before flash.** Uses `fastboot fetch` to save the current partition image into `~/flask-adb-snapshots/` before overwriting it. Restore via *Bootloader tools → Restore a saved snapshot*.
+- **Command log.** Every adb/fastboot call and its output lands in `~/.flask-adb-toolkit.log` (rotates at 1 MB).
+- **Support report.** *Toolkit → Make a support report* bundles version, host, device info and the log tail into `~/Downloads/flask-adb-support-report.txt` for GitHub issues.
+- **Back up before wipe.** Booted-phone menu pulls `/sdcard` (or selected folders) plus a third-party app list into `~/flask-adb-backups/<timestamp>/`.
+- **Learn mode.** Three states — *off*, *show commands*, *dry-run*. Cycles from *Toolkit → 1*.
+- **ROM flasher no longer requires `vendor_boot.img`.** Warns once, offers to continue, and stops at the first failed step instead of flashing on top of it.
+- **Flexible ROM folder picker.** Auto-detects `vbmeta`, `vbmeta_system`, `dtbo`, `boot`, `init_boot`, `vendor_boot`, `recovery`, `super_empty` and the ROM zip. Any layout, any device.
 
-[1.0] - Never released
-Deleted by accident while trying to tidy the lab. The flask slipped. These things happen when you have no body and still attempt file management.
+### Fixed
+- `check_state` now recognises `unauthorized`, `offline`, `recovery`, `no permissions` and multi-device — not just `device` and `sideload`.
+- The flasher stops at the first failed step instead of continuing.
+
+## [1.2] — 2026-09-XX
+
+- Generic partition flasher for any Android device.
+- Sideload helper and recovery reboot shortcuts.
+- Checksum verifier (`sha256sum` / `shasum`).
+- Performance pass with resume, deep clean, battery & storage report.
+
+## [1.1] — 2026-09-XX
+
+- Auto-detecting ROM flasher.
+- Booted-phone tools: screenshot, APK install, pull/push, logcat.
+
+## [1.0] — 2026-09-XX
+
+- First release. Menu-driven adb & fastboot wrapper.
