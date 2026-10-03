@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#000000">
-<meta name="description" content="Menu-driven adb & fastboot toolkit — v1.4 with connection doctor, pre-flight safety checks, snapshots, auto ROM flash, partition tools, and maintenance helpers for any Android device.">
+<meta name="description" content="Menu-driven adb & fastboot toolkit — v1.5 with payload.bin support, PowerShell launcher, connection doctor, pre-flight safety checks, snapshots, auto ROM flash, partition tools, and maintenance helpers for any Android device.">
 <meta property="og:title" content="Flask-ADB-toolkit">
 <meta property="og:description" content="One little flask — every flashing tool you'll ever need.">
 <meta property="og:type" content="website">
@@ -29,8 +29,8 @@
   "url": "https://dedsec-1337.github.io/Flask-ADB-toolkit/",
   "applicationCategory": "DeveloperApplication",
   "operatingSystem": "Linux, macOS, Windows",
-  "description": "Menu-driven adb and fastboot toolkit with auto ROM flashing, generic partition tools, checksum verification, and maintenance helpers for any Android device.",
-  "softwareVersion": "1.4",
+  "description": "Menu-driven adb and fastboot toolkit with payload.bin support, auto ROM flashing, generic partition tools, checksum verification, and maintenance helpers for any Android device.",
+  "softwareVersion": "1.5",
   "dateModified": "2026-10-03",
   "license": "https://opensource.org/licenses/MIT",
   "author": {
@@ -657,16 +657,17 @@ body.custom-cursor * { cursor: none !important; }
 <main id="main">
 
 <header class="hero">
-  <div class="hud hud-tl" aria-hidden="true"><b>Flask/ADB</b><br>sys 1.4</div>
+  <div class="hud hud-tl" aria-hidden="true"><b>Flask/ADB</b><br>sys 1.5</div>
   <div class="hud hud-tr" aria-hidden="true"><span class="live"><b id="hud-clock">00:00:00</b></span><br>adb online</div>
   <div class="hud hud-bl" aria-hidden="true"><div class="barcode"></div>0001 / 1337</div>
   <div class="hud hud-br" aria-hidden="true">MIT licence<br><b>open source</b></div>
   <div class="hero-content">
-    <div class="star" aria-hidden="true"><b>v1.4</b></div>
+    <div class="star" aria-hidden="true"><b>v1.5</b></div>
     <h1 class="hero-title" aria-label="Flask-ADB-toolkit"><span>Flask</span></h1>
     <p class="hero-desc">
-      One little flask — every flashing tool you'll ever need. Auto-detecting ROM flasher,
-      generic partition tools for any Android device, and a checksum verifier, all in one friendly terminal menu.
+      One little flask — every flashing tool you'll ever need. Auto-detecting ROM flasher with
+      payload.bin support, generic partition tools for any Android device, and a checksum verifier,
+      all in one friendly terminal menu.
     </p>
     <p class="hero-status" aria-hidden="true"><span class="prompt">❯</span> <span id="hero-status"></span></p>
     <div class="hero-actions">
@@ -676,7 +677,7 @@ body.custom-cursor * { cursor: none !important; }
   </div>
 </header>
 
-<div class="ticker-wrap" aria-hidden="true"><div class="ticker"><div class="ticker-track"><div class="tg"><span>BOOT ✦ INIT_BOOT ✦ VBMETA ✦ DTBO ✦ VENDOR_BOOT ✦ SUPER ✦ RECOVERY ✦ SIDELOAD ✦</span><span>BOOT ✦ INIT_BOOT ✦ VBMETA ✦ DTBO ✦ VENDOR_BOOT ✦ SUPER ✦ RECOVERY ✦ SIDELOAD ✦</span><span>BOOT ✦ INIT_BOOT ✦ VBMETA ✦ DTBO ✦ VENDOR_BOOT ✦ SUPER ✦ RECOVERY ✦ SIDELOAD ✦</span></div><div class="tg"><span>BOOT ✦ INIT_BOOT ✦ VBMETA ✦ DTBO ✦ VENDOR_BOOT ✦ SUPER ✦ RECOVERY ✦ SIDELOAD ✦</span><span>BOOT ✦ INIT_BOOT ✦ VBMETA ✦ DTBO ✦ VENDOR_BOOT ✦ SUPER ✦ RECOVERY ✦ SIDELOAD ✦</span><span>BOOT ✦ INIT_BOOT ✦ VBMETA ✦ DTBO ✦ VENDOR_BOOT ✦ SUPER ✦ RECOVERY ✦ SIDELOAD ✦</span></div></div></div></div>
+<div class="ticker-wrap" aria-hidden="true"><div class="ticker"><div class="ticker-track"><div class="tg"><span>BOOT ✦ INIT_BOOT ✦ VBMETA ✦ DTBO ✦ VENDOR_BOOT ✦ SUPER ✦ RECOVERY ✦ SIDELOAD ✦ PAYLOAD ✦</span><span>BOOT ✦ INIT_BOOT ✦ VBMETA ✦ DTBO ✦ VENDOR_BOOT ✦ SUPER ✦ RECOVERY ✦ SIDELOAD ✦ PAYLOAD ✦</span><span>BOOT ✦ INIT_BOOT ✦ VBMETA ✦ DTBO ✦ VENDOR_BOOT ✦ SUPER ✦ RECOVERY ✦ SIDELOAD ✦ PAYLOAD ✦</span></div><div class="tg"><span>BOOT ✦ INIT_BOOT ✦ VBMETA ✦ DTBO ✦ VENDOR_BOOT ✦ SUPER ✦ RECOVERY ✦ SIDELOAD ✦ PAYLOAD ✦</span><span>BOOT ✦ INIT_BOOT ✦ VBMETA ✦ DTBO ✦ VENDOR_BOOT ✦ SUPER ✦ RECOVERY ✦ SIDELOAD ✦ PAYLOAD ✦</span><span>BOOT ✦ INIT_BOOT ✦ VBMETA ✦ DTBO ✦ VENDOR_BOOT ✦ SUPER ✦ RECOVERY ✦ SIDELOAD ✦ PAYLOAD ✦</span></div></div></div></div>
 
 <section id="features" class="section" aria-labelledby="features-title">
   <div class="section-header reveal">
@@ -687,7 +688,7 @@ body.custom-cursor * { cursor: none !important; }
   <div class="feature-grid">
     <article class="feature-card reveal">
       <h3 class="feature-title">Auto-Detecting ROM Flash</h3>
-      <p class="feature-desc">Drop a ROM folder anywhere and the flasher finds <code>vbmeta</code>, <code>dtbo</code>, <code>boot</code>, <code>init_boot</code>, <code>vendor_boot</code>, <code>super_empty</code> and the ROM zip — flashes what's there in a safe order, then reboots to recovery and sideloads. Your folder, your layout, no hand-written commands.</p>
+      <p class="feature-desc">Drop a ROM folder anywhere and the flasher finds <code>vbmeta</code>, <code>dtbo</code>, <code>boot</code>, <code>init_boot</code>, <code>vendor_boot</code>, <code>super_empty</code> and the ROM zip — flashes what's there in a safe order, then reboots to recovery and sideloads. Modern ROMs with <code>payload.bin</code> are unpacked automatically via <code>payload-dumper-go</code>.</p>
     </article>
 
     <article class="feature-card reveal" style="transition-delay:100ms">
@@ -697,7 +698,7 @@ body.custom-cursor * { cursor: none !important; }
 
     <article class="feature-card reveal" style="transition-delay:200ms">
       <h3 class="feature-title">Checksum Verifier</h3>
-      <p class="feature-desc">Paste a file, optionally the expected SHA256, and get a match / no-match verdict before you flash anything. Never flash a corrupted download again.</p>
+      <p class="feature-desc">Paste a file, optionally the expected SHA256, and get a match / no-match verdict before you flash anything. The flasher also auto-detects <code>.sha256</code> / <code>SHA256SUMS</code> sidecars next to ROM zips and verifies them for you.</p>
     </article>
 
     <article class="feature-card reveal">
@@ -712,7 +713,7 @@ body.custom-cursor * { cursor: none !important; }
 
     <article class="feature-card reveal" style="transition-delay:200ms">
       <h3 class="feature-title">Cross-Platform</h3>
-      <p class="feature-desc">Runs on Linux, macOS, and Windows. On Windows, double-click <code>flask-adb-toolkit.bat</code> — it finds Google's platform-tools next to the script (or on PATH). Same real <code>adb</code>/<code>fastboot</code> commands, with <code>YES</code> confirmations before anything dangerous. Git Bash / WSL optional for the full colour menu.</p>
+      <p class="feature-desc">Runs on Linux, macOS, and Windows. On Windows, double-click <code>flask-adb-toolkit.bat</code> — the PowerShell launcher finds Git Bash, offers to install Google's platform-tools, and drops you into the full colour menu. Same real <code>adb</code>/<code>fastboot</code> commands, with <code>YES</code> confirmations before anything dangerous.</p>
     </article>
   </div>
 </section>
@@ -818,8 +819,8 @@ body.custom-cursor * { cursor: none !important; }
     </div>
 
     <p class="step-hint" style="margin-top:1rem;padding-top:0.75rem;border-top:1px solid var(--white-10)">
-      <strong>Windows:</strong> Download Google's <a href="https://developer.android.com/tools/releases/platform-tools">platform-tools</a> and unzip. Put <code>flask-adb-toolkit.bat</code> <em>inside</em> that folder <strong>or</strong> put the whole <code>platform-tools</code> folder next to the <code>.bat</code>. Double-click the <code>.bat</code> — it finds <code>adb.exe</code> automatically. No need to open the folder and type CMD.<br>
-      <strong>Windows (full colours):</strong> Use Git Bash or WSL with the <code>.sh</code> instead.
+      <strong>Windows:</strong> download <code>flask-adb-toolkit.ps1</code>, <code>flask-adb-toolkit.bat</code>, and <code>flask-adb-toolkit.sh</code>, put them in the same folder, and double-click the <code>.bat</code>. The PowerShell launcher finds Git Bash, offers to install Google's platform-tools, and drops you into the full colour menu. No manual PATH fiddling.<br>
+      <strong>Windows (manual):</strong> if you'd rather not use the launcher, download Google's <a href="https://developer.android.com/tools/releases/platform-tools">platform-tools</a>, unzip, and run <code>flask-adb-toolkit.sh</code> inside Git Bash or WSL.
     </p>
   </div>
 </section>
@@ -852,7 +853,7 @@ body.custom-cursor * { cursor: none !important; }
     </div>
 
     <p class="step-hint" style="margin-top:1rem;padding-top:0.75rem;border-top:1px solid var(--white-10)">
-      <strong>Windows:</strong> delete <code>flask-adb-toolkit.bat</code> from wherever you saved it.<br>
+      <strong>Windows:</strong> delete the folder containing <code>flask-adb-toolkit.bat</code>, <code>flask-adb-toolkit.ps1</code>, and <code>flask-adb-toolkit.sh</code>.<br>
       <strong>Screenshots</strong> are saved in your <strong>Downloads</strong> folder (<code>~/Downloads</code> or <code>%USERPROFILE%\Downloads</code> on Windows) — that matches both the .sh and the .bat.
     </p>
   </div>
@@ -1270,6 +1271,7 @@ body.custom-cursor * { cursor: none !important; }
     const LINES = [
       'adb devices ... 1 device attached',
       'fastboot getvar product ... ok',
+      'payload.bin detected ... unpacking',
       'vbmeta ... verified',
       'ready.'
     ];
