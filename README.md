@@ -1,6 +1,6 @@
 # ⚗️⚡ Flask-ADB-toolkit
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Version](https://img.shields.io/badge/version-1.5-blue)](https://github.com/dedsec-1337/Flask-ADB-toolkit/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Version](https://img.shields.io/badge/version-1.5-blue)](https://github.com/dedsec-1337/Flask-ADB-toolkit/releases/tag/v1.5)
 > **One little flask 🧪 — every flashing tool you'll ever need.**
 
 [![Bash](https://img.shields.io/badge/language-bash-4EAA25?style=for-the-badge&logo=gnubash&logoColor=white)](https://github.com/dedsec-1337/Flask-ADB-toolkit) [![Platform](https://img.shields.io/badge/platform-Linux%20%C2%B7%20macOS%20%C2%B7%20Windows%20%28Git--Bash%20%2F%20WSL%29-0078D6?style=for-the-badge)](https://github.com/dedsec-1337/Flask-ADB-toolkit) [![Vibes](https://img.shields.io/badge/vibes-100%25%20fun-ff69b4?style=for-the-badge)](https://github.com/dedsec-1337/Flask-ADB-toolkit)
