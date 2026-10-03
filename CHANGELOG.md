@@ -1,12 +1,23 @@
 # Changelog
 
+All notable changes to **Flask-ADB-toolkit** are documented here.
+Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
 ## [Unreleased]
 
 ### Planned
-- `payload.bin` support in the ROM flasher (extract via `payload-dumper-go` before flashing).
-- PowerShell launcher (`flask-adb-toolkit.ps1` + `.bat` wrapper) for Windows.
-- Auto-detect `.sha256` / `SHA256SUMS` next to ROM zips.
-- Config file at `~/.flask-adb-toolkit.conf`.
+- Config file at `~/.flask-adb-toolkit.conf` (remember default ROM folder, learn mode, etc.).
+
+## [1.5] — 2026-10-03
+
+### Added
+- **`payload.bin` support in the ROM flasher.** Modern ROMs (LineageOS, crDroid, EvolutionX, most Nothing/CMF builds) ship a single `payload.bin` container instead of separate `.img` files. The flasher now detects it inside the ROM zip and offers to unpack it with `payload-dumper-go`, then feeds the extracted images straight into the existing flash sequence. If the dumper is missing, it prints the one-line install for your OS.
+- **PowerShell launcher for Windows (`flask-adb-toolkit.ps1` + `.bat` wrapper).** Replaces the old cmd-only `.bat`. The launcher finds Git Bash (offers `winget install Git.Git` if missing), checks `adb` / `fastboot` on PATH (offers to download Google's platform-tools into `%LOCALAPPDATA%\Android\platform-tools` and add it to the user PATH), then hands off to the `.sh` inside Git Bash. Windows users now get the same full-colour, mode-aware menu as Linux and macOS.
+- **Auto-detect checksum sidecars next to ROM zips.** Before flashing, the toolkit looks for `<zip>.sha256`, `<zip>.sha256sum`, `SHA256SUMS`, `SHA256SUMS.txt`, `checksums.txt` and similar files next to the zip. If one is found, the expected hash is read automatically and verified — no more copy-pasting hashes from a download page.
+
+### Changed
+- The ROM flasher now scans `.img` files inside an extracted `payload_extracted/` folder when one exists, falling back to the top-level ROM folder otherwise.
 
 ## [1.4] — 2026-10-03
 
