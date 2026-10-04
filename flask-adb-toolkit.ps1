@@ -37,7 +37,13 @@ $bashCandidates = @(
 $bash = $bashCandidates | Select-Object -First 1
 if (-not $bash) {
     $onPath = Get-Command bash.exe -ErrorAction SilentlyContinue
-    if ($onPath) { $bash = $onPath.Source }
+    if ($onPath) {
+        $src = $onPath.Source
+        # Skip WSL launcher (System32\bash.exe) and WindowsApps stubs
+        if ($src -notmatch '(?i)\\System32\\bash\.exe$' -and $src -notmatch '(?i)\\WindowsApps\\') {
+            $bash = $src
+        }
+    }
 }
 
 if (-not $bash) {
@@ -53,8 +59,19 @@ if (-not $bash) {
             Write-Host ""
             & winget install --id Git.Git -e --source winget
             Write-Host ""
-            Write-Ok "Installed. Close this window and double-click the .bat again."
-            exit 0
+            # Refresh candidate list for this session
+            $bashCandidates = @(
+                "$env:ProgramFiles\Git\bin\bash.exe",
+                "${env:ProgramFiles(x86)}\Git\bin\bash.exe",
+                "$env:LOCALAPPDATA\Programs\Git\bin\bash.exe"
+            ) | Where-Object { $_ -and (Test-Path $_) }
+            $bash = $bashCandidates | Select-Object -First 1
+            if ($bash) {
+                Write-Ok "Git Bash now available: $bash — continuing."
+            } else {
+                Write-Ok "Installed. Close this window and double-click the .bat again."
+                exit 0
+            }
         }
     } else {
         Write-Host "  Download Git manually: https://git-scm.com/download/win"
@@ -108,12 +125,9 @@ if ($missing.Count -gt 0) {
         if ($userPath -notlike "*$pt*") {
             $newPath = if ([string]::IsNullOrEmpty($userPath)) { $pt } else { "$userPath;$pt" }
             [Environment]::SetEnvironmentVariable('PATH', $newPath, 'User')
-            Write-Ok "Added $pt to user PATH."
+            $env:Path = "$pt;$env:Path"
+            Write-Ok "Added $pt to user PATH (and this session)."
             Write-Host ""
-            Write-Warn "PATH changes only apply to new processes."
-            Write-Host "  Close this window and double-click the .bat again."
-            Read-Host "  Press Enter to exit"
-            exit 0
         } else {
             Write-Ok "platform-tools already on PATH."
         }

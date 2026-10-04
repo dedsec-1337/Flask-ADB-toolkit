@@ -18,6 +18,17 @@ This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 - The ROM flasher now scans `.img` files inside an extracted `payload_extracted/` folder when one exists, falling back to the top-level ROM folder otherwise.
+- `payload-dumper-go` is preferred with selective `-p` partitions and can take the zip directly (unzip fallback retained).
+- Checksum verification now runs *before* any payload extraction.
+
+### Fixed
+- **`run()` never reported failure.** `local rc` after the pipeline reset `PIPESTATUS`; stop-on-first-failure, unlock/set_active fallbacks and "✓ Flashed" after real errors are restored.
+- Checksum sidecars no longer fail-open when the file exists but has no matching entry for the zip (warn + fall through to manual prompt).
+- Dry-run no longer prints "✓ Flashed / Erased / Sideloaded / flash_all finished".
+- Performance-pass resume file is per-device again.
+- Support report redacts long hex strings (possible serials) in addition to `$HOME`.
+- PowerShell launcher skips `System32\bash.exe` / WindowsApps stubs, and continues in-session after installing Git or platform-tools.
+- `.bat` pauses on non-zero exit so errors stay visible.
 
 ## [1.4] — 2026-10-03
 

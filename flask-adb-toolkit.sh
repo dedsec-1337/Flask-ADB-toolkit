@@ -19,6 +19,14 @@
 #   • Learn mode: show every command, or dry-run
 #   • ROM flasher no longer demands vendor_boot.img and stops
 #     at the first failed step
+# Fixes in this build:
+#   • run() PIPESTATUS capture restored (stop-on-first-failure works again)
+#   • Checksum sidecars no longer fail-open when the hash is missing
+#   • Checksum runs before payload extraction
+#   • payload-dumper prefers selective -p partitions + direct zip
+#   • Dry-run no longer claims "✓ Flashed / Erased / Sideloaded"
+#   • Performance-pass resume file is per-device
+#   • Support report redacts long hex strings (possible serials)
 # ══════════════════════════════════════════════════════════════
 
 # ── Needs bash 4+ (macOS ships bash 3.2) ──
@@ -88,8 +96,8 @@ _show(){
 run(){
   _show "$*"; log "RUN: $*"
   if (( LEARN == 2 )); then log "(dry-run: not executed)"; return 0; fi
-  "$@" 2>&1 | tee -a "$LOGFILE"
   local rc
+  "$@" 2>&1 | tee -a "$LOGFILE"
   rc=${PIPESTATUS[0]}
   log "EXIT: $rc"
   return "$rc"
@@ -675,7 +683,11 @@ flash_generic(){
   confirm "Flash $(basename "$image") to $target?" || return
   snapshot_gate "$target" || return
   if run fastboot ${flags[@]+"${flags[@]}"} flash "$target" "$image"; then
-    echo -e "${GREEN}✓ Flashed $target.${RESET}"
+    if (( LEARN == 2 )); then
+      echo -e "${DIM}(dry-run: would flash)${RESET} $target"
+    else
+      echo -e "${GREEN}✓ Flashed $target.${RESET}"
+    fi
   else
     echo -e "${BRED}✗ Flash failed. Details: $LOGFILE${RESET}"
   fi
@@ -700,7 +712,11 @@ erase_partition(){
   confirm "Erase $target?" || return
   snapshot_gate "$target" || return
   if run fastboot erase "$target"; then
-    echo -e "${GREEN}✓ Erased $target.${RESET}"
+    if (( LEARN == 2 )); then
+      echo -e "${DIM}(dry-run: would erase)${RESET} $target"
+    else
+      echo -e "${GREEN}✓ Erased $target.${RESET}"
+    fi
   else
     echo -e "${BRED}✗ Erase failed. Details: $LOGFILE${RESET}"
   fi
@@ -740,7 +756,11 @@ switch_slot(){
     echo -e "${RED}Enter a or b.${RESET}"
   done
   if run fastboot --set-active="$s" || run fastboot set_active "$s"; then
-    echo -e "${GREEN}Active slot set to $s.${RESET}"
+    if (( LEARN == 2 )); then
+      echo -e "${DIM}(dry-run: would set active slot to)${RESET} $s"
+    else
+      echo -e "${GREEN}Active slot set to $s.${RESET}"
+    fi
   else
     echo -e "${BRED}✗ Could not set the slot. Details: $LOGFILE${RESET}"
   fi
@@ -824,29 +844,45 @@ payload_dumper_install_hint(){
   echo -e "  ${DIM}Linux / macOS (Go):${RESET} go install github.com/ssut/payload-dumper-go@latest"
   echo -e "  ${DIM}macOS (Homebrew):${RESET}  brew install payload-dumper-go"
   echo -e "  ${DIM}Arch (AUR):${RESET}        yay -S payload-dumper-go-bin"
-  echo -e "  ${DIM}Prebuilt binaries:${RESET} https://github.com/ssut/payload-dumper-go/releases"
+  echo -e "  ${DIM}Windows / any:${RESET}    prebuilt binaries → https://github.com/ssut/payload-dumper-go/releases"
+  echo -e "  ${DIM}(put the binary on PATH or next to this script)${RESET}"
 }
 
-# Extract payload.bin from ZIP and dump every partition into OUTDIR.
+# Extract needed partitions from a ROM zip that contains payload.bin.
+# Prefer feeding the zip directly to payload-dumper-go (it understands payload.bin
+# inside a zip). Fall back to unzip + dump if that fails.
+# Only extracts the partitions the flasher actually uses.
 # Returns 0 on success, 1 on any failure (already cleaned up).
 extract_payload(){
-  local zip="$1" outdir="$2" dumper tmp payload_file
+  local zip="$1" outdir="$2" dumper
+  local needed=(vbmeta vbmeta_system dtbo boot init_boot vendor_boot recovery super_empty)
   dumper=$(find_payload_dumper) || { payload_dumper_install_hint; return 1; }
   mkdir -p "$outdir" || return 1
-  tmp="$outdir/.payload_tmp"
+  echo -e "${CYAN}Unpacking selected partitions with $dumper... (this can take a minute)${RESET}"
+
+  # Try feeding the zip directly (payload-dumper-go accepts zip containing payload.bin)
+  local -a pflags=()
+  local p
+  for p in "${needed[@]}"; do pflags+=(-p "$p"); done
+  if run_tty "$dumper" -o "$outdir" "${pflags[@]}" "$zip"; then
+    rm -f "$outdir/payload.bin" 2>/dev/null
+    return 0
+  fi
+
+  # Fallback: unzip payload.bin then dump
+  echo -e "${DIM}Direct zip dump failed — falling back to unzip + dump.${RESET}"
+  local tmp="$outdir/.payload_tmp"
   rm -rf "$tmp"; mkdir -p "$tmp"
-  echo -e "${CYAN}Extracting payload.bin from the zip...${RESET}"
   if ! run unzip -o "$zip" payload.bin -d "$tmp"; then
     echo -e "${BRED}Could not pull payload.bin out of the zip.${RESET}"
     rm -rf "$tmp"; return 1
   fi
-  payload_file="$tmp/payload.bin"
+  local payload_file="$tmp/payload.bin"
   if [[ ! -f "$payload_file" ]]; then
     echo -e "${BRED}payload.bin was not produced by unzip.${RESET}"
     rm -rf "$tmp"; return 1
   fi
-  echo -e "${CYAN}Unpacking partitions with $dumper... (this can take a minute)${RESET}"
-  if ! run_tty "$dumper" -o "$outdir" "$payload_file"; then
+  if ! run_tty "$dumper" -o "$outdir" "${pflags[@]}" "$payload_file"; then
     echo -e "${BRED}payload-dumper failed. Details: $LOGFILE${RESET}"
     rm -rf "$tmp"; return 1
   fi
@@ -907,7 +943,12 @@ expected_hash_for(){
 verify_sidecar_if_present(){
   local target="$1" checkfile expected actual
   checkfile=$(find_checksum_file "$target") || return 0
-  expected=$(expected_hash_for "$checkfile" "$target") || return 0
+  expected=$(expected_hash_for "$checkfile" "$target")
+  if [[ -z "$expected" ]]; then
+    echo -e "${BYELLOW}Checksum file found ($(basename "$checkfile")) but no entry for $(basename "$target").${RESET}"
+    echo -e "${DIM}Falling through to manual verification prompt.${RESET}"
+    return 2
+  fi
   echo -e "${BCYAN}Found $(basename "$checkfile"). Verifying $(basename "$target")...${RESET}"
   actual=$(sha256_of "$target") || {
     echo -e "${YELLOW}No sha256 tool found; skipping verification.${RESET}"
@@ -983,6 +1024,30 @@ flash_rom(){
   dir=$(pick_rom) || return
   zip=$(find "$dir" -maxdepth 1 -iname '*.zip' 2>/dev/null | head -n1)
 
+  # Checksum verification: prefer a sidecar next to the zip when present
+  # (runs before any payload extraction so a bad download is caught early)
+  if [[ -n "$zip" ]]; then
+    local checkfile cs_rc
+    if checkfile=$(find_checksum_file "$zip"); then
+      echo -e "${BCYAN}Found $(basename "$checkfile") next to the zip.${RESET}"
+      verify_sidecar_if_present "$zip"
+      cs_rc=$?
+      if (( cs_rc == 1 )); then
+        echo -e "${BRED}Stopped. Sort out the checksum first.${RESET}"
+        return
+      elif (( cs_rc == 2 )); then
+        # Sidecar present but no matching entry — fall through to manual prompt
+        if ask_no "Verify the ROM zip's SHA256 before flashing? (recommended)"; then
+          verify_checksum "$zip" || { echo -e "${BRED}Stopped. Sort out the checksum first.${RESET}"; return; }
+        fi
+      fi
+    elif ask_no "Verify the ROM zip's SHA256 before flashing? (recommended)"; then
+      verify_checksum "$zip" || { echo -e "${BRED}Stopped. Sort out the checksum first.${RESET}"; return; }
+    fi
+  fi
+
+
+
   # ── payload.bin handling ──
   local payload_dir=""
   if [[ -n "$zip" ]] && rom_zip_has_payload "$zip"; then
@@ -1033,20 +1098,6 @@ flash_rom(){
   [[ -n "$zip" ]] && echo -e "and sideload $(basename "$zip")."
   [[ -f "$img_src/system.img" ]] && echo -e "${BYELLOW}Note: system.img won't be touched automatically. It's normally installed by the ROM zip itself — use \"Flash any partition\" if a guide specifically tells you to flash it directly.${RESET}"
 
-  # Checksum verification: prefer a sidecar next to the zip when present
-  if [[ -n "$zip" ]]; then
-    local checkfile
-    if checkfile=$(find_checksum_file "$zip"); then
-      echo -e "${BCYAN}Found $(basename "$checkfile") next to the zip.${RESET}"
-      if ! verify_sidecar_if_present "$zip"; then
-        echo -e "${BRED}Stopped. Sort out the checksum first.${RESET}"
-        return
-      fi
-    elif ask_no "Verify the ROM zip's SHA256 before flashing? (recommended)"; then
-      verify_checksum "$zip" || { echo -e "${BRED}Stopped. Sort out the checksum first.${RESET}"; return; }
-    fi
-  fi
-
   confirm "Proceed? This wipes data and system.\nBack up first: boot the phone → Booted-phone tools → Back up before wipe." || return
 
   # Snapshot what is about to be overwritten
@@ -1079,7 +1130,11 @@ flash_rom(){
   read -rp "Once the phone is waiting for the package, press Enter..."
   if [[ -n "$zip" ]]; then
     if run_tty adb sideload "$zip"; then
-      echo -e "${GREEN}✓ Sideload finished.${RESET}"
+      if (( LEARN == 2 )); then
+        echo -e "${DIM}(dry-run: would sideload)${RESET} $(basename "$zip")"
+      else
+        echo -e "${GREEN}✓ Sideload finished.${RESET}"
+      fi
     else
       echo -e "${BRED}✗ Sideload failed. Details: $LOGFILE${RESET}"
     fi
@@ -1099,7 +1154,11 @@ restore_stock(){
   confirm "Restores stock from $(basename "$dir"). Wipes the phone.\nBack up first: boot the phone → Booted-phone tools → Back up before wipe." || return
   [[ -f "$dir/flash_all.sh" ]] || { echo -e "${RED}No flash_all.sh in that folder. This expects the layout your device's stock-firmware archive uses (for Nothing/CMF phones: spike0en/nothing_flasher, galaga-tetris branch).${RESET}"; return; }
   if ( cd "$dir" && run_tty bash flash_all.sh ); then
-    echo -e "${GREEN}✓ flash_all.sh finished.${RESET}"
+    if (( LEARN == 2 )); then
+      echo -e "${DIM}(dry-run: would run flash_all.sh)${RESET}"
+    else
+      echo -e "${GREEN}✓ flash_all.sh finished.${RESET}"
+    fi
   else
     echo -e "${BRED}✗ flash_all.sh reported a failure. Details: $LOGFILE${RESET}"
   fi
@@ -1111,7 +1170,8 @@ restore_stock(){
 
 performance_pass(){
   need_mode adb || return
-  local progress=~/.flask-adb-compile-progress
+  # Resume file is per-device so two phones never skip each other's apps.
+  local progress=~/".flask-adb-compile-progress-${DEV//[^A-Za-z0-9._-]/_}"
   local pkgs=() p failed=() i=0 total
   mapfile -t pkgs < <(adb shell pm list packages | sed 's/^package://' | tr -d '\r' | sort)
   total=${#pkgs[@]}
@@ -1166,7 +1226,11 @@ deep_clean(){
   echo
   if confirm "Clear thumbnail cache too? (regenerates on its own, always safe)"; then
     run adb shell rm -rf /sdcard/DCIM/.thumbnails /sdcard/Pictures/.thumbnails
-    echo -e "${GREEN}Thumbnail cache cleared.${RESET}"
+    if (( LEARN == 2 )); then
+      echo -e "${DIM}(dry-run: would clear thumbnail cache)${RESET}"
+    else
+      echo -e "${GREEN}Thumbnail cache cleared.${RESET}"
+    fi
   fi
   echo -e "${DIM}To remove an orphaned folder: adb shell rm -rf '/sdcard/Android/data/<name>'${RESET}"
 }
@@ -1327,13 +1391,13 @@ support_report(){
     echo
     echo "== Recent log (last 60 lines) =="
     if [[ -s "$LOGFILE" ]]; then
-      tail -n 60 "$LOGFILE" | sed "s|$HOME|~|g" | strip_ansi
+      tail -n 60 "$LOGFILE" | sed "s|$HOME|~|g" | sed -E "s/[0-9A-Fa-f]{8,}/[serial-redacted]/g" | strip_ansi
     else
       echo "(empty)"
     fi
   } > "$REPORT"
   echo -e "${GREEN}✓ Saved:${RESET} $REPORT"
-  echo -e "${DIM}Serial numbers are left out and your home folder shows as ~. Read it once before sharing.${RESET}"
+  echo -e "${DIM}Home folder shows as ~ and long hex strings (possible serials) are redacted. Read it once before sharing.${RESET}"
   echo -e "Paste it into a new issue: ${BOLD}https://github.com/dedsec-1337/Flask-ADB-toolkit/issues/new${RESET}"
 }
 
