@@ -35,6 +35,7 @@ $bashCandidates = @(
 ) | Where-Object { $_ -and (Test-Path $_) }
 
 $bash = $bashCandidates | Select-Object -First 1
+
 if (-not $bash) {
     $onPath = Get-Command bash.exe -ErrorAction SilentlyContinue
     if ($onPath) {
@@ -67,18 +68,28 @@ if (-not $bash) {
             ) | Where-Object { $_ -and (Test-Path $_) }
             $bash = $bashCandidates | Select-Object -First 1
             if ($bash) {
-                Write-Ok "Git Bash now available: $bash — continuing."
+                Write-Ok "Git Bash now available: $bash - continuing."
             } else {
                 Write-Ok "Installed. Close this window and double-click the .bat again."
                 exit 0
             }
+        } else {
+            Read-Host "  Press Enter to exit"
+            exit 1
         }
     } else {
         Write-Host "  Download Git manually: https://git-scm.com/download/win"
+        Read-Host "  Press Enter to exit"
+        exit 1
     }
+}
+
+if (-not $bash) {
+    Write-Err "Git Bash still not found after install attempt."
     Read-Host "  Press Enter to exit"
     exit 1
 }
+
 Write-Ok "Git Bash: $bash"
 
 # ── 2. Locate adb / fastboot ──
@@ -86,8 +97,12 @@ $missing = @()
 foreach ($tool in 'adb','fastboot') {
     $cmd = Get-Command "$tool.exe" -ErrorAction SilentlyContinue
     if (-not $cmd) { $cmd = Get-Command $tool -ErrorAction SilentlyContinue }
-    if ($cmd) { Write-Ok "$tool : $($cmd.Source)" }
-    else      { Write-Warn "$tool not found on PATH"; $missing += $tool }
+    if ($cmd) {
+        Write-Ok "$tool : $($cmd.Source)"
+    } else {
+        Write-Warn "$tool not found on PATH"
+        $missing += $tool
+    }
 }
 
 if ($missing.Count -gt 0) {
@@ -133,7 +148,7 @@ if ($missing.Count -gt 0) {
         }
     } else {
         Write-Host ""
-        Write-Host "  You can still continue — the toolkit will tell you what's missing."
+        Write-Host "  You can still continue - the toolkit will tell you what's missing."
         Write-Host ""
     }
 }
@@ -153,7 +168,7 @@ if (-not (Test-Path $shPath)) {
 }
 
 # ── 4. Launch inside Git Bash ──
-$bashScript = $shPath -replace '\\','/'
+$bashScript = $shPath -replace '\\', '/'
 
 Write-Host ""
 Write-Host "  Starting Flask-ADB-toolkit..." -ForegroundColor Cyan
