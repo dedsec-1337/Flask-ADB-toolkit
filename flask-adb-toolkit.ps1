@@ -1,7 +1,7 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-    Flask-ADB-toolkit — Windows launcher.
+    Flask-ADB-toolkit - Windows launcher.
 
 .DESCRIPTION
     Finds Git Bash, checks adb / fastboot, then hands off to
@@ -23,11 +23,11 @@ function Write-Err  { param($m) Write-Host "  $m" -ForegroundColor Red }
 function Write-Cyan { param($m) Write-Host "  $m" -ForegroundColor Cyan }
 
 Write-Host ""
-Write-Host "  Flask-ADB-toolkit — Windows launcher" -ForegroundColor Cyan
+Write-Host "  Flask-ADB-toolkit - Windows launcher" -ForegroundColor Cyan
 Write-Host "  =====================================" -ForegroundColor Cyan
 Write-Host ""
 
-# ── 1. Locate Git Bash ──
+# --- 1. Locate Git Bash ---
 $bashCandidates = @(
     "$env:ProgramFiles\Git\bin\bash.exe",
     "${env:ProgramFiles(x86)}\Git\bin\bash.exe",
@@ -41,7 +41,7 @@ if (-not $bash) {
     if ($onPath) {
         $src = $onPath.Source
         # Skip WSL launcher (System32\bash.exe) and WindowsApps stubs
-        if ($src -notmatch '(?i)\\System32\\bash\.exe$' -and $src -notmatch '(?i)\\WindowsApps\\') {
+        if ($src -notmatch '(?i)\\System32\\bash\\.exe$' -and $src -notmatch '(?i)\\WindowsApps\\') {
             $bash = $src
         }
     }
@@ -92,7 +92,7 @@ if (-not $bash) {
 
 Write-Ok "Git Bash: $bash"
 
-# ── 2. Locate adb / fastboot ──
+# --- 2. Locate adb / fastboot ---
 $missing = @()
 foreach ($tool in 'adb','fastboot') {
     $cmd = Get-Command "$tool.exe" -ErrorAction SilentlyContinue
@@ -148,12 +148,12 @@ if ($missing.Count -gt 0) {
         }
     } else {
         Write-Host ""
-        Write-Host "  You can still continue - the toolkit will tell you what's missing."
+        Write-Host "  You can still continue - the toolkit will tell you what is missing."
         Write-Host ""
     }
 }
 
-# ── 3. Locate the .sh next to this launcher ──
+# --- 3. Locate the .sh next to this launcher ---
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $shPath    = Join-Path $scriptDir 'flask-adb-toolkit.sh'
 
@@ -167,8 +167,8 @@ if (-not (Test-Path $shPath)) {
     exit 1
 }
 
-# ── 4. Launch inside Git Bash ──
-$bashScript = $shPath -replace '\\', '/'
+# --- 4. Launch inside Git Bash ---
+$bashScript = $shPath.Replace('\', '/')
 
 Write-Host ""
 Write-Host "  Starting Flask-ADB-toolkit..." -ForegroundColor Cyan
