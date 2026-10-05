@@ -36,7 +36,7 @@ This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 - **`payload.bin` support in the ROM flasher.** Modern ROMs (LineageOS, crDroid, EvolutionX, most Nothing/CMF builds) ship a single `payload.bin` container instead of separate `.img` files. The flasher now detects it inside the ROM zip and offers to unpack it with `payload-dumper-go`, then feeds the extracted images straight into the existing flash sequence. If the dumper is missing, it prints the one-line install for your OS.
-- **PowerShell launcher for Windows (`flask-adb-toolkit.ps1` + `.bat` wrapper).** Replaces the old cmd-only `.bat`. The launcher finds Git Bash (offers `winget install Git.Git` if missing), checks `adb` / `fastboot` on PATH (offers to download Google's platform-tools into `%LOCALAPPDATA%\\Android\\platform-tools` and add it to the user PATH), then hands off to the `.sh` inside Git Bash. Windows users now get the same full-colour, mode-aware menu as Linux and macOS.
+- **PowerShell launcher for Windows (`flask-adb-toolkit.ps1` + `.bat` wrapper).** Replaces the old cmd-only `.bat`. The launcher finds Git Bash (offers `winget install Git.Git` if missing), checks `adb` / `fastboot` on PATH (offers to download Google's platform-tools into `%LOCALAPPDATA%\Android\platform-tools` and add it to the user PATH), then hands off to the `.sh` inside Git Bash. Windows users now get the same full-colour, mode-aware menu as Linux and macOS.
 - **Auto-detect checksum sidecars next to ROM zips.** Before flashing, the toolkit looks for `<zip>.sha256`, `<zip>.sha256sum`, `SHA256SUMS`, `SHA256SUMS.txt`, `checksums.txt` and similar files next to the zip. If one is found, the expected hash is read automatically and verified — no more copy-pasting hashes from a download page.
 
 ### Changed
@@ -50,7 +50,7 @@ This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Dry-run no longer prints "✓ Flashed / Erased / Sideloaded / flash_all finished".
 - Performance-pass resume file is per-device again.
 - Support report redacts long hex strings (possible serials) in addition to `$HOME`.
-- PowerShell launcher skips `System32\\bash.exe` / WindowsApps stubs, and continues in-session after installing Git or platform-tools.
+- PowerShell launcher skips `System32\bash.exe` / WindowsApps stubs, and continues in-session after installing Git or platform-tools.
 - `.bat` pauses on non-zero exit so errors stay visible.
 
 ## [1.4] — 2026-10-03
@@ -60,7 +60,7 @@ This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **`fastboot set_active` fallback.** Some bootloaders only accept the newer `set_active` spelling. Both forms are now tried.
 - **Wait-for-device after reboot.** After `adb reboot bootloader`, the toolkit waits up to 30 s for the bootloader to appear so the next menu shows the real state instead of a stale one.
 - **Unlock verification.** After `fastboot flashing unlock` / `oem unlock`, the toolkit re-reads the lock state and tells you whether it actually changed, instead of assuming success.
-- **Dry-run honesty for snapshots and screenshots.** `--dry-run` now says *\"would save\"* instead of *\"✓ saved\"* for files that were never written.
+- **Dry-run honesty for snapshots and screenshots.** `--dry-run` now says *"would save"* instead of *"✓ saved"* for files that were never written.
 
 ### Changed
 - **`flash_generic` also scans `~/Downloads`.** Image picker no longer only looks at `~/Desktop`, matching the other pickers.
