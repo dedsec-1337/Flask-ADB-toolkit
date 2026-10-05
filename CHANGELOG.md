@@ -1,5 +1,9 @@
 # Changelog
 
+All notable changes to **Flask-ADB-toolkit** are documented here.
+Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
 ## 1.5.1 — 2026-10-05
 
 ### Fixed
@@ -12,12 +16,6 @@
 - Checksum sidecars: when a filename is present on the hash line, require a basename match (no more cross-file false verify). Bare single-hash files still work.
 - PowerShell launcher: `winget` installs pass `--accept-source-agreements --accept-package-agreements`.
 - `.bat` always pauses so the window does not vanish on success.
-
-
-
-All notable changes to **Flask-ADB-toolkit** are documented here.
-Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
-This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
