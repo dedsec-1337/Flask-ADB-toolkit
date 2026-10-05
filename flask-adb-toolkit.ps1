@@ -52,13 +52,13 @@ if (-not $bash) {
     Write-Host ""
     Write-Host "  Git Bash comes with Git for Windows and is what runs the .sh script."
     Write-Host "  Install it with:"
-    Write-Cyan "    winget install --id Git.Git -e --source winget"
+    Write-Cyan "    winget install --id Git.Git -e --source winget --accept-source-agreements --accept-package-agreements"
     Write-Host ""
     if (Get-Command winget -ErrorAction SilentlyContinue) {
         $ans = Read-Host "  Install Git for Windows now? [y/N]"
         if ($ans -match '^[Yy]') {
             Write-Host ""
-            & winget install --id Git.Git -e --source winget
+            & winget install --id Git.Git -e --source winget --accept-source-agreements --accept-package-agreements
             Write-Host ""
             # Refresh candidate list for this session
             $bashCandidates = @(
