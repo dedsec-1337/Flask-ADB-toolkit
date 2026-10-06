@@ -3,7 +3,8 @@
 ## Reporting a Vulnerability
 
 Please report security vulnerabilities privately via GitHub Security Advisories
-or email dedsect-t@protonmail.com.
+or
+email dedsect-t@protonmail.com.
 
 Do not open public issues for security bugs.
 
