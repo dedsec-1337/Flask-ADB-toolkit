@@ -75,6 +75,12 @@ ROM_FLASHED=()
 declare -A ROM_SNAP=()
 
 set -uo pipefail
+
+cleanup() {
+  tput cnorm 2>/dev/null || true
+  stty echo 2>/dev/null || true
+}
+trap cleanup EXIT INT TERM
 PS3="> "
 
 line(){ echo -e "${DIM}────────────────────────────────────────${RESET}"; }
@@ -674,6 +680,12 @@ flash_generic(){
   local partition="$p"
   [[ "$partition" == "custom (type it)" ]] && read -rp "Partition name: " partition
   [[ -n "${partition// /}" ]] || { echo -e "${RED}No partition name given.${RESET}"; return; }
+
+# Validate partition name (letters, numbers, underscore only)
+if [[ ! "$partition" =~ ^[A-Za-z0-9_]+$ ]]; then
+    echo -e "${RED}Invalid partition name. Use only letters, numbers, underscore.${RESET}"
+    return 1
+fi
   echo
   local suffix; suffix=$(pick_slot_suffix)
   local target="${partition}${suffix}"
@@ -704,7 +716,7 @@ flash_generic(){
   echo -e "${BOLD}Command:${RESET} fastboot ${extra_flags}flash $target \"$(basename "$image")\""
   confirm "Flash $(basename "$image") to $target?" || return
   snapshot_gate "$target" || return
-  if run fastboot ${flags[@]+"${flags[@]}"} flash "$target" "$image"; then
+  if run fastboot ${flags[@]+"${flags[@]}"} flash -- "$target" "$image"; then
     if (( LEARN == 2 )); then
       echo -e "${DIM}(dry-run: would flash)${RESET} $target"
     else
@@ -727,6 +739,12 @@ erase_partition(){
   local partition="$p"
   [[ "$partition" == "custom (type it)" ]] && read -rp "Partition name: " partition
   [[ -n "${partition// /}" ]] || { echo -e "${RED}No partition name given.${RESET}"; return; }
+
+# Validate partition name (letters, numbers, underscore only)
+if [[ ! "$partition" =~ ^[A-Za-z0-9_]+$ ]]; then
+    echo -e "${RED}Invalid partition name. Use only letters, numbers, underscore.${RESET}"
+    return 1
+fi
   echo
   local suffix; suffix=$(pick_slot_suffix)
   local target="${partition}${suffix}"

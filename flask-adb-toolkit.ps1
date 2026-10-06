@@ -186,15 +186,25 @@ if ($missing.Count -gt 0) {
             }
 
             if ($info) {
-                $actual = (Get-FileHash -Path $zip -Algorithm SHA1).Hash.ToLower()
-                if ($actual -ne $info.Sha1) {
-                    Remove-Item $zip -Force -ErrorAction SilentlyContinue
-                    Write-Err "Checksum mismatch. The download was discarded and nothing was installed."
-                    Write-Host "  Expected: $($info.Sha1)"
-                    Write-Host "  Got:      $actual"
-                    Read-Host "  Press Enter to exit"
-                    exit 1
-                }
+                $expectedSha256 = $info.sha256
+if (-not $expectedSha256) { $expectedSha256 = $info.Sha256 }
+
+if ($expectedSha256) {
+    $actual = (Get-FileHash -Path $zip -Algorithm SHA256).Hash.ToLower()
+    if ($actual -ne $expectedSha256.ToLower()) {
+        Remove-Item $zip -Force -ErrorAction SilentlyContinue
+        Write-Err "SHA-256 mismatch. The download was discarded and nothing was installed."
+        exit 1
+    }
+} else {
+    Write-Warning "SHA-256 not found in manifest. Falling back to SHA-1 (weak)."
+    $actual = (Get-FileHash -Path $zip -Algorithm SHA1).Hash.ToLower()
+    if ($actual -ne $info.Sha1) {
+        Remove-Item $zip -Force -ErrorAction SilentlyContinue
+        Write-Err "SHA-1 mismatch. The download was discarded and nothing was installed."
+        exit 1
+    }
+}
                 Write-Ok "Checksum OK (matches the SHA-1 Google lists)."
             }
 
