@@ -19,24 +19,26 @@ The script never auto-flashes `system.img`; that partition is normally logical a
 
 ## Feature Reference
 
-- Auto-detecting ROM flash: Scans a ROM folder for known partition images and the ROM zip, flashes in a safe order, then reboots to recovery and sideloads.
+- Auto-detecting ROM flash: Scans a ROM folder for known partition images and the ROM zip, unpacks `payload.bin` when present (via `payload-dumper-go`), verifies checksums from sidecar files such as `.sha256` or `SHA256SUMS`, saves a snapshot first, flashes in a safe order and stops at the first failed step, then reboots to recovery and sideloads.
 - Generic partition flash: Flash `boot`, `init_boot`, `recovery`, `vbmeta`, `system`, `super`, or any custom partition name, with slot suffix handling and vbmeta verification flags.
 - Checksum verifier: Computes SHA256 of a file and compares it to an expected value before flashing.
 - Recovery & sideload helpers: Reboot to recovery from fastboot or booted mode, standalone sideloading for GApps/Magisk zips, reboot-to-system from recovery.
 - Maintenance & cleanup: Resumable performance pass (speed-compiles every app), deep-clean for orphaned app data, battery and storage reports, live logcat, screenshots, APK installs.
 - Device info & file transfer: Live device status bar (connection mode, bootloader lock state, active slot), dump all fastboot variables, pull and push files.
-- CMF Phone 2 Pro stock restore: Dedicated restore options for the CMF Phone 2 Pro (Galaga) — newest (B4.1) and older (V3.2) builds, both slots.
+- Stock firmware restore: Point it at any stock-firmware folder that contains a `flash_all.bat` or `flash_all.sh` script. There are no device presets.
+- Safety and support: Connection doctor that names the real problem (unauthorized, offline, no permissions, several phones), pre-flight check that stops on a locked bootloader and warns below 30 % battery, backup before wipe, learn mode (show every command, or dry-run), a command log and a support report.
 
 ## Requirements
 
-- `adb` and `fastboot` on PATH (or bundled `platform-tools` for the Windows `.bat`).
+- `adb` and `fastboot` on PATH. On Windows the launcher can download Google's `platform-tools` and add them to your user PATH.
 - Linux: `android-tools-adb` and `android-tools-fastboot` via the distro package manager, or Homebrew's `android-platform-tools` on macOS.
-- Bash 4+ for the `.sh` version. Git Bash or WSL on Windows for the full colour menu.
+- Bash 4+ for the `.sh` version (macOS ships 3.2: `brew install bash`). On Windows the launcher needs Git Bash and can install Git for Windows with `winget`.
 
 ## Uninstall
 
 - Remove the script: `rm -f ~/flask-adb-toolkit.sh ~/.flask-adb-compile-progress`
-- Windows: delete `flask-adb-toolkit.bat` and, optionally, the `platform-tools` folder.
+- Windows: delete `flask-adb-toolkit.bat`, `flask-adb-toolkit.ps1` and `flask-adb-toolkit.sh`. Optionally delete `%LOCALAPPDATA%\Android\platform-tools` and remove it from your user PATH.
+- Optional leftovers: `~/.flask-adb-toolkit.log`, `~/Downloads/flask-adb-support-report.txt`, and the `~/flask-adb-snapshots` and `~/flask-adb-backups` folders (they hold your snapshots and backups, so check before deleting).
 
 ## License
 

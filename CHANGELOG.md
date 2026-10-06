@@ -13,14 +13,13 @@ This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 - README version badge aligned to the actual release (was stuck on 1.5.1 / 1.5.2).
-- `docs/llms.txt`: Windows `.bat` correctly described as launcher for the PowerShell script, not a parallel batch rewrite.
-- `mkdocs.yml`: description corrected (Bash script, not the Python Flask framework); nav no longer points at a missing file. Marked unused — Pages deploys `./docs` directly.
-- CHANGELOG structure: bracketed headings, `[Unreleased]` at top.
+- `docs/llms.txt`: Windows `.bat` correctly described as launcher for the PowerShell script, not a parallel batch rewrite. Also removed the claim of built-in CMF restore presets (there are none), and updated the ROM-flash, requirements and uninstall entries to match the current script.
+- `mkdocs.yml` removed. It was unused (Pages deploys `./docs` directly) and its nav pointed at a file that is not in `docs/`.
+- CHANGELOG structure: bracketed headings, `[Unreleased]` at top, 1.0–1.2 dates filled in from git history.
 - `.github/workflows/shellcheck.yml`: now runs real ShellCheck in addition to `bash -n`.
 - Site CSS: removed unused `--accent-red` variable (the active `--red` remains white for selection/focus/CTAs).
-
-### Notes
-- `og-image.png` is still missing from `docs/`; social previews will 404 until you add a 1200×630 image.
+- Uninstall notes (README, site, llms.txt) now list the log, support report, snapshot and backup locations.
+- Added the missing `docs/og-image.png` (1200×630) referenced by the site's social-preview tags.
 
 
 ## [1.5.2] — 2026-10-05
@@ -100,18 +99,18 @@ This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `check_state` now recognises `unauthorized`, `offline`, `recovery`, `no permissions` and multi-device — not just `device` and `sideload`.
 - The flasher stops at the first failed step instead of continuing.
 
-## [1.2] — 2026-09-XX
+## [1.2] — 2026-09-30
 
 - Generic partition flasher for any Android device.
 - Sideload helper and recovery reboot shortcuts.
 - Checksum verifier (`sha256sum` / `shasum`).
 - Performance pass with resume, deep clean, battery & storage report.
 
-## [1.1] — 2026-09-XX
+## [1.1] — 2026-09-30
 
 - Auto-detecting ROM flasher.
 - Booted-phone tools: screenshot, APK install, pull/push, logcat.
 
-## [1.0] — 2026-09-XX
+## [1.0] — 2026-09-29
 
 - First release. Menu-driven adb & fastboot wrapper.

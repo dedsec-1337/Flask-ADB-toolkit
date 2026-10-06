@@ -215,6 +215,12 @@ The error will stay on screen. Paste it into a GitHub issue with the support rep
 
 Screenshots taken through the toolkit are saved in your **Downloads** folder.
 
+Other files the toolkit may have created (all optional to remove):
+
+- `~/.flask-adb-toolkit.log` (command log)
+- `~/Downloads/flask-adb-support-report.txt` (support report)
+- `~/flask-adb-snapshots` and `~/flask-adb-backups` — these hold partition snapshots and your backed-up files, so check them before deleting
+
 **Optional – remove adb/fastboot:**
 
 - Ubuntu/Debian: `sudo apt remove android-tools-adb android-tools-fastboot && sudo apt autoremove`
