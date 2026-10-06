@@ -5,7 +5,7 @@
 # images & partitions easy — even for total beginners.
 # https://github.com/dedsec-1337/Flask-ADB-toolkit
 #
-# Version 1.5.2
+# Version 1.5.3
 #   • payload.bin support in the ROM flasher (payload-dumper-go)
 #   • FIX: payload-dumper -p is comma-separated (was last-wins / extracted nothing)
 #   • FIX: multi-zip ROM folders prompt instead of head -n1
@@ -45,7 +45,7 @@ if (( BASH_VERSINFO[0] < 4 )); then
   exit 1
 fi
 
-VERSION="1.5.2"
+VERSION="1.5.3"
 
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[0;33m'
 CYAN='\033[0;36m'; BLUE='\033[0;34m'; MAGENTA='\033[0;35m'

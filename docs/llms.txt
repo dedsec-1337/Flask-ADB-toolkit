@@ -2,7 +2,7 @@
 
 > Menu-driven adb & fastboot toolkit for any Android device — auto ROM flashing, generic partition tools, checksum verification, and maintenance helpers, all in one friendly terminal menu.
 
-Flask-ADB-toolkit is a single Bash script (`flask-adb-toolkit.sh`) with a parallel Windows batch version (`flask-adb-toolkit.bat`). It wraps the real `adb` and `fastboot` binaries in a numbered menu, auto-detects device state (booted, recovery, fastboot, sideload), and asks for `YES` confirmation before any destructive operation. It works on Linux, macOS, and Windows, and targets every Android device that speaks standard ADB/Fastboot — it is not tied to a specific OEM or ROM.
+Flask-ADB-toolkit is a single Bash script (`flask-adb-toolkit.sh`) with a Windows launcher (`flask-adb-toolkit.bat` + `flask-adb-toolkit.ps1`). It wraps the real `adb` and `fastboot` binaries in a numbered menu, auto-detects device state (booted, recovery, fastboot, sideload), and asks for `YES` confirmation before any destructive operation. It works on Linux, macOS, and Windows, and targets every Android device that speaks standard ADB/Fastboot — it is not tied to a specific OEM or ROM.
 
 The script never auto-flashes `system.img`; that partition is normally logical and is installed by the ROM's own installer zip. ROM flashing covers `vbmeta`, `vbmeta_system`, `dtbo`, `boot`, `init_boot`, `vendor_boot`, `super_empty`, and the ROM zip itself, in a safe order, followed by a reboot-to-recovery and sideload. Generic partition flashing accepts any partition name with optional slot suffix and vbmeta verification flags.
 
@@ -15,7 +15,7 @@ The script never auto-flashes `system.img`; that partition is normally logical a
 ## Installable Artifacts
 
 - [`flask-adb-toolkit.sh`](https://raw.githubusercontent.com/dedsec-1337/Flask-ADB-toolkit/main/flask-adb-toolkit.sh): Main Bash script for Linux, macOS, and WSL. Make executable with `chmod +x` and run.
-- [`flask-adb-toolkit.bat`](https://github.com/dedsec-1337/Flask-ADB-toolkit/blob/main/flask-adb-toolkit.bat): Windows batch wrapper. Place inside a `platform-tools` folder (or next to one) and double-click.
+- [`flask-adb-toolkit.bat`](https://github.com/dedsec-1337/Flask-ADB-toolkit/blob/main/flask-adb-toolkit.bat) + [`flask-adb-toolkit.ps1`](https://github.com/dedsec-1337/Flask-ADB-toolkit/blob/main/flask-adb-toolkit.ps1): Windows launcher. Double-click the `.bat`; it runs the PowerShell script which finds Git Bash, offers platform-tools if missing, then hands off to the `.sh`.
 
 ## Feature Reference
 

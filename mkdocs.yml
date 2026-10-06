@@ -1,5 +1,5 @@
 site_name: Flask ADB Toolkit
-site_description: A fun and interactive Android ADB toolkit built with Flask.
+site_description: A fun and interactive Android ADB toolkit (Bash script, not Flask the Python framework).
 theme:
   name: material
   palette:
@@ -12,5 +12,6 @@ theme:
     - search.highlight
     - content.code.copy
 nav:
-  - Home: README.md
+  - Home: index.md
   - GitHub: https://github.com/dedsec-1337/Flask-ADB-toolkit
+# Note: this file is unused. GitHub Pages deploys ./docs directly via deploy-site.yml.

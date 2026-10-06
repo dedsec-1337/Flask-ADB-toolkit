@@ -4,7 +4,26 @@ All notable changes to **Flask-ADB-toolkit** are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 1.5.2 — 2026-10-05
+## [Unreleased]
+
+### Planned
+- Config file at `~/.flask-adb-toolkit.conf` (remember default ROM folder, learn mode, etc.).
+
+## [1.5.3] — 2026-10-06
+
+### Fixed
+- README version badge aligned to the actual release (was stuck on 1.5.1 / 1.5.2).
+- `docs/llms.txt`: Windows `.bat` correctly described as launcher for the PowerShell script, not a parallel batch rewrite.
+- `mkdocs.yml`: description corrected (Bash script, not the Python Flask framework); nav no longer points at a missing file. Marked unused — Pages deploys `./docs` directly.
+- CHANGELOG structure: bracketed headings, `[Unreleased]` at top.
+- `.github/workflows/shellcheck.yml`: now runs real ShellCheck in addition to `bash -n`.
+- Site CSS: removed unused `--accent-red` variable (the active `--red` remains white for selection/focus/CTAs).
+
+### Notes
+- `og-image.png` is still missing from `docs/`; social previews will 404 until you add a 1200×630 image.
+
+
+## [1.5.2] — 2026-10-05
 
 ### Fixed
 - **Safety:** `confirm()` no longer replays the previous answer on Ctrl+D / EOF. EOF is treated as cancel.
@@ -14,7 +33,7 @@ This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `super_empty.img` is detected in both the ROM folder and `payload_extracted/`.
 - Performance pass only deletes the resume file when every package compiled successfully (failed packages can still be retried).
 
-## 1.5.1 — 2026-10-05
+## [1.5.1] — 2026-10-05
 
 ### Fixed
 - **Critical:** `payload-dumper-go -p` now uses a single comma-separated list. Repeated `-p` flags were last-wins, so extraction silently produced zero images (often only trying `super_empty`, which is never in `payload.bin`).
@@ -26,11 +45,6 @@ This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Checksum sidecars: when a filename is present on the hash line, require a basename match (no more cross-file false verify). Bare single-hash files still work.
 - PowerShell launcher: `winget` installs pass `--accept-source-agreements --accept-package-agreements`.
 - `.bat` always pauses so the window does not vanish on success.
-
-## [Unreleased]
-
-### Planned
-- Config file at `~/.flask-adb-toolkit.conf` (remember default ROM folder, learn mode, etc.).
 
 ## [1.5] — 2026-10-03
 
