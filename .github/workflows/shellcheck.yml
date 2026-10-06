@@ -1,4 +1,4 @@
-name: Shell Syntax Check
+name: ShellCheck
 
 on: [push, pull_request]
 
@@ -11,3 +11,5 @@ jobs:
         run: |
           bash -n flask-adb-toolkit.sh
           echo "Syntax OK"
+      - name: ShellCheck
+        run: shellcheck flask-adb-toolkit.sh
