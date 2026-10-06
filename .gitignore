@@ -11,3 +11,6 @@ screenshots/
 # OS junk
 .DS_Store
 Thumbs.db
+
+# Backups
+*.bak
