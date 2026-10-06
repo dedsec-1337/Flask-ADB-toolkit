@@ -4,7 +4,6 @@ All notable changes to **Flask-ADB-toolkit** are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
 
 ### Fixed
 - `flask-adb-toolkit.ps1`: the filter meant to skip the WSL launcher never matched (regex had `bash\\.exe`), so `System32\bash.exe` could be picked instead of Git Bash. Now `bash\.exe`.
@@ -13,7 +12,7 @@ This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Flash ROM: if a step fails after earlier images were flashed, the toolkit offers to restore the snapshots it saved for them (newest step first) and lists any partition without a snapshot.
 - Flash any partition / Erase a partition: an empty custom partition name is rejected instead of building a target from the slot suffix alone.
 
-### Planned
+### Planned `not executed`
 - Config file at `~/.flask-adb-toolkit.conf` (remember default ROM folder, learn mode, etc.).
 
 ## [1.5.3] — 2026-10-06
