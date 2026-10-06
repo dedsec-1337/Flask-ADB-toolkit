@@ -47,7 +47,7 @@ It was built for people who **know nothing about custom ROMs, vendor images, or 
 | 🧹 Erase a partition | cache, userdata, metadata… (with warnings) |
 | 🛠️ Reboot to fastbootd | For logical-partition operations |
 | 📋 Show all fastboot variables | Debug info dump |
-| 📦 Flash ROM | **Auto-detects** images, unpacks `payload.bin` when present, verifies checksums via sidecar files, saves a snapshot first, and stops at the first failed step |
+| 📦 Flash ROM | **Auto-detects** images, unpacks `payload.bin` when present, verifies checksums via sidecar files, saves a snapshot first, stops at the first failed step, and offers to restore the snapshots of anything it already flashed |
 | ⏮ Restore stock firmware | Point it at **any** stock-firmware folder with a `flash_all` script — no presets |
 
 ### 📱 Booted-phone (ADB) mode
@@ -180,7 +180,7 @@ Put all three files **in the same folder**. That's it.
 
 3. First run, the launcher will:
    - Check for Git Bash. If missing, offer to install it with `winget install Git.Git`.
-   - Check for `adb` and `fastboot`. If missing, offer to download Google's platform-tools into `%LOCALAPPDATA%\Android\platform-tools` and add them to your user PATH.
+   - Check for `adb` and `fastboot`. If missing, offer to download Google's platform-tools into `%LOCALAPPDATA%\Android\platform-tools` and add them to your user PATH. The download is checked against the SHA-1 Google publishes before it is unzipped.
    - Hand off to `flask-adb-toolkit.sh` inside Git Bash → you get the **full-colour, mode-aware menu**.
 
 4. Enable **USB debugging** on the phone, plug it in, tap **Allow** on the prompt, then use the numbered menu.

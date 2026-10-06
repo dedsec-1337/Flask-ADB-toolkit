@@ -69,6 +69,10 @@ MODE="none"; DEV="none"; LOCK="unknown"; LOCKRAW=""; SLOT="unknown"
 PROBLEM=""; PROBLEM_DETAIL=""; ADB_STATE_RAW=""
 # Partitions too big (or pointless) to snapshot
 SNAP_SKIP=" userdata super system system_ext vendor product odm cache metadata "
+# Snapshot file from the last successful snapshot_partition, and what the current ROM flash did
+SNAP_LAST=""
+ROM_FLASHED=()
+declare -A ROM_SNAP=()
 
 set -uo pipefail
 PS3="> "
@@ -572,6 +576,7 @@ preflight(){
 # Returns 0 saved, 1 failed or unsupported, 2 skipped (too big / not worth it).
 snapshot_partition(){
   local target="$1" base out why
+  SNAP_LAST=""
   base="${target%_[ab]}"
   if [[ "$SNAP_SKIP" == *" $base "* ]]; then
     echo -e "${DIM}• $target: data or too large, no snapshot.${RESET}"
@@ -584,6 +589,7 @@ snapshot_partition(){
       echo -e "${DIM}(dry-run: would save)${RESET} $target → $out"
     else
       echo -e "${GREEN}✓ saved${RESET} $target → $out"
+      SNAP_LAST="$out"
     fi
     return 0
   fi
@@ -667,6 +673,7 @@ flash_generic(){
   [[ -z "${p:-}" ]] && return
   local partition="$p"
   [[ "$partition" == "custom (type it)" ]] && read -rp "Partition name: " partition
+  [[ -n "${partition// /}" ]] || { echo -e "${RED}No partition name given.${RESET}"; return; }
   echo
   local suffix; suffix=$(pick_slot_suffix)
   local target="${partition}${suffix}"
@@ -719,6 +726,7 @@ erase_partition(){
   [[ -z "${p:-}" ]] && return
   local partition="$p"
   [[ "$partition" == "custom (type it)" ]] && read -rp "Partition name: " partition
+  [[ -n "${partition// /}" ]] || { echo -e "${RED}No partition name given.${RESET}"; return; }
   echo
   local suffix; suffix=$(pick_slot_suffix)
   local target="${partition}${suffix}"
@@ -772,6 +780,13 @@ switch_slot(){
     [[ "$s" == "a" || "$s" == "b" ]] && break
     echo -e "${RED}Enter a or b.${RESET}"
   done
+  local cur="${SLOT//[$'\r\n ']/}"
+  if [[ "$cur" == "$s" ]]; then
+    echo -e "${DIM}Slot $s is already the active slot. Nothing to do.${RESET}"
+    return
+  fi
+  [[ -n "$cur" && "$cur" != "unknown" ]] && echo -e "${DIM}Active slot right now: $cur${RESET}"
+  confirm "Make slot $s the active slot?\nThe phone will try to boot slot $s next. If that slot has no working ROM (never flashed, or wiped), the phone will not boot until you switch back or flash it." || return
   if run fastboot --set-active="$s" || run fastboot set_active "$s"; then
     if (( LEARN == 2 )); then
       echo -e "${DIM}(dry-run: would set active slot to)${RESET} $s"
@@ -1080,6 +1095,52 @@ flash_step(){
   return 1
 }
 
+# rom_step PART CMD...: flash_step for the ROM flow. Remembers what this run flashed;
+# if a step fails, offers to put the saved snapshots back so the phone is not left half-converted.
+rom_step(){
+  local part="$1"; shift
+  if flash_step "$@"; then
+    ROM_FLASHED+=("$part")
+    return 0
+  fi
+  rom_rollback
+  return 1
+}
+
+# Offer to restore the snapshots of everything this ROM run already flashed (newest step first).
+rom_rollback(){
+  (( ${#ROM_FLASHED[@]} == 0 )) && return 0
+  local part i
+  local -a back=() lost=()
+  echo -e "${BYELLOW}Already flashed in this run: ${ROM_FLASHED[*]}${RESET}"
+  for part in "${ROM_FLASHED[@]}"; do
+    if [[ -n "${ROM_SNAP[$part]:-}" && -f "${ROM_SNAP[$part]}" ]]; then
+      back+=("$part")
+    else
+      lost+=("$part")
+    fi
+  done
+  if (( ${#lost[@]} > 0 )); then
+    echo -e "${DIM}No snapshot for: ${lost[*]}. Those cannot be restored automatically.${RESET}"
+  fi
+  if (( ${#back[@]} == 0 )); then
+    echo -e "${DIM}Nothing to restore. Fix the cause above and run Flash ROM again.${RESET}"
+    return 0
+  fi
+  if ! confirm "Restore the saved snapshots for: ${back[*]}?\nThis puts those partitions back as they were before this run. Say no if you plan to fix the failed step and run Flash ROM again."; then
+    echo -e "${DIM}Left as is. Snapshots stay in $SNAPDIR (Restore a snapshot).${RESET}"
+    return 0
+  fi
+  for (( i=${#back[@]}-1; i>=0; i-- )); do
+    part="${back[$i]}"
+    if run fastboot flash "$part" "${ROM_SNAP[$part]}"; then
+      echo -e "${GREEN}✓ Restored $part.${RESET}"
+    else
+      echo -e "${BRED}✗ Could not restore $part. Details: $LOGFILE${RESET}"
+    fi
+  done
+}
+
 flash_rom(){
   need_mode fastboot || return
   preflight || return
@@ -1188,10 +1249,15 @@ flash_rom(){
   # Snapshot what is about to be overwritten
   echo -e "${CYAN}Trying to save the current images first...${RESET}"
   local saved=0 failed=0 part rc
+  ROM_FLASHED=(); ROM_SNAP=()
   for part in vbmeta vbmeta_system dtbo boot init_boot vendor_boot recovery; do
     [[ -n "${found[$part]:-}" ]] || continue
     snapshot_partition "$part"; rc=$?
-    case "$rc" in 0) saved=$((saved+1)) ;; 1) failed=$((failed+1)) ;; esac
+    case "$rc" in
+      0) saved=$((saved+1))
+         [[ -n "$SNAP_LAST" ]] && ROM_SNAP[$part]="$SNAP_LAST" ;;
+      1) failed=$((failed+1)) ;;
+    esac
   done
   if (( failed > 0 && saved == 0 )); then
     echo -e "${BYELLOW}No snapshots were possible on this phone in this mode.${RESET}"
@@ -1201,18 +1267,18 @@ flash_rom(){
     echo -e "${DIM}$saved saved, $failed could not be saved. Only the saved ones can be restored later.${RESET}"
   fi
 
-  [[ -n "${found[vbmeta]:-}" ]] && { flash_step fastboot --disable-verity --disable-verification flash vbmeta "$img_src/vbmeta.img" || return; }
-  [[ -n "${found[vbmeta_system]:-}" ]] && { flash_step fastboot --disable-verity --disable-verification flash vbmeta_system "$img_src/vbmeta_system.img" || return; }
-  [[ -n "${found[dtbo]:-}" ]] && { flash_step fastboot flash dtbo "$img_src/dtbo.img" || return; }
-  [[ -n "${found[boot]:-}" ]] && { flash_step fastboot flash boot "$img_src/boot.img" || return; }
-  [[ -n "${found[init_boot]:-}" ]] && { flash_step fastboot flash init_boot "$img_src/init_boot.img" || return; }
+  [[ -n "${found[vbmeta]:-}" ]] && { rom_step vbmeta fastboot --disable-verity --disable-verification flash vbmeta "$img_src/vbmeta.img" || return; }
+  [[ -n "${found[vbmeta_system]:-}" ]] && { rom_step vbmeta_system fastboot --disable-verity --disable-verification flash vbmeta_system "$img_src/vbmeta_system.img" || return; }
+  [[ -n "${found[dtbo]:-}" ]] && { rom_step dtbo fastboot flash dtbo "$img_src/dtbo.img" || return; }
+  [[ -n "${found[boot]:-}" ]] && { rom_step boot fastboot flash boot "$img_src/boot.img" || return; }
+  [[ -n "${found[init_boot]:-}" ]] && { rom_step init_boot fastboot flash init_boot "$img_src/init_boot.img" || return; }
   if [[ -n "${found[super_empty]:-}" ]]; then
     local se="$img_src/super_empty.img"
     [[ -f "$se" ]] || se="$dir/super_empty.img"
-    flash_step fastboot wipe-super "$se" || return
+    rom_step super_empty fastboot wipe-super "$se" || return
   fi
-  [[ -n "${found[vendor_boot]:-}" ]] && { flash_step fastboot flash vendor_boot "$img_src/vendor_boot.img" || return; }
-  [[ -n "${found[recovery]:-}" ]] && { flash_step fastboot flash recovery "$img_src/recovery.img" || return; }
+  [[ -n "${found[vendor_boot]:-}" ]] && { rom_step vendor_boot fastboot flash vendor_boot "$img_src/vendor_boot.img" || return; }
+  [[ -n "${found[recovery]:-}" ]] && { rom_step recovery fastboot flash recovery "$img_src/recovery.img" || return; }
   flash_step fastboot reboot recovery || return
 
   echo -e "${YELLOW}On the phone: Factory reset → Format data, then Apply update → Apply from ADB.${RESET}"

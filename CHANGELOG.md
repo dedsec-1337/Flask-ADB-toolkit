@@ -6,6 +6,13 @@ This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+- `flask-adb-toolkit.ps1`: the filter meant to skip the WSL launcher never matched (regex had `bash\\.exe`), so `System32\bash.exe` could be picked instead of Git Bash. Now `bash\.exe`.
+- `flask-adb-toolkit.ps1`: the platform-tools download now uses the exact versioned URL from Google's repository manifest and is checked against the listed SHA-1 before unzipping. A mismatch discards the file and stops. If the manifest cannot be read, the launcher asks before downloading unverified.
+- Switch active slot now asks for `YES`, shows the current slot, and does nothing if the chosen slot is already active.
+- Flash ROM: if a step fails after earlier images were flashed, the toolkit offers to restore the snapshots it saved for them (newest step first) and lists any partition without a snapshot.
+- Flash any partition / Erase a partition: an empty custom partition name is rejected instead of building a target from the slot suffix alone.
+
 ### Planned
 - Config file at `~/.flask-adb-toolkit.conf` (remember default ROM folder, learn mode, etc.).
 
