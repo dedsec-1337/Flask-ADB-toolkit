@@ -7,6 +7,8 @@
 
 🌐 **Live site:** [dedsec-1337.github.io/Flask-ADB-toolkit](https://dedsec-1337.github.io/Flask-ADB-toolkit/) — features, quick start, and a one-click copy/download of the script.
 
+[![Flask ADB Toolkit | AlternativeTo](https://alternativeto.net/static/badges/badge-wide-dark.svg)](https://alternativeto.net/software/flask-adb-toolkit/about/?utm_source=badge&utm_medium=referral)
+
 ---
 
 ## 🤔 What is this?
