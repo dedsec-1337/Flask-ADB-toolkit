@@ -1,87 +1,122 @@
 # Changelog
 
-All notable changes to **MANHNT** are documented in this file.
+All notable changes to **Flask-ADB-toolkit** are documented here.
+Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project aims to follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-## [Unreleased]
 
 ### Fixed
-- **Tag / catch code never finishing a match** — the host now saves a confirmed tag with a field-level update instead of rewriting the whole Hider record, which was refused whenever the host's local copy of the private catch code was blank. Catch codes are also cached so one failed poll cannot blank them.
-- **Seeker could only ever tag the first Hider in the list** — with two or more Hiders the tag sheet now asks which Hider was tagged, so the code is checked against the right runner.
-- **Seeker could not tag without a fresh GPS fix** — tagging is code-proven, so the Tag button no longer depends on the Seeker's own location.
-- **Quick chat did not appear on other phones** — messages are stamped with Firebase's clock (`.sv: timestamp`), shown once per new message, and no longer dropped when phone clocks disagree. Senders see their own message only after Firebase accepts it, and get the HTTP reason if it does not.
-- **Host restart froze the match clock** — the host's countdown resumes from the server value; the final "match finished" write is retried.
-- Seekers now learn a tag succeeded from the Hider's public flag as well as the host's acknowledgement, and are told when the host never answers.
-- Stale catch attempts/acks are ignored after a restart; attempt age check widened to tolerate phone clock differences.
+- `flask-adb-toolkit.ps1`: the filter meant to skip the WSL launcher never matched (regex had `bash\\.exe`), so `System32\bash.exe` could be picked instead of Git Bash. Now `bash\.exe`.
+- `flask-adb-toolkit.ps1`: the platform-tools download now uses the exact versioned URL from Google's repository manifest and is checked against the listed SHA-1 before unzipping. A mismatch discards the file and stops. If the manifest cannot be read, the launcher asks before downloading unverified.
+- Switch active slot now asks for `YES`, shows the current slot, and does nothing if the chosen slot is already active.
+- Flash ROM: if a step fails after earlier images were flashed, the toolkit offers to restore the snapshots it saved for them (newest step first) and lists any partition without a snapshot.
+- Flash any partition / Erase a partition: an empty custom partition name is rejected instead of building a target from the slot suffix alone.
+
+### Planned `not executed`
+- Config file at `~/.flask-adb-toolkit.conf` (remember default ROM folder, learn mode, etc.).
+
+## [1.5.3] — 2026-10-06
+
+### Fixed
+- README version badge aligned to the actual release (was stuck on 1.5.1 / 1.5.2).
+- `docs/llms.txt`: Windows `.bat` correctly described as launcher for the PowerShell script, not a parallel batch rewrite. Also removed the claim of built-in CMF restore presets (there are none), and updated the ROM-flash, requirements and uninstall entries to match the current script.
+- `mkdocs.yml` removed. It was unused (Pages deploys `./docs` directly) and its nav pointed at a file that is not in `docs/`.
+- CHANGELOG structure: bracketed headings, `[Unreleased]` at top, 1.0–1.2 dates filled in from git history.
+- `.github/workflows/shellcheck.yml`: now runs real ShellCheck in addition to `bash -n`.
+- Site CSS: removed unused `--accent-red` variable (the active `--red` remains white for selection/focus/CTAs).
+- Uninstall notes (README, site, llms.txt) now list the log, support report, snapshot and backup locations.
+- Added the missing `docs/og-image.png` (1200×630) referenced by the site's social-preview tags.
+
+
+## [1.5.2] — 2026-10-05
+
+### Fixed
+- **Safety:** `confirm()` no longer replays the previous answer on Ctrl+D / EOF. EOF is treated as cancel.
+- All prompt helpers (`ask_yes`, `ask_no`, menu loops, selects, path reads) initialise variables and treat EOF as cancel — no more `set -u` crashes or silent re-runs of the last action.
+- **payload-dumper:** `-p` is only passed to `payload-dumper-go`. Python `payload_dumper` / `payload-dumper` extract without that flag (they used to always fail).
+- `rom_zip_has_payload` no longer requires `unzip` when a dumper is present — the Go tool can read zips natively.
+- `super_empty.img` is detected in both the ROM folder and `payload_extracted/`.
+- Performance pass only deletes the resume file when every package compiled successfully (failed packages can still be retried).
+
+## [1.5.1] — 2026-10-05
+
+### Fixed
+- **Critical:** `payload-dumper-go -p` now uses a single comma-separated list. Repeated `-p` flags were last-wins, so extraction silently produced zero images (often only trying `super_empty`, which is never in `payload.bin`).
+- Multi-zip ROM folders: prompt to pick the ROM zip instead of `head -n1`.
+- `restore_stock` accepts `flash_all.bat` (Windows) as promised in the README; falls back to `flash_all.sh`.
+- Dry-run (`LEARN=2`) no longer burns 30 s in `wait_for_fastboot` / `wait_for_adb`.
+- Ctrl+D / EOF at `select` prompts no longer trips `set -u` unbound-variable exits.
+- Nested `payload.bin` members are extracted by path; root-level still preferred.
+- Checksum sidecars: when a filename is present on the hash line, require a basename match (no more cross-file false verify). Bare single-hash files still work.
+- PowerShell launcher: `winget` installs pass `--accept-source-agreements --accept-package-agreements`.
+- `.bat` always pauses so the window does not vanish on success.
+
+## [1.5] — 2026-10-03
 
 ### Added
-- `firebase/tests/offline-flow.cjs` — replays the app's real calls against the rules file without the emulator (`npm run test:rules:offline`).
-
-### Planned
-- Optional camera-based QR scan for seekers (hider QR display already ships)
-- Further launcher icon polish (full wordmark where adaptive safe-zone allows)
-- Field-test polish for BLE reliability across OEMs
-
-## [1.1.0] - 2026-10-28
-
-### Added
-- **Frozen location reveals** — on each auto-ping, hider positions are snapshotted once and held locally so map pins do not jump with every network/GPS update
-- `LocationRevealSnapshot` model and map wiring (`OSMMapView` prefers frozen coords when present)
-- **QR catch proof** — hiders can reveal a QR encoding `MANHNT|joinCode|playerId|catchCode` (`QrCodeUtil` + ZXing)
-- **Optional Bluetooth LE nearby assist** — hiders advertise, seekers scan; UI shows “Nearby (Bluetooth)” without blocking tag (`BleNearbyAssist`)
-- BLE runtime permissions (Android 12+) requested alongside location in `MainActivity`
-- Config knobs for reveal/catch behaviour in `Constants`
+- **`payload.bin` support in the ROM flasher.** Modern ROMs (LineageOS, crDroid, EvolutionX, most Nothing/CMF builds) ship a single `payload.bin` container instead of separate `.img` files. The flasher now detects it inside the ROM zip and offers to unpack it with `payload-dumper-go`, then feeds the extracted images straight into the existing flash sequence. If the dumper is missing, it prints the one-line install for your OS.
+- **PowerShell launcher for Windows (`flask-adb-toolkit.ps1` + `.bat` wrapper).** Replaces the old cmd-only `.bat`. The launcher finds Git Bash (offers `winget install Git.Git` if missing), checks `adb` / `fastboot` on PATH (offers to download Google's platform-tools into `%LOCALAPPDATA%\Android\platform-tools` and add it to the user PATH), then hands off to the `.sh` inside Git Bash. Windows users now get the same full-colour, mode-aware menu as Linux and macOS.
+- **Auto-detect checksum sidecars next to ROM zips.** Before flashing, the toolkit looks for `<zip>.sha256`, `<zip>.sha256sum`, `SHA256SUMS`, `SHA256SUMS.txt`, `checksums.txt` and similar files next to the zip. If one is found, the expected hash is read automatically and verified — no more copy-pasting hashes from a download page.
 
 ### Changed
-- Catch validation no longer rejects on GPS freshness or mutual distance; **code (and QR display) is the tag proof**
-- Game-over after the last successful catch updates local `session.status` to `FINISHED` immediately so all clients can navigate to Results
-- README updated for timer-based reveals, ungated catch, QR, and BLE
+- The ROM flasher now scans `.img` files inside an extracted `payload_extracted/` folder when one exists, falling back to the top-level ROM folder otherwise.
+- `payload-dumper-go` is preferred with selective `-p` partitions and can take the zip directly (unzip fallback retained).
+- Checksum verification now runs *before* any payload extraction.
 
 ### Fixed
-- MainActivity compile regressions (`modifier` → `Modifier`, `onCreateRoomSubmit` vs `onCreateClick`)
-- CI Android compile job after BLE integration commits
+- **`run()` never reported failure.** `local rc` after the pipeline reset `PIPESTATUS`; stop-on-first-failure, unlock/set_active fallbacks and "✓ Flashed" after real errors are restored.
+- Checksum sidecars no longer fail-open when the file exists but has no matching entry for the zip (warn + fall through to manual prompt).
+- Dry-run no longer prints "✓ Flashed / Erased / Sideloaded / flash_all finished".
+- Performance-pass resume file is per-device again.
+- Support report redacts long hex strings (possible serials) in addition to `$HOME`.
+- PowerShell launcher skips `System32\bash.exe` / WindowsApps stubs, and continues in-session after installing Git or platform-tools.
+- `.bat` pauses on non-zero exit so errors stay visible.
 
-### Security
-- Firebase Realtime Database **rules unchanged** — BLE and QR are client-side; catch still goes through existing attempt/ack paths
-
-## [1.0.0] - 2026-10-26
+## [1.4] — 2026-10-03
 
 ### Added
-- Last-known player markers on the map when GPS is briefly stale
-- CI step that prints Kotlin compile errors into the job log / annotations
-- Vector adaptive launcher assets (foreground + monochrome monogram)
+- **Battery pre-flight check.** Before rebooting to the bootloader to flash, the toolkit reads the phone's battery level over adb. Below 30 %, it stops and asks you to confirm.
+- **`fastboot set_active` fallback.** Some bootloaders only accept the newer `set_active` spelling. Both forms are now tried.
+- **Wait-for-device after reboot.** After `adb reboot bootloader`, the toolkit waits up to 30 s for the bootloader to appear so the next menu shows the real state instead of a stale one.
+- **Unlock verification.** After `fastboot flashing unlock` / `oem unlock`, the toolkit re-reads the lock state and tells you whether it actually changed, instead of assuming success.
+- **Dry-run honesty for snapshots and screenshots.** `--dry-run` now says *"would save"* instead of *"✓ saved"* for files that were never written.
 
 ### Changed
-- Catch flow is code-based only: distance and GPS-freshness gates removed from the catch button and host validation path
-- Catch button labels no longer show “Too far” / “Within 25m”
-- Create a Hunt navigation resolves the create-room destination without requiring an active session
-- Leave-room path uses `FirebaseSyncService.leaveRoom` (replaces non-existent `deletePlayer` calls)
+- **`flash_generic` also scans `~/Downloads`.** Image picker no longer only looks at `~/Desktop`, matching the other pickers.
+- **Snapshot filenames use a readable separator.** New format: `<partition>__YYYYmmdd_HHMMSS.img`. `restore_snapshot` parses on `__`, no more fixed-width timestamp guessing.
 
 ### Fixed
-- Android resource linking failures from corrupted `ic_launcher` / monochrome PNGs in mipmap folders
-- Adaptive icon clipping that only showed a partial “MAN” glyph
-- `GameViewModel` / `GameScreen` truncation and placeholder stubs that broke release compile
-- CatchBottomSheet parameter name mismatches (`targetHider`, `onSubmitCatchCode`)
-- Firebase sync method name mismatches (`publishCatchAck`, `sendQuickSignal`, `patchPlayer`, `stopSync`)
-- Appearance settings and match-history entity field name mismatches in the ViewModel
-- Unused `distance` variable warning in `GameViewModel` after ungating catch
-- GitHub Actions Android compile job (structure, scripts, and Firebase rules checks)
+- **`run()` `PIPESTATUS` read split onto its own line.** Same behaviour, but portable across bash versions instead of relying on `local x=…` assignment quirks.
 
-### Security
-- Firebase Realtime Database rules unchanged for catch distance (distance was never enforced server-side); catch-code validation remains host/rules driven
-
-## [0.9.0] - 2026-10-25
+## [1.3] — 2026-10-02
 
 ### Added
-- Core outdoor manhunt loop: rooms, roles, zone, jail, stealth, quick signals
-- OSM map integration and proximity haptics
-- Firebase Auth (anonymous) + Realtime Database room sync
+- **Connection doctor.** Names the real adb problem — `unauthorized`, `offline`, `no permissions`, `multi`, `wait` — and prints the fix step-by-step.
+- **Pre-flight gate.** Flashing and erasing refuse to start when the bootloader is locked.
+- **Snapshot before flash.** Uses `fastboot fetch` to save the current partition image into `~/flask-adb-snapshots/` before overwriting it. Restore via *Bootloader tools → Restore a saved snapshot*.
+- **Command log.** Every adb/fastboot call and its output lands in `~/.flask-adb-toolkit.log` (rotates at 1 MB).
+- **Support report.** *Toolkit → Make a support report* bundles version, host, device info and the log tail into `~/Downloads/flask-adb-support-report.txt` for GitHub issues.
+- **Back up before wipe.** Booted-phone menu pulls `/sdcard` (or selected folders) plus a third-party app list into `~/flask-adb-backups/<timestamp>/`.
+- **Learn mode.** Three states — *off*, *show commands*, *dry-run*. Cycles from *Toolkit → 1*.
+- **ROM flasher no longer requires `vendor_boot.img`.** Warns once, offers to continue, and stops at the first failed step instead of flashing on top of it.
+- **Flexible ROM folder picker.** Auto-detects `vbmeta`, `vbmeta_system`, `dtbo`, `boot`, `init_boot`, `vendor_boot`, `recovery`, `super_empty` and the ROM zip. Any layout, any device.
 
----
+### Fixed
+- `check_state` now recognises `unauthorized`, `offline`, `recovery`, `no permissions` and multi-device — not just `device` and `sideload`.
+- The flasher stops at the first failed step instead of continuing.
 
-[Unreleased]: https://github.com/dedsec-1337/MANHNT/compare/v1.1.0...HEAD
-[1.1.0]: https://github.com/dedsec-1337/MANHNT/compare/v1.0.0...v1.1.0
-[1.0.0]: https://github.com/dedsec-1337/MANHNT/releases/tag/v1.0.0
-[0.9.0]: https://github.com/dedsec-1337/MANHNT/releases/tag/v0.9.0
+## [1.2] — 2026-09-30
+
+- Generic partition flasher for any Android device.
+- Sideload helper and recovery reboot shortcuts.
+- Checksum verifier (`sha256sum` / `shasum`).
+- Performance pass with resume, deep clean, battery & storage report.
+
+## [1.1] — 2026-09-30
+
+- Auto-detecting ROM flasher.
+- Booted-phone tools: screenshot, APK install, pull/push, logcat.
+
+## [1.0] — 2026-09-29
+
+- First release. Menu-driven adb & fastboot wrapper.
